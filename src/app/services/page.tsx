@@ -59,11 +59,11 @@ export default function ServicesPage() {
 
       <main className="flex-1">
         {/* Hero */}
-        <section className="bg-gradient-to-br from-[#042816] via-[#074526] to-[#0a5c32] text-white py-20 relative overflow-hidden">
+        <section className="bg-gradient-to-br from-xyroots-teal to-[#068050] text-white py-20 relative overflow-hidden">
           <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 30% 70%, #00d085 0%, transparent 50%)' }} />
           <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="font-editorial text-4xl sm:text-5xl text-white mb-5">Everything You Need to<br /><span className="text-[#7fffc4]">Hire or Get Hired</span></h1>
-            <p className="text-green-100/80 text-lg max-w-2xl mx-auto">
+            <p className="text-xyroots-mint/90 text-lg max-w-2xl mx-auto">
               Xyroots offers a full-stack education recruitment platform — from teacher profiles to institution hiring dashboards and agency portals.
             </p>
           </div>
@@ -93,7 +93,7 @@ export default function ServicesPage() {
                   </ul>
                 </div>
                 <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50">
-                  <Link href={s.href} className="inline-flex items-center gap-2 text-sm font-bold text-xyroots-teal hover:text-[#042816] transition-colors">
+                  <Link href={s.href} className="inline-flex items-center gap-2 text-sm font-bold text-xyroots-teal hover:text-xyroots-teal transition-colors">
                     {s.cta} <FaArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
@@ -103,11 +103,11 @@ export default function ServicesPage() {
         </section>
 
         {/* CTA */}
-        <section className="py-16 bg-gradient-to-br from-[#042816] to-[#0a5c32] text-white text-center">
+        <section className="py-16 bg-gradient-to-br from-xyroots-teal to-[#068050] text-white text-center">
           <div className="max-w-2xl mx-auto px-4 sm:px-6">
             <h2 className="text-3xl font-bold mb-4">Start for free today</h2>
-            <p className="text-green-100/80 mb-8">No credit card required. Xyroots is free for teachers, always.</p>
-            <Link href="/register" className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-white text-[#042816] font-bold text-sm hover:bg-green-50 transition-colors shadow-lg">
+            <p className="text-xyroots-mint/90 mb-8">No credit card required. Xyroots is free for teachers, always.</p>
+            <Link href="/register" className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-white text-xyroots-teal font-bold text-sm hover:bg-green-50 transition-colors shadow-lg">
               Create Free Account <FaArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>

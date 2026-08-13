@@ -20,11 +20,11 @@ export default function SecurityPage() {
       <Navbar />
 
       <main className="flex-1">
-        <section className="bg-gradient-to-br from-[#042816] via-[#074526] to-[#0a5c32] text-white py-20">
+        <section className="bg-gradient-to-br from-xyroots-teal to-[#068050] text-white py-20">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
             <FaShieldHalved className="w-12 h-12 text-green-400 mx-auto mb-5" />
             <h1 className="font-editorial text-4xl sm:text-5xl text-white mb-4">Your Security, Our Priority</h1>
-            <p className="text-green-100/80 text-lg">We take every measure to keep your data, identity, and career information safe.</p>
+            <p className="text-xyroots-mint/90 text-lg">We take every measure to keep your data, identity, and career information safe.</p>
           </div>
         </section>
 
@@ -32,7 +32,7 @@ export default function SecurityPage() {
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 grid sm:grid-cols-2 gap-6 mb-12">
             {features.map((f) => (
               <div key={f.title} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-all">
-                <div className="w-11 h-11 bg-gradient-to-br from-[#042816] to-[#0a5c32] rounded-xl flex items-center justify-center mb-4">
+                <div className="w-11 h-11 bg-gradient-to-br from-xyroots-teal to-[#068050] rounded-xl flex items-center justify-center mb-4">
                   <f.icon className="w-5 h-5 text-white" />
                 </div>
                 <h2 className="text-base font-bold text-gray-900 mb-2">{f.title}</h2>

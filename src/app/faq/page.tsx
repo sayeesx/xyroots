@@ -75,10 +75,10 @@ export default function FAQPage() {
 
       <main className="flex-1">
         {/* Hero */}
-        <section className="bg-gradient-to-br from-[#042816] via-[#074526] to-[#0a5c32] text-white py-20">
+        <section className="bg-gradient-to-br from-xyroots-teal to-[#068050] text-white py-20">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
             <h1 className="font-editorial text-4xl sm:text-5xl text-white mb-4">Frequently Asked Questions</h1>
-            <p className="text-green-100/80 text-lg">Everything you need to know about Xyroots. Can't find your answer? Contact us anytime.</p>
+            <p className="text-xyroots-mint/90 text-lg">Everything you need to know about Xyroots. Can't find your answer? Contact us anytime.</p>
           </div>
         </section>
 

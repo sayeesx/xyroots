@@ -135,15 +135,28 @@ export default function Navbar() {
                       )}
                       
                       {role === 'management' && (
-                        <Link href="/dashboard/employer" className="flex items-center gap-3 px-4 py-2 text-sm text-xyroots-text hover:bg-xyroots-cream transition-colors" onClick={() => setProfileOpen(false)}>
-                          <FaBriefcase className="w-4 h-4 text-xyroots-muted" /> Management Dashboard
-                        </Link>
+                        <>
+                          <Link href="/dashboard/employer" className="flex items-center gap-3 px-4 py-2 text-sm text-xyroots-text hover:bg-xyroots-cream transition-colors" onClick={() => setProfileOpen(false)}>
+                            <FaBriefcase className="w-4 h-4 text-xyroots-muted" /> Management Dashboard
+                          </Link>
+                          <Link href="/dashboard/employer?action=post-job" className="flex items-center gap-3 px-4 py-2 text-sm text-xyroots-text hover:bg-xyroots-cream transition-colors" onClick={() => setProfileOpen(false)}>
+                            <FaPlus className="w-4 h-4 text-xyroots-teal" /> Post a Job
+                          </Link>
+                        </>
                       )}
                       
                       {role === 'agency' && (
-                        <Link href="/dashboard/agency" className="flex items-center gap-3 px-4 py-2 text-sm text-xyroots-text hover:bg-xyroots-cream transition-colors" onClick={() => setProfileOpen(false)}>
-                          <FaBriefcase className="w-4 h-4 text-xyroots-muted" /> Agency Dashboard
-                        </Link>
+                        <>
+                          <Link href="/dashboard/agency" className="flex items-center gap-3 px-4 py-2 text-sm text-xyroots-text hover:bg-xyroots-cream transition-colors" onClick={() => setProfileOpen(false)}>
+                            <FaBriefcase className="w-4 h-4 text-xyroots-muted" /> Agency Dashboard
+                          </Link>
+                          <Link href="/dashboard/agency?action=post-job" className="flex items-center gap-3 px-4 py-2 text-sm text-xyroots-text hover:bg-xyroots-cream transition-colors" onClick={() => setProfileOpen(false)}>
+                            <FaPlus className="w-4 h-4 text-xyroots-teal" /> Post a Job
+                          </Link>
+                          <Link href="/dashboard/agency?action=post-teacher" className="flex items-center gap-3 px-4 py-2 text-sm text-xyroots-text hover:bg-xyroots-cream transition-colors" onClick={() => setProfileOpen(false)}>
+                            <FaPlus className="w-4 h-4 text-xyroots-teal" /> Post a Profile
+                          </Link>
+                        </>
                       )}
 
                       <Link href="/profile" className="flex items-center gap-3 px-4 py-2 text-sm text-xyroots-text hover:bg-xyroots-cream transition-colors" onClick={() => setProfileOpen(false)}>

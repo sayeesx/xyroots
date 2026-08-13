@@ -62,14 +62,14 @@ export default function TestimonialsPage() {
 
       <main className="flex-1">
         {/* Hero */}
-        <section className="bg-gradient-to-br from-[#042816] via-[#074526] to-[#0a5c32] text-white py-20 relative overflow-hidden">
+        <section className="bg-gradient-to-br from-xyroots-teal to-[#068050] text-white py-20 relative overflow-hidden">
           <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 70% 30%, #00d085 0%, transparent 50%)' }} />
           <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div className="flex justify-center gap-1 mb-4">
               {[...Array(5)].map((_, i) => <FaStar key={i} className="w-5 h-5 text-yellow-400" />)}
             </div>
             <h1 className="font-editorial text-4xl sm:text-5xl text-white mb-4">What Our Community Says</h1>
-            <p className="text-green-100/80 text-lg max-w-2xl mx-auto">
+            <p className="text-xyroots-mint/90 text-lg max-w-2xl mx-auto">
               Real stories from teachers and institutions who found their match through Xyroots.
             </p>
           </div>
@@ -87,7 +87,7 @@ export default function TestimonialsPage() {
                     {[...Array(t.rating)].map((_, i) => <FaStar key={i} className="w-3.5 h-3.5 text-yellow-400" />)}
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#042816] to-[#0a5c32] flex items-center justify-center text-white font-bold text-sm shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-xyroots-teal to-[#068050] flex items-center justify-center text-white font-bold text-sm shrink-0">
                       {t.grad}
                     </div>
                     <div>
@@ -106,7 +106,7 @@ export default function TestimonialsPage() {
           <div className="max-w-xl mx-auto px-4 sm:px-6">
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Join thousands of satisfied users</h2>
             <p className="text-gray-500 text-sm mb-8">Create your free profile and start connecting with the best institutions in India.</p>
-            <a href="/jobs" className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-gradient-to-br from-[#042816] to-[#0a5c32] text-white font-bold text-sm shadow-lg hover:shadow-xl transition-all">
+            <a href="/jobs" className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-gradient-to-br from-xyroots-teal to-[#068050] text-white font-bold text-sm shadow-lg hover:shadow-xl transition-all">
               Get Started Free
             </a>
           </div>

@@ -34,7 +34,7 @@ export default function AboutPage() {
       <main className="flex-1">
 
         {/* Hero */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-[#042816] via-[#074526] to-[#0a5c32] text-white">
+        <section className="relative overflow-hidden bg-gradient-to-br from-xyroots-teal to-[#068050] text-white">
           <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, #00d085 0%, transparent 50%), radial-gradient(circle at 80% 20%, #00a264 0%, transparent 40%)' }} />
           <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20 text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-sm font-medium text-green-300 mb-8 backdrop-blur-sm">
@@ -45,11 +45,11 @@ export default function AboutPage() {
               Reimagining how India's<br />
               <span className="text-[#7fffc4]">best teachers</span> find their schools
             </h1>
-            <p className="text-lg text-green-100/80 max-w-2xl mx-auto leading-relaxed mb-10">
+            <p className="text-lg text-xyroots-mint/90 max-w-2xl mx-auto leading-relaxed mb-10">
               Xyroots is an education recruitment platform built with one purpose — to make the process of finding the right teaching opportunity as seamless, transparent, and dignified as possible.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/jobs" className="px-7 py-3.5 rounded-xl bg-white text-[#042816] font-bold text-sm hover:bg-green-50 transition-colors shadow-lg">
+              <Link href="/jobs" className="px-7 py-3.5 rounded-xl bg-white text-xyroots-teal font-bold text-sm hover:bg-green-50 transition-colors shadow-lg">
                 Explore Opportunities
               </Link>
               <Link href="/contact" className="px-7 py-3.5 rounded-xl border border-white/30 text-white font-semibold text-sm hover:bg-white/10 transition-colors">
@@ -65,7 +65,7 @@ export default function AboutPage() {
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
               {stats.map((s) => (
                 <div key={s.label} className="text-center">
-                  <p className="text-3xl sm:text-4xl font-bold text-[#042816] mb-1">{s.number}</p>
+                  <p className="text-3xl sm:text-4xl font-bold text-xyroots-teal mb-1">{s.number}</p>
                   <p className="text-sm text-gray-500 font-medium">{s.label}</p>
                 </div>
               ))}
@@ -97,19 +97,8 @@ export default function AboutPage() {
               </div>
             </div>
             <div className="relative">
-              <div className="aspect-square max-w-sm mx-auto bg-gradient-to-br from-[#042816] to-[#0a5c32] rounded-[2.5rem] overflow-hidden shadow-2xl flex items-center justify-center p-10">
-                <div className="text-center text-white">
-                  <div className="text-7xl font-bold text-white/20 mb-4">XY</div>
-                  <p className="text-xl font-bold text-green-300 mb-2">Xyroots</p>
-                  <p className="text-sm text-white/70">Education Recruitment Platform</p>
-                  <div className="mt-6 grid grid-cols-3 gap-3">
-                    {["🎓", "🏫", "🤝"].map((e, i) => (
-                      <div key={i} className="aspect-square bg-white/10 rounded-2xl flex items-center justify-center text-2xl">
-                        {e}
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              <div className="aspect-square max-w-xs mx-auto bg-white rounded-[2.5rem] overflow-hidden shadow-2xl flex items-center justify-center p-10 border border-gray-100">
+                <img src="/logo1.webp" alt="Xyroots Logo" className="w-full h-auto object-contain" />
               </div>
               <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-yellow-400/20 rounded-full blur-2xl" />
             </div>
@@ -125,7 +114,7 @@ export default function AboutPage() {
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {values.map((v) => (
               <div key={v.title} className="bg-[#f7f8fa] rounded-2xl p-6 border border-gray-100 hover:border-xyroots-teal/30 hover:shadow-md transition-all">
-                <div className="w-10 h-10 bg-gradient-to-br from-[#042816] to-[#0a5c32] rounded-xl flex items-center justify-center mb-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-xyroots-teal to-[#068050] rounded-xl flex items-center justify-center mb-4">
                   <v.icon className="w-5 h-5 text-white" />
                 </div>
                 <h3 className="text-base font-bold text-gray-900 mb-2">{v.title}</h3>
@@ -135,32 +124,13 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* Team */}
-        <section className="py-20 bg-[#f7f8fa]">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-12">
-            <p className="text-xs font-bold text-xyroots-teal uppercase tracking-widest mb-3">The People</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">Meet the Team</h2>
-          </div>
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 lg:grid-cols-4 gap-6">
-            {team.map((member) => (
-              <div key={member.name} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm text-center hover:shadow-md transition-all">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#042816] to-[#0a5c32] flex items-center justify-center text-white font-bold text-lg mx-auto mb-3">
-                  {member.grad}
-                </div>
-                <h3 className="text-sm font-bold text-gray-900">{member.name}</h3>
-                <p className="text-xs text-gray-500 mt-0.5">{member.role}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
         {/* CTA */}
-        <section className="py-20 bg-gradient-to-br from-[#042816] to-[#0a5c32] text-white text-center">
+        <section className="py-20 bg-gradient-to-br from-xyroots-teal to-[#068050] text-white text-center">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl sm:text-4xl font-bold mb-5">Ready to find your next opportunity?</h2>
-            <p className="text-green-100/80 text-base mb-8">Join thousands of educators who found their dream classrooms through Xyroots.</p>
+            <p className="text-xyroots-mint/90 text-base mb-8">Join thousands of educators who found their dream classrooms through Xyroots.</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/jobs" className="px-7 py-3.5 rounded-xl bg-white text-[#042816] font-bold text-sm hover:bg-green-50 transition-colors shadow-lg flex items-center gap-2">
+              <Link href="/jobs" className="px-7 py-3.5 rounded-xl bg-white text-xyroots-teal font-bold text-sm hover:bg-green-50 transition-colors shadow-lg flex items-center gap-2">
                 Browse Jobs <FaArrowRight className="w-3.5 h-3.5" />
               </Link>
               <Link href="/services" className="px-7 py-3.5 rounded-xl border border-white/30 text-white font-semibold text-sm hover:bg-white/10 transition-colors">

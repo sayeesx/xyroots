@@ -97,7 +97,7 @@ export default function AgencyDashboard() {
         ) : (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Institution Welcome Banner */}
-            <div className="bg-gradient-to-br from-[#074526] to-[#042816] text-white rounded-[2rem] p-8 sm:p-10 shadow-[0_20px_40px_rgb(0,0,0,0.12)] mb-8 relative overflow-hidden border border-white/10">
+            <div className="bg-gradient-to-br from-xyroots-teal to-[#068050] text-white rounded-[2rem] p-8 sm:p-10 shadow-[0_20px_40px_rgb(0,0,0,0.12)] mb-8 relative overflow-hidden border border-white/10">
               <div className="absolute -top-20 -right-20 w-96 h-96 bg-xyroots-teal/30 rounded-full blur-[100px] pointer-events-none"
               /><div className="absolute -bottom-20 -left-20 w-72 h-72 bg-blue-500/20 rounded-full blur-[80px] pointer-events-none" />
 

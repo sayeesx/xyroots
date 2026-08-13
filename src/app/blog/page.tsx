@@ -23,10 +23,10 @@ export default function BlogPage() {
 
       <main className="flex-1">
         {/* Hero */}
-        <section className="bg-gradient-to-br from-[#042816] via-[#074526] to-[#0a5c32] text-white py-20">
+        <section className="bg-gradient-to-br from-xyroots-teal to-[#068050] text-white py-20">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
             <h1 className="font-editorial text-4xl sm:text-5xl text-white mb-4">Xyroots Blog</h1>
-            <p className="text-green-100/80 text-lg">Insights, guides, and trends for educators and institutions across India.</p>
+            <p className="text-xyroots-mint/90 text-lg">Insights, guides, and trends for educators and institutions across India.</p>
           </div>
         </section>
 
@@ -34,7 +34,7 @@ export default function BlogPage() {
         <div className="bg-white border-b border-gray-100 sticky top-14 z-20">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex overflow-x-auto gap-2 scrollbar-none">
             {categories.map(c => (
-              <button key={c} className={`shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors ${c === 'All' ? 'bg-[#042816] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{c}</button>
+              <button key={c} className={`shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors ${c === 'All' ? 'bg-xyroots-teal text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{c}</button>
             ))}
           </div>
         </div>
@@ -44,7 +44,7 @@ export default function BlogPage() {
           <div className="max-w-5xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {posts.map((post) => (
               <Link href={`/blog/${post.slug}`} key={post.slug} className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all overflow-hidden group flex flex-col">
-                <div className="h-36 bg-gradient-to-br from-[#042816] to-[#0a5c32] flex items-center justify-center p-6">
+                <div className="h-36 bg-gradient-to-br from-xyroots-teal to-[#068050] flex items-center justify-center p-6">
                   <p className="text-white/70 text-sm font-medium text-center leading-relaxed">{post.title}</p>
                 </div>
                 <div className="p-5 flex-1 flex flex-col">

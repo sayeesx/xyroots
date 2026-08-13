@@ -202,7 +202,7 @@ export default function TeachersPage() {
         </div>
       )}
 
-      <main className="flex-1 pt-14 lg:pt-16 pb-10">
+      <main className="flex-1 pt-6 lg:pt-8 pb-10">
         <div className="max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8">
 
           {/* Search Bar */}

@@ -85,6 +85,9 @@ export default function Navbar() {
                 )
               )}
               <NavLink href="/about">About Us</NavLink>
+              <NavLink href="/services">Services</NavLink>
+              <NavLink href="/testimonials">Testimonials</NavLink>
+              <NavLink href="/contact">Contact</NavLink>
             </div>
 
             <div className="hidden lg:flex items-center gap-3">
@@ -218,6 +221,9 @@ export default function Navbar() {
                 )
               )}
               <MobileNavLink href="/about" onClick={() => setMobileOpen(false)}>About Us</MobileNavLink>
+              <MobileNavLink href="/services" onClick={() => setMobileOpen(false)}>Services</MobileNavLink>
+              <MobileNavLink href="/testimonials" onClick={() => setMobileOpen(false)}>Testimonials</MobileNavLink>
+              <MobileNavLink href="/contact" onClick={() => setMobileOpen(false)}>Contact</MobileNavLink>
               
               <div className="border-t border-xyroots-border my-4 mx-4" />
               

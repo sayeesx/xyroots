@@ -13,7 +13,7 @@ export default function Footer() {
     <footer className="bg-black text-white" role="contentinfo">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main footer */}
-        <div className="py-16 grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-8">
+        <div className="py-16 grid grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Brand */}
           <div className="col-span-2 lg:col-span-1">
             <Link href="/" className="flex items-center mb-4">
@@ -85,13 +85,28 @@ export default function Footer() {
               Company
             </h3>
             <ul className="space-y-3">
-              <FooterLink href="#">About</FooterLink>
-              <FooterLink href="#">Contact</FooterLink>
-              <FooterLink href="#">Careers</FooterLink>
-              <FooterLink href="#">Privacy Policy</FooterLink>
-              <FooterLink href="#">Terms of Service</FooterLink>
+              <FooterLink href="/about">About Us</FooterLink>
+              <FooterLink href="/services">Services</FooterLink>
+              <FooterLink href="/testimonials">Testimonials</FooterLink>
+              <FooterLink href="/blog">Blog</FooterLink>
+              <FooterLink href="/contact">Contact</FooterLink>
             </ul>
           </div>
+
+          {/* Legal & SEO */}
+          <div>
+            <h3 className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-xyroots-teal mb-4">
+              Legal & Support
+            </h3>
+            <ul className="space-y-3">
+              <FooterLink href="/faq">FAQ</FooterLink>
+              <FooterLink href="/security">Security</FooterLink>
+              <FooterLink href="/privacy-policy">Privacy Policy</FooterLink>
+              <FooterLink href="/terms">Terms of Service</FooterLink>
+              <FooterLink href="/sitemap.xml">Sitemap</FooterLink>
+            </ul>
+          </div>
+
         </div>
 
         {/* Bottom bar */}
@@ -100,14 +115,17 @@ export default function Footer() {
             © 2026 Xyroots. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
-            <Link href="#" className="text-sm text-gray-500 hover:text-white transition-colors">
+            <Link href="/privacy-policy" className="text-sm text-gray-500 hover:text-white transition-colors">
               Privacy
             </Link>
-            <Link href="#" className="text-sm text-gray-500 hover:text-white transition-colors">
+            <Link href="/terms" className="text-sm text-gray-500 hover:text-white transition-colors">
               Terms
             </Link>
-            <Link href="#" className="text-sm text-gray-500 hover:text-white transition-colors">
-              Cookies
+            <Link href="/security" className="text-sm text-gray-500 hover:text-white transition-colors">
+              Security
+            </Link>
+            <Link href="/sitemap.xml" className="text-sm text-gray-500 hover:text-white transition-colors">
+              Sitemap
             </Link>
           </div>
         </div>

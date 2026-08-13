@@ -80,7 +80,7 @@ export default function JobDetailPage() {
     <div className="min-h-screen flex flex-col bg-[#f7f8fa]">
       <Navbar />
 
-      <main className="flex-1 pt-16 lg:pt-20 pb-28">
+      <main className="flex-1 pt-14 lg:pt-16 pb-28">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
           {/* Back button */}

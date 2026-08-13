@@ -84,7 +84,7 @@ export default function TeacherProfilePage() {
     <div className="min-h-screen flex flex-col bg-xyroots-cream/30">
       <Navbar />
 
-      <main className="flex-1 pt-24 lg:pt-32 pb-24">
+      <main className="flex-1 pt-14 lg:pt-16 pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Back Button */}
           <button

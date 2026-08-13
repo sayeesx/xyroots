@@ -1,26 +1,188 @@
 @import "tailwindcss";
+@config "../../tailwind.config.ts";
+@source "../**";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Glassdoor Signature Green Brand Palette */
+  --color-xyroots-dark: #074526;
+  --color-xyroots-teal: #00a264;
+  --color-xyroots-mint: #e6f7ed;
+  --color-xyroots-cream: #f7f9f8;
+  --color-xyroots-yellow: #f5c63c;
+  --color-xyroots-text: #18181b;
+  --color-xyroots-muted: #6b7280;
+  --color-xyroots-light-green: #c8eed6;
+  --color-xyroots-border: #e4e8f0;
+  --color-xyroots-success: #00a264;
+  --color-xyroots-white: #ffffff;
+  --color-xyroots-surface: #f0f4f2;
+
+  /* ALL text uses Cabinet Grotesk font sitewide */
+  --font-sans: 'Cabinet Grotesk', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Instrument Serif', serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@utility font-serif {
+  font-family: 'Instrument Serif', serif !important;
+  -webkit-text-stroke: 0.5px currentColor;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── Base Reset ───────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Hide scrollbars across all browsers */
+html, body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  color: var(--color-xyroots-text);
+  background: #f7f9f8;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
+
+/* Force Geist font on every element */
+*, *::before, *::after {
+  font-family: inherit;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+}
+
+/* ─── Global Background & Smooth Section Blends ─────── */
+.modal-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.modal-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.modal-scrollbar::-webkit-scrollbar-thumb {
+  background: #c8eed6;
+  border-radius: 4px;
+}
+.modal-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #00a264;
+}
+.modal-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #00a264 transparent;
+}
+
+.page-bg {
+  background: linear-gradient(180deg, #f7f9f8 0%, #e6f7ed 35%, #f0f4f2 70%, #f7f9f8 100%);
+  min-height: 100vh;
+}
+
+/* Smooth fade gradient section breaks (no hard box borders) */
+.section-blend-1 {
+  background: linear-gradient(180deg, #ffffff 0%, #f7f9f8 50%, #e6f7ed 100%);
+}
+.section-blend-2 {
+  background: linear-gradient(180deg, #e6f7ed 0%, #f0f4f2 50%, #ffffff 100%);
+}
+.section-blend-3 {
+  background: linear-gradient(180deg, #ffffff 0%, #e6f7ed 50%, #f7f9f8 100%);
+}
+.section-blend-4 {
+  background: linear-gradient(180deg, #f7f9f8 0%, #ffffff 100%);
+}
+
+/* Bootstrap Icons helper */
+.bi {
+  display: inline-block;
+  line-height: 1;
+}
+
+/* Editorial helper font (Geist) */
+.font-editorial {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+/* Strictly NO SHADOWS and PURE SHARP CORNERS on any elements */
+*, *::before, *::after {
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+/* Re-allow minimal focus rings on inputs */
+input:focus, textarea:focus, select:focus {
+  box-shadow: 0 0 0 2px var(--color-xyroots-teal) !important;
+}
+
+/* Floating animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+.animate-float { animation: float 4s ease-in-out infinite; }
+
+/* Smooth hover effects (no shadow) */
+.card-hover {
+  transition: transform 0.25s ease, background-color 0.25s ease;
+}
+.card-hover:hover {
+  transform: translateY(-3px);
+}
+
+.btn-hover {
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
+.btn-hover:hover {
+  transform: translateY(-1.5px);
+  opacity: 0.92;
+}
+
+/* Focus outlines */
+*:focus-visible {
+  outline: 2px solid var(--color-xyroots-teal);
+  outline-offset: 2px;
+}
+
+/* Links base */
+a, button {
+  transition: color 0.18s ease, background-color 0.18s ease, opacity 0.18s ease;
+}
+
+/* Section padding */
+.section-padding { padding-top: 4.5rem; padding-bottom: 4.5rem; }
+@media (min-width: 768px)  { .section-padding { padding-top: 5.5rem; padding-bottom: 5.5rem; } }
+@media (min-width: 1024px) { .section-padding { padding-top: 6.5rem; padding-bottom: 6.5rem; } }
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--color-xyroots-teal);
+  border-radius: 20px;
+}
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-xyroots-teal) transparent;
+}
+
+/* Loader CSS */
+.custom-loader-wrapper { display: flex; justify-content: center; align-items: center; }
+.custom-loader-svg { width: 3.25em; transform-origin: center; animation: rotate4 2s linear infinite; }
+.custom-loader-circle { fill: none; stroke: var(--color-xyroots-teal); stroke-width: 4; stroke-dasharray: 1, 200; stroke-dashoffset: 0; stroke-linecap: round; animation: dash4 1.5s ease-in-out infinite; }
+@keyframes rotate4 { 100% { transform: rotate(360deg); } }
+@keyframes dash4 { 0% { stroke-dasharray: 1, 200; stroke-dashoffset: 0; } 50% { stroke-dasharray: 90, 200; stroke-dashoffset: -35px; } 100% { stroke-dashoffset: -125px; } }

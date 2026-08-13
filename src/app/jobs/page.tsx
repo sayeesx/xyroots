@@ -123,8 +123,8 @@ export default function JobsPage() {
       }
       // Experience filter mapping (simplified check for demo)
       if (selectedExperiences.length > 0) {
-        // Just checking if any selected experience string matches part of it
-        const hasMatch = selectedExperiences.some(exp => job.experience.includes(exp) || exp.includes('years') && job.experience !== 'Fresher');
+        const exp = job.experience ?? '';
+        const hasMatch = selectedExperiences.some(e => exp.includes(e) || (e.includes('years') && exp !== 'Fresher'));
         if (!hasMatch) return false;
       }
       return true;

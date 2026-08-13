@@ -158,6 +158,8 @@ export default function TeachersPage() {
   const filteredTeachers = useMemo(() => {
     return dbTeachers.filter(t => {
       if (!t.is_visible) return false;
+      
+      // Search Box Matches
       if (searchTerm) {
         const term = searchTerm.toLowerCase();
         if (!t.name.toLowerCase().includes(term) &&
@@ -169,9 +171,39 @@ export default function TeachersPage() {
       if (citySearch) {
         if (!t.location.toLowerCase().includes(citySearch.toLowerCase())) return false;
       }
+      
+      // Sidebar Filters
+      if (selectedVerification.length > 0) {
+        if (selectedVerification.includes('verified') && !t.verified) return false;
+      }
+      
+      if (selectedSubjects.length > 0) {
+        const hasSubMatch = selectedSubjects.some(sub => (t.subjects || []).includes(sub));
+        if (!hasSubMatch) return false;
+      }
+      
+      if (selectedQuals.length > 0) {
+        // Teacher's prof qualifications are in t.professionalQualifications usually, or we can check t.education
+        // Using t.professional_qualification if available, else assuming B.Ed
+        const teacherQuals = (t.professional_qualification || "B.Ed").toLowerCase();
+        const hasQualMatch = selectedQuals.some(q => teacherQuals.includes(q.toLowerCase()));
+        if (!hasQualMatch) return false;
+      }
+      
+      if (selectedExperiences.length > 0) {
+        const hasExpMatch = selectedExperiences.some(exp => {
+          if (exp === "Fresher") return t.experience === 0;
+          if (exp === "1-3 Years") return t.experience >= 1 && t.experience <= 3;
+          if (exp === "4-7 Years") return t.experience >= 4 && t.experience <= 7;
+          if (exp === "8+ Years") return t.experience >= 8;
+          return false;
+        });
+        if (!hasExpMatch) return false;
+      }
+      
       return true;
     });
-  }, [searchTerm, citySearch, dbTeachers]);
+  }, [searchTerm, citySearch, dbTeachers, selectedVerification, selectedSubjects, selectedQuals, selectedExperiences]);
 
   const filterProps = { selectedVerification, setSelectedVerification, selectedSubjects, setSelectedSubjects, selectedQuals, setSelectedQuals, selectedExperiences, setSelectedExperiences, clearAll };
 

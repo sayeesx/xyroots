@@ -186,3 +186,30 @@ a, button {
 .custom-loader-circle { fill: none; stroke: var(--color-xyroots-teal); stroke-width: 4; stroke-dasharray: 1, 200; stroke-dashoffset: 0; stroke-linecap: round; animation: dash4 1.5s ease-in-out infinite; }
 @keyframes rotate4 { 100% { transform: rotate(360deg); } }
 @keyframes dash4 { 0% { stroke-dasharray: 1, 200; stroke-dashoffset: 0; } 50% { stroke-dasharray: 90, 200; stroke-dashoffset: -35px; } 100% { stroke-dashoffset: -125px; } }
+
+/* ─── Salary Range Slider Thumbs ───────────────────────────────────── */
+.salary-slider-thumb {
+  pointer-events: none;
+}
+.salary-slider-thumb::-webkit-slider-thumb {
+  pointer-events: all;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #00a264;
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0, 162, 100, 0.4);
+  cursor: pointer;
+}
+.salary-slider-thumb::-moz-range-thumb {
+  pointer-events: all;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #00a264;
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0, 162, 100, 0.4);
+  cursor: pointer;
+}

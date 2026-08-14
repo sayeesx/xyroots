@@ -8,7 +8,7 @@ import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
   FaMagnifyingGlass, FaLocationDot, FaCircleCheck,
-  FaBars, FaTableCellsLarge, FaFilter, FaXmark
+  FaBars, FaTableCellsLarge, FaFilter, FaXmark, FaSort
 } from "react-icons/fa6";
 import { useAuth } from "@/lib/auth/AuthProvider";
 
@@ -18,11 +18,35 @@ const SUBJECTS = [
   "Geography", "Sanskrit", "Physical Education"
 ];
 
+const INDIA_STATES = [
+  "All States",
+  "Maharashtra",
+  "Uttar Pradesh",
+  "Tamil Nadu",
+  "Karnataka",
+  "Delhi",
+  "West Bengal",
+  "Telangana",
+  "Gujarat",
+  "Rajasthan",
+  "Kerala",
+];
+
+const SORT_OPTIONS = [
+  { value: "default", label: "Default" },
+  { value: "experience_desc", label: "Experience: High to Low" },
+  { value: "experience_asc", label: "Experience: Low to High" },
+  { value: "name_asc", label: "Name: A–Z" },
+  { value: "completion_desc", label: "Profile Completeness" },
+];
+
 // ─── Filter Panel ─────────────────────────────────────────────────────────────
 function FilterPanel({
   selectedVerification, setSelectedVerification,
   selectedQuals, setSelectedQuals,
   selectedExperiences, setSelectedExperiences,
+  selectedState, setSelectedState,
+  sortBy, setSortBy,
   clearAll,
 }: any) {
   const toggleCheckbox = (state: string[], setState: any, val: string) => {
@@ -36,6 +60,32 @@ function FilterPanel({
         </h2>
         <button onClick={clearAll} className="text-xs font-semibold text-gray-600 hover:text-black">Clear All</button>
       </div>
+
+      {/* Sort */}
+      <div>
+        <p className="font-semibold mb-2 text-gray-800 flex items-center gap-1.5"><FaSort className="w-3 h-3" /> Sort By</p>
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          className="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-gray-500 text-gray-700"
+        >
+          {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </select>
+      </div>
+      <hr className="border-gray-200" />
+
+      {/* State */}
+      <div>
+        <p className="font-semibold mb-2 text-gray-800 flex items-center gap-1.5"><FaLocationDot className="w-3 h-3" /> State</p>
+        <select
+          value={selectedState}
+          onChange={(e) => setSelectedState(e.target.value)}
+          className="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-gray-500 text-gray-700"
+        >
+          {INDIA_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+        </select>
+      </div>
+      <hr className="border-gray-200" />
 
       {/* Status */}
       <div>
@@ -124,7 +174,6 @@ function TeachersPageInner() {
       if (!user) {
         if (typeof window !== "undefined") window.location.href = "/";
       } else if (role === 'teacher') {
-        // Teachers should not browse other teacher profiles
         if (typeof window !== "undefined") window.location.href = "/dashboard/teacher";
       }
     }
@@ -144,7 +193,7 @@ function TeachersPageInner() {
     setIsLoading(true);
     supabase
       .from('teacher_profiles')
-      .select('id, subject, title, location, experience_years, professional_qualification, profile_completion, profiles!inner(full_name, avatar_url)')
+      .select('id, subject, title, location, experience_years, professional_qualification, profile_completion, expected_salary_min, expected_salary_max, profiles!inner(full_name, avatar_url)')
       .eq('is_visible', true)
       .limit(50)
       .then(({ data }) => {
@@ -160,6 +209,8 @@ function TeachersPageInner() {
             professional_qualification: t.professional_qualification || "",
             profile_completion: t.profile_completion || 0,
             verified: (t.profile_completion || 0) > 80,
+            expected_salary_min: t.expected_salary_min || 0,
+            expected_salary_max: t.expected_salary_max || 0,
           }));
           setDbTeachers(mapped);
         }
@@ -170,18 +221,21 @@ function TeachersPageInner() {
   const [selectedVerification, setSelectedVerification] = useState<string[]>([]);
   const [selectedQuals, setSelectedQuals] = useState<string[]>([]);
   const [selectedExperiences, setSelectedExperiences] = useState<string[]>([]);
+  const [selectedState, setSelectedState] = useState("All States");
+  const [sortBy, setSortBy] = useState("default");
 
   const clearAll = () => {
     setSelectedVerification([]);
     setSelectedQuals([]);
     setSelectedExperiences([]);
+    setSelectedState("All States");
+    setSortBy("default");
   };
 
-  const activeFilterCount = selectedVerification.length + selectedQuals.length + selectedExperiences.length;
+  const activeFilterCount = selectedVerification.length + selectedQuals.length + selectedExperiences.length + (selectedState !== "All States" ? 1 : 0);
 
   const filteredTeachers = useMemo(() => {
-    return dbTeachers.filter(t => {
-      // Subject bubble filter
+    let result = dbTeachers.filter(t => {
       if (activeSubject && activeSubject !== "All") {
         const teacherSubject = (t.subject || "").toLowerCase();
         if (!teacherSubject.includes(activeSubject.toLowerCase())) return false;
@@ -197,6 +251,10 @@ function TeachersPageInner() {
       }
       if (citySearch) {
         if (!t.location.toLowerCase().includes(citySearch.toLowerCase())) return false;
+      }
+
+      if (selectedState && selectedState !== "All States") {
+        if (!t.location.toLowerCase().includes(selectedState.toLowerCase())) return false;
       }
 
       if (selectedVerification.includes("Verified Only") && !t.verified) return false;
@@ -223,9 +281,17 @@ function TeachersPageInner() {
 
       return true;
     });
-  }, [searchTerm, citySearch, activeSubject, dbTeachers, selectedVerification, selectedQuals, selectedExperiences]);
 
-  const filterProps = { selectedVerification, setSelectedVerification, selectedQuals, setSelectedQuals, selectedExperiences, setSelectedExperiences, clearAll };
+    // Sort
+    if (sortBy === "experience_desc") result = [...result].sort((a, b) => (b.experience_years || 0) - (a.experience_years || 0));
+    else if (sortBy === "experience_asc") result = [...result].sort((a, b) => (a.experience_years || 0) - (b.experience_years || 0));
+    else if (sortBy === "name_asc") result = [...result].sort((a, b) => a.name.localeCompare(b.name));
+    else if (sortBy === "completion_desc") result = [...result].sort((a, b) => (b.profile_completion || 0) - (a.profile_completion || 0));
+
+    return result;
+  }, [searchTerm, citySearch, activeSubject, dbTeachers, selectedVerification, selectedQuals, selectedExperiences, selectedState, sortBy]);
+
+  const filterProps = { selectedVerification, setSelectedVerification, selectedQuals, setSelectedQuals, selectedExperiences, setSelectedExperiences, selectedState, setSelectedState, sortBy, setSortBy, clearAll };
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f7f8fa]">
@@ -280,6 +346,16 @@ function TeachersPageInner() {
                   className="w-full text-sm outline-none bg-transparent placeholder-gray-400 text-gray-900 font-medium min-w-0"
                 />
               </div>
+              {/* State Dropdown */}
+              <div className="flex items-center px-3 py-2.5 border-b sm:border-b-0 sm:border-r border-gray-200 min-w-0">
+                <select
+                  value={selectedState}
+                  onChange={(e) => setSelectedState(e.target.value)}
+                  className="w-full text-sm outline-none bg-transparent text-gray-700 font-medium min-w-0 cursor-pointer"
+                >
+                  {INDIA_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
               <button className="bg-[#00a264] text-white rounded-lg px-6 py-2.5 text-sm font-semibold hover:bg-[#008f58] transition-colors shrink-0 flex items-center justify-center gap-2 m-1">
                 <FaMagnifyingGlass className="w-3.5 h-3.5" /> Find
               </button>
@@ -333,13 +409,26 @@ function TeachersPageInner() {
                     <span className="font-bold text-gray-900">{isLoading ? "..." : filteredTeachers.length}</span> teachers found
                   </p>
                 </div>
-                <div className="flex items-center bg-white rounded-lg p-0.5 border border-gray-200 shadow-sm">
-                  <button onClick={() => setViewMode("grid")} className={`p-1.5 rounded-md transition-all ${viewMode === 'grid' ? 'bg-gray-100 text-gray-900' : 'text-gray-400 hover:text-gray-700'}`}>
-                    <FaTableCellsLarge className="w-3.5 h-3.5" />
-                  </button>
-                  <button onClick={() => setViewMode("list")} className={`p-1.5 rounded-md transition-all ${viewMode === 'list' ? 'bg-gray-100 text-gray-900' : 'text-gray-400 hover:text-gray-700'}`}>
-                    <FaBars className="w-3.5 h-3.5" />
-                  </button>
+                <div className="flex items-center gap-2">
+                  {/* Sort select on mobile/desktop */}
+                  <div className="hidden sm:flex items-center gap-1.5">
+                    <FaSort className="w-3.5 h-3.5 text-gray-400" />
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="text-xs text-gray-600 bg-white border border-gray-200 rounded-lg px-2 py-1.5 outline-none focus:border-gray-400"
+                    >
+                      {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                    </select>
+                  </div>
+                  <div className="flex items-center bg-white rounded-lg p-0.5 border border-gray-200 shadow-sm">
+                    <button onClick={() => setViewMode("grid")} className={`p-1.5 rounded-md transition-all ${viewMode === 'grid' ? 'bg-gray-100 text-gray-900' : 'text-gray-400 hover:text-gray-700'}`}>
+                      <FaTableCellsLarge className="w-3.5 h-3.5" />
+                    </button>
+                    <button onClick={() => setViewMode("list")} className={`p-1.5 rounded-md transition-all ${viewMode === 'list' ? 'bg-gray-100 text-gray-900' : 'text-gray-400 hover:text-gray-700'}`}>
+                      <FaBars className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -363,9 +452,8 @@ function TeachersPageInner() {
                         style={{ borderRadius: "1rem" }}
                       >
                         <div className="p-5 flex-1">
-                          {/* Top row: initial circle + name/title */}
+                          {/* Top row: avatar + name/title */}
                           <div className="flex items-start gap-3 mb-3">
-                            {/* Profile image or initial */}
                             <div
                               className="w-11 h-11 shrink-0 flex items-center justify-center text-sm font-bold overflow-hidden"
                               style={{ borderRadius: "50%", backgroundColor: tp.avatar_url ? "transparent" : "#e5e7eb", color: "#4b5563" }}
@@ -387,11 +475,19 @@ function TeachersPageInner() {
                             </div>
                           </div>
 
-                          {/* Location */}
-                          <div className="flex items-center gap-1 text-xs text-gray-400 mb-3">
-                            <FaLocationDot className="w-3 h-3 shrink-0" />
-                            {tp.location}
+                          {/* Location — single, no duplicate */}
+                          <div className="flex items-center gap-1 text-xs text-gray-400 mb-2">
+                            <FaLocationDot className="w-3 h-3 shrink-0 text-[#00a264]" />
+                            <span className="truncate">{tp.location}</span>
                           </div>
+
+                          {/* Salary range if available */}
+                          {(tp.expected_salary_min > 0 || tp.expected_salary_max > 0) && (
+                            <div className="text-xs text-[#00a264] font-semibold mb-2">
+                              ₹{tp.expected_salary_min ? `${(tp.expected_salary_min/1000).toFixed(0)}k` : '?'}
+                              {tp.expected_salary_max ? `–${(tp.expected_salary_max/1000).toFixed(0)}k` : '+'}/mo
+                            </div>
+                          )}
 
                           {/* Badges */}
                           <div className="flex flex-wrap gap-1.5">
@@ -411,17 +507,14 @@ function TeachersPageInner() {
                           </div>
                         </div>
 
-                        {/* Footer */}
-                        <div
-                          className="px-5 py-3 border-t border-gray-100 flex items-center justify-between bg-gray-50/60"
-                        >
-                          <span className="text-xs text-gray-400">{tp.location?.split(",")[0]}</span>
+                        {/* Footer — no duplicate location text */}
+                        <div className="px-5 py-3 border-t border-gray-100 flex items-center justify-end bg-gray-50/60">
                           <Link
                             href={`/teachers/${tp.id}`}
                             className="px-3 py-1.5 text-xs font-bold text-white bg-[#00a264] hover:bg-[#008f58] transition-all"
                             style={{ borderRadius: "0.5rem" }}
                           >
-                            View
+                            View Profile
                           </Link>
                         </div>
                       </div>
@@ -433,6 +526,7 @@ function TeachersPageInner() {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
@@ -452,3 +546,4 @@ export default function TeachersPage() {
     </Suspense>
   );
 }
+

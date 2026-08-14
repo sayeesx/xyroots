@@ -71,6 +71,21 @@ export default function TeacherProfilePage() {
   }, [actualId]); // eslint-disable-line
 
   const [shortlisted, setShortlisted] = useState(false);
+
+  // Load shortlist state from localStorage on mount
+  useEffect(() => {
+    if (!actualId) return;
+    const saved: string[] = JSON.parse(localStorage.getItem("agency_watchlist_teachers") || "[]");
+    setShortlisted(saved.includes(actualId));
+  }, [actualId]);
+
+  const toggleShortlist = () => {
+    if (!actualId) return;
+    const saved: string[] = JSON.parse(localStorage.getItem("agency_watchlist_teachers") || "[]");
+    const next = shortlisted ? saved.filter(i => i !== actualId) : [...saved, actualId];
+    localStorage.setItem("agency_watchlist_teachers", JSON.stringify(next));
+    setShortlisted(!shortlisted);
+  };
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [isPlayingDemo, setIsPlayingDemo] = useState(false);
 
@@ -126,7 +141,7 @@ export default function TeacherProfilePage() {
         <div className="text-center p-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">Teacher Not Found</h2>
           <p className="text-gray-500 text-sm mb-6">This profile may not exist or the link is invalid.</p>
-          <button onClick={() => router.push('/teachers')} className="inline-flex items-center gap-2 px-5 py-2.5 bg-xyroots-teal text-white text-sm font-semibold" style={{ borderRadius: "0.75rem" }}>
+          <button onClick={() => router.push('/teachers')} className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#00a264] text-white text-sm font-semibold" style={{ borderRadius: "0.75rem" }}>
             <FaArrowLeft className="w-3.5 h-3.5" /> Browse All Teachers
           </button>
         </div>
@@ -143,7 +158,7 @@ export default function TeacherProfilePage() {
 
       <main className="flex-1 pt-6 pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <button onClick={() => router.back()} className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-xyroots-teal mb-6 transition-colors group">
+          <button onClick={() => router.back()} className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-[#00a264] mb-6 transition-colors group">
             <FaArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" /> Back
           </button>
 
@@ -151,7 +166,7 @@ export default function TeacherProfilePage() {
           <div className="bg-white border border-gray-100 p-6 sm:p-8 mb-6" style={{ borderRadius: "1.25rem" }}>
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center text-white font-bold text-2xl sm:text-3xl shrink-0 overflow-hidden" style={{ borderRadius: "1.25rem", backgroundColor: "#00a264" }}>
+                <div className="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center text-white font-bold text-2xl sm:text-3xl shrink-0 overflow-hidden" style={{ borderRadius: "1.25rem", backgroundColor: "#374151" }}>
                   {teacher.avatar
                     ? <img src={teacher.avatar} alt={teacher.name} className="w-full h-full object-cover" />
                     : teacher.name.charAt(0).toUpperCase()}
@@ -159,12 +174,12 @@ export default function TeacherProfilePage() {
                 <div>
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{teacher.name}</h1>
-                    {teacher.verified && <span title="Verified Educator"><FaShieldHalved className="w-5 h-5 text-xyroots-teal" /></span>}
+                    {teacher.verified && <span title="Verified Educator"><FaShieldHalved className="w-5 h-5 text-[#00a264]" /></span>}
                   </div>
                   <p className="text-base text-gray-500 mb-2">{teacher.title}</p>
                   <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">
-                    <span className="flex items-center gap-1.5"><FaLocationDot className="w-3.5 h-3.5 text-xyroots-teal" />{teacher.location}</span>
-                    <span className="flex items-center gap-1.5"><FaBriefcase className="w-3.5 h-3.5 text-xyroots-teal" />{teacher.experience} Years Exp.</span>
+                    <span className="flex items-center gap-1.5"><FaLocationDot className="w-3.5 h-3.5 text-[#00a264]" />{teacher.location}</span>
+                    <span className="flex items-center gap-1.5"><FaBriefcase className="w-3.5 h-3.5 text-[#00a264]" />{teacher.experience} Years Exp.</span>
                     {teacher.rating && (
                       <span className="flex items-center gap-1 bg-yellow-50 px-2.5 py-0.5 border border-yellow-200 text-yellow-700 font-bold" style={{ borderRadius: "0.5rem" }}>
                         <FaStar className="w-3 h-3 text-yellow-500" />{teacher.rating}
@@ -175,8 +190,8 @@ export default function TeacherProfilePage() {
               </div>
               <div className="flex items-center gap-3 flex-wrap">
                 <button
-                  onClick={() => setShortlisted(!shortlisted)}
-                  className={`px-5 py-2.5 font-semibold text-sm border transition-all flex items-center gap-2 ${shortlisted ? "bg-amber-50 border-amber-300 text-amber-700" : "border-gray-200 text-gray-700 hover:border-xyroots-teal"}`}
+                  onClick={toggleShortlist}
+                  className={`px-5 py-2.5 font-semibold text-sm border transition-all flex items-center gap-2 ${shortlisted ? "bg-[#e6f7ed] border-[#00a264]/30 text-[#00a264]" : "border-gray-200 text-gray-700 hover:border-[#00a264] hover:text-[#00a264]"}`}
                   style={{ borderRadius: "0.75rem" }}
                 >
                   {shortlisted ? <FaBookmark className="w-4 h-4" /> : <FaRegBookmark className="w-4 h-4" />}
@@ -184,7 +199,7 @@ export default function TeacherProfilePage() {
                 </button>
                 <button
                   onClick={() => setShowScheduleModal(true)}
-                  className="px-6 py-2.5 font-semibold text-sm bg-xyroots-teal text-white hover:bg-xyroots-dark transition-all flex items-center gap-2"
+                  className="px-6 py-2.5 font-semibold text-sm bg-[#00a264] text-white hover:bg-[#008f58] transition-all flex items-center gap-2"
                   style={{ borderRadius: "0.75rem" }}
                 >
                   <FaCalendarDays className="w-4 h-4" /> Schedule Interview
@@ -206,18 +221,18 @@ export default function TeacherProfilePage() {
               {teacher.hasDemo && (
                 <div className="bg-white border border-gray-100 p-6" style={{ borderRadius: "1rem" }}>
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-base font-bold text-gray-900 flex items-center gap-2"><FaVideo className="w-4 h-4 text-xyroots-teal" /> Teaching Demo</h2>
+                    <h2 className="text-base font-bold text-gray-900 flex items-center gap-2"><FaVideo className="w-4 h-4 text-[#00a264]" /> Teaching Demo</h2>
                   </div>
                   <div className="relative bg-gray-900 h-52 flex items-center justify-center overflow-hidden group cursor-pointer" style={{ borderRadius: "0.75rem" }} onClick={() => setIsPlayingDemo(!isPlayingDemo)}>
                     {isPlayingDemo ? (
-                      <div className="w-full h-full flex items-center justify-center bg-xyroots-teal/90 text-white flex-col gap-2">
+                      <div className="w-full h-full flex items-center justify-center bg-[#00a264]/90 text-white flex-col gap-2">
                         <FaPlay className="w-10 h-10 animate-pulse text-white/80" />
                         <p className="font-bold text-sm">Playing Demo</p>
                       </div>
                     ) : (
                       <>
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                        <div className="w-14 h-14 bg-xyroots-yellow text-black flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform z-10" style={{ borderRadius: "50%" }}>
+                        <div className="w-14 h-14 bg-gray-900 text-white flex items-center justify-center group-hover:scale-110 transition-transform z-10" style={{ borderRadius: "50%" }}>
                           <FaPlay className="w-5 h-5 ml-1" />
                         </div>
                       </>
@@ -228,18 +243,18 @@ export default function TeacherProfilePage() {
 
               {teacher.teachingExperience?.length > 0 && (
                 <div className="bg-white border border-gray-100 p-6" style={{ borderRadius: "1rem" }}>
-                  <h2 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2"><FaBriefcase className="w-4 h-4 text-xyroots-teal" /> Experience</h2>
+                  <h2 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2"><FaBriefcase className="w-4 h-4 text-[#00a264]" /> Experience</h2>
                   <div className="space-y-5">
                     {teacher.teachingExperience.map((exp: any, i: number) => (
-                      <div key={i} className="relative pl-5 border-l-2 border-xyroots-teal/20">
-                        <div className="absolute -left-[5px] top-1 w-2.5 h-2.5 bg-xyroots-teal" style={{ borderRadius: "50%" }} />
+                      <div key={i} className="relative pl-5 border-l-2 border-[#00a264]/20">
+                        <div className="absolute -left-[5px] top-1 w-2.5 h-2.5 bg-[#00a264]" style={{ borderRadius: "50%" }} />
                         <div className="flex flex-wrap items-center justify-between gap-2 mb-0.5">
                           <h3 className="text-sm font-bold text-gray-900">{exp.role || exp.jobTitle || "Teacher"}</h3>
                           <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-500 font-medium" style={{ borderRadius: "0.375rem" }}>
                             {exp.duration || `${exp.startDate || ""}${exp.endDate ? ` – ${exp.endDate}` : ""}`}
                           </span>
                         </div>
-                        <p className="text-xs font-medium text-xyroots-teal">{exp.school || exp.organization || ""}</p>
+                        <p className="text-xs font-medium text-[#00a264]">{exp.school || exp.organization || ""}</p>
                       </div>
                     ))}
                   </div>
@@ -247,7 +262,7 @@ export default function TeacherProfilePage() {
               )}
 
               <div className="bg-white border border-gray-100 p-6" style={{ borderRadius: "1rem" }}>
-                <h2 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2"><FaGraduationCap className="w-4 h-4 text-xyroots-teal" /> Education & Qualifications</h2>
+                <h2 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2"><FaGraduationCap className="w-4 h-4 text-[#00a264]" /> Education & Qualifications</h2>
                 <div className="grid sm:grid-cols-2 gap-5">
                   {teacher.education?.length > 0 && (
                     <div>
@@ -267,7 +282,7 @@ export default function TeacherProfilePage() {
                       <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">Prof. Qualifications</p>
                       <div className="flex flex-wrap gap-1.5">
                         {teacher.professionalQualifications.map((q: any, i: number) => (
-                          <span key={i} className="text-xs font-semibold px-3 py-1.5 bg-xyroots-mint text-xyroots-teal flex items-center gap-1.5" style={{ borderRadius: "999px" }}>
+                          <span key={i} className="text-xs font-semibold px-3 py-1.5 bg-[#e6f7ed] text-[#00a264] flex items-center gap-1.5" style={{ borderRadius: "999px" }}>
                             <FaAward className="w-3 h-3" />{q}
                           </span>
                         ))}
@@ -285,7 +300,7 @@ export default function TeacherProfilePage() {
                       <div>
                         <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">Subjects</p>
                         <div className="flex flex-wrap gap-1.5">
-                          {teacher.subjects.map((s: string) => <span key={s} className="text-xs font-bold px-3 py-1 bg-xyroots-dark text-white" style={{ borderRadius: "0.5rem" }}>{s}</span>)}
+                          {teacher.subjects.map((s: string) => <span key={s} className="text-xs font-bold px-3 py-1 bg-gray-900 text-white" style={{ borderRadius: "0.5rem" }}>{s}</span>)}
                         </div>
                       </div>
                     )}
@@ -315,7 +330,7 @@ export default function TeacherProfilePage() {
               <div className="bg-white border border-gray-100 p-5 lg:sticky lg:top-24" style={{ borderRadius: "1rem" }}>
                 <h3 className="text-sm font-bold text-gray-900 mb-4 pb-3 border-b border-gray-100">Candidate Overview</h3>
                 <div className="space-y-3 text-sm mb-5">
-                  <div className="flex justify-between"><span className="text-gray-500">Availability</span><span className="font-bold text-xyroots-teal">{teacher.availability}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500">Availability</span><span className="font-bold text-[#00a264]">{teacher.availability}</span></div>
                   <div className="flex justify-between"><span className="text-gray-500">Expected Salary</span><span className="font-bold text-gray-900">{formatSalary(teacher.expectedSalaryMin, teacher.expectedSalaryMax)}</span></div>
                   {teacher.preferredLocations?.length > 0 && <div className="flex justify-between"><span className="text-gray-500">Preferred Cities</span><span className="font-semibold text-gray-900 text-right max-w-[60%]">{teacher.preferredLocations.join(", ")}</span></div>}
                   {teacher.languages?.length > 0 && <div className="flex justify-between"><span className="text-gray-500">Languages</span><span className="font-semibold text-gray-900">{teacher.languages.join(", ")}</span></div>}
@@ -323,7 +338,7 @@ export default function TeacherProfilePage() {
 
                 {teacher.hasCV && (
                   <div className="p-3 bg-gray-50 border border-gray-100 flex items-center gap-3 mb-4" style={{ borderRadius: "0.75rem" }}>
-                    <FaFileLines className="w-4 h-4 text-xyroots-teal" />
+                    <FaFileLines className="w-4 h-4 text-[#00a264]" />
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-bold text-gray-900">Resume / CV</p>
                       <p className="text-[10px] text-gray-400">PDF • Verified</p>
@@ -331,7 +346,7 @@ export default function TeacherProfilePage() {
                   </div>
                 )}
 
-                <button onClick={() => setShowScheduleModal(true)} className="w-full py-3 text-sm font-semibold bg-xyroots-teal text-white hover:bg-xyroots-dark transition-all" style={{ borderRadius: "0.75rem" }}>
+                <button onClick={() => setShowScheduleModal(true)} className="w-full py-3 text-sm font-semibold bg-[#00a264] text-white hover:bg-[#008f58] transition-all" style={{ borderRadius: "0.75rem" }}>
                   Schedule Interview
                 </button>
               </div>
@@ -363,7 +378,7 @@ export default function TeacherProfilePage() {
                   <h4 className="text-lg font-bold text-gray-900 mb-2">Interview Scheduled!</h4>
                   <p className="text-sm text-gray-500 mb-1">{teacher.name} will be notified of the interview request.</p>
                   <p className="text-xs text-gray-400">Date: {scheduleDate} · {scheduleTime}</p>
-                  <button onClick={resetScheduleModal} className="mt-6 px-6 py-2.5 bg-xyroots-teal text-white text-sm font-semibold" style={{ borderRadius: "0.75rem" }}>
+                  <button onClick={resetScheduleModal} className="mt-6 px-6 py-2.5 bg-[#00a264] text-white text-sm font-semibold" style={{ borderRadius: "0.75rem" }}>
                     Done
                   </button>
                 </div>
@@ -384,19 +399,19 @@ export default function TeacherProfilePage() {
                   <div>
                     <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase">Interview Date <span className="text-red-500">*</span></label>
                     <input type="date" value={scheduleDate} onChange={e => setScheduleDate(e.target.value)} min={new Date().toISOString().split('T')[0]}
-                      className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal" style={{ borderRadius: "0.75rem" }} />
+                      className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-[#00a264]" style={{ borderRadius: "0.75rem" }} />
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase">Time Slot</label>
                     <select value={scheduleTime} onChange={e => setScheduleTime(e.target.value)}
-                      className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal" style={{ borderRadius: "0.75rem" }}>
+                      className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-[#00a264]" style={{ borderRadius: "0.75rem" }}>
                       {["09:00 AM - 09:45 AM","10:00 AM - 10:45 AM","11:00 AM - 11:45 AM","12:00 PM - 12:45 PM","02:00 PM - 02:45 PM","03:00 PM - 03:45 PM","04:00 PM - 04:45 PM","05:00 PM - 05:45 PM"].map(t => <option key={t}>{t}</option>)}
                     </select>
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase">Interview Type</label>
                     <select value={scheduleType} onChange={e => setScheduleType(e.target.value)}
-                      className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal" style={{ borderRadius: "0.75rem" }}>
+                      className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-[#00a264]" style={{ borderRadius: "0.75rem" }}>
                       <option>Video Call (Google Meet / Zoom)</option>
                       <option>Phone Call</option>
                       <option>In-Person Campus Interview</option>
@@ -407,12 +422,12 @@ export default function TeacherProfilePage() {
                     <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase">Message (Optional)</label>
                     <textarea value={scheduleMessage} onChange={e => setScheduleMessage(e.target.value)} rows={3}
                       placeholder="Add any additional details or instructions..."
-                      className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal resize-none" style={{ borderRadius: "0.75rem" }} />
+                      className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-[#00a264] resize-none" style={{ borderRadius: "0.75rem" }} />
                   </div>
 
                   <div className="flex gap-3 pt-2">
                     <button onClick={resetScheduleModal} className="flex-1 py-2.5 text-sm font-semibold border border-gray-200 text-gray-700 hover:bg-gray-50" style={{ borderRadius: "0.75rem" }}>Cancel</button>
-                    <button onClick={handleSchedule} disabled={scheduleLoading} className="flex-[2] py-2.5 text-sm font-semibold bg-xyroots-teal text-white hover:bg-xyroots-dark flex items-center justify-center gap-2 disabled:opacity-70" style={{ borderRadius: "0.75rem" }}>
+                    <button onClick={handleSchedule} disabled={scheduleLoading} className="flex-[2] py-2.5 text-sm font-semibold bg-[#00a264] text-white hover:bg-[#008f58] flex items-center justify-center gap-2 disabled:opacity-70" style={{ borderRadius: "0.75rem" }}>
                       {scheduleLoading ? <><FaSpinner className="w-4 h-4 animate-spin" /> Scheduling...</> : <><FaCalendarDays className="w-4 h-4" /> Send Invite</>}
                     </button>
                   </div>

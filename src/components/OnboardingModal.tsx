@@ -199,8 +199,14 @@ export default function OnboardingModal({ isOpen, onClose, role }: OnboardingMod
           onClose();
         }, 3000);
       }
+    } else if (role === 'agency') {
+      // Agencies skip all steps, go straight to dashboard
+      setShowSuccess(true);
+      setTimeout(() => {
+        onClose();
+      }, 2000);
     } else {
-      // For management
+      // For management — step 1 saves profile, step 2 asks to post job
       if (step === 1) {
         setStep(2);
       } else {
@@ -243,10 +249,10 @@ export default function OnboardingModal({ isOpen, onClose, role }: OnboardingMod
                 <div>
                   <div className="mb-6 border-b pb-4">
                     <h2 className="text-2xl font-bold text-black font-editorial uppercase tracking-wide">
-                      Teacher Profile Information
+                      {role === 'teacher' ? 'Teacher Profile Information' : role === 'management' ? 'Complete Your Institution Profile' : 'Welcome to Xyroots'}
                     </h2>
                     <p className="text-sm text-gray-500 mt-1">
-                      Complete your professional teacher profile
+                      {role === 'teacher' ? 'Complete your professional teacher profile' : role === 'management' ? 'Add your institution details to get started' : 'Your agency account is ready to use'}
                     </p>
                   </div>
 
@@ -267,17 +273,21 @@ export default function OnboardingModal({ isOpen, onClose, role }: OnboardingMod
                   <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Personal Information */}
                     <div>
-                      <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3 pb-2 border-b">Personal Information</h3>
+                      <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3 pb-2 border-b">
+                        {role === 'management' ? 'Institution Contact Details' : 'Personal Information'}
+                      </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="text-xs font-bold text-gray-700 block mb-1">Full Name <span className="text-red-500">*</span></label>
+                          <label className="text-xs font-bold text-gray-700 block mb-1">
+                            {role === 'management' ? 'Contact Name' : 'Full Name'} <span className="text-red-500">*</span>
+                          </label>
                           <input 
                             type="text" 
                             name="fullName" 
                             value={formData.fullName} 
                             onChange={handleChange} 
                             required 
-                            placeholder="e.g. Anjali Menon"
+                            placeholder={role === 'management' ? 'e.g. Dr. Rachel Varghese' : 'e.g. Anjali Menon'}
                             className="w-full px-4 py-2.5 text-sm bg-white border border-gray-200 rounded-lg outline-none focus:border-xyroots-teal" 
                           />
                         </div>
@@ -306,7 +316,9 @@ export default function OnboardingModal({ isOpen, onClose, role }: OnboardingMod
                           />
                         </div>
                         <div>
-                          <label className="text-xs font-bold text-gray-700 block mb-1">Current Location <span className="text-red-500">*</span></label>
+                          <label className="text-xs font-bold text-gray-700 block mb-1">
+                            {role === 'management' ? 'School / Institution Location' : 'Current Location'} <span className="text-red-500">*</span>
+                          </label>
                           <input 
                             type="text" 
                             name="location" 
@@ -320,7 +332,8 @@ export default function OnboardingModal({ isOpen, onClose, role }: OnboardingMod
                       </div>
                     </div>
 
-                    {/* Professional Information */}
+                    {/* Professional Information — teacher only */}
+                    {role === 'teacher' && (
                     <div>
                       <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3 pb-2 border-b">Professional Information</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -382,16 +395,62 @@ export default function OnboardingModal({ isOpen, onClose, role }: OnboardingMod
                         </div>
                       </div>
                     </div>
+                    )}
+
+                    {/* Institution details — management only */}
+                    {role === 'management' && (
+                    <div>
+                      <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3 pb-2 border-b">Institution Details</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="md:col-span-2">
+                          <label className="text-xs font-bold text-gray-700 block mb-1">School / Institution Name <span className="text-red-500">*</span></label>
+                          <input 
+                            type="text" 
+                            name="title" 
+                            value={formData.title} 
+                            onChange={handleChange} 
+                            required
+                            placeholder="e.g. Greenfield International School"
+                            className="w-full px-4 py-2.5 text-sm bg-white border border-gray-200 rounded-lg outline-none focus:border-xyroots-teal" 
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-gray-700 block mb-1">Your Role / Designation</label>
+                          <input 
+                            type="text" 
+                            name="qualification" 
+                            value={formData.qualification} 
+                            onChange={handleChange}
+                            placeholder="e.g. Principal, HR Manager"
+                            className="w-full px-4 py-2.5 text-sm bg-white border border-gray-200 rounded-lg outline-none focus:border-xyroots-teal" 
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-gray-700 block mb-1">Institution Website</label>
+                          <input 
+                            type="url" 
+                            name="professionalQualification" 
+                            value={formData.professionalQualification} 
+                            onChange={handleChange}
+                            placeholder="https://yourschool.edu.in"
+                            className="w-full px-4 py-2.5 text-sm bg-white border border-gray-200 rounded-lg outline-none focus:border-xyroots-teal" 
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    )}
 
                     {/* Optional Bio */}
                     <div>
-                      <label className="text-xs font-bold text-gray-700 block mb-1">Professional Bio (Optional)</label>
+                      <label className="text-xs font-bold text-gray-700 block mb-1">
+                        {role === 'management' ? 'About Your Institution (Optional)' : 'Professional Bio (Optional)'}
+                      </label>
                       <textarea
                         name="bio"
                         value={formData.bio}
-                        onChange={handleChange}
+                        onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
                         rows={3}
-                        placeholder="Brief description of your teaching experience and philosophy..."
+                        placeholder={role === 'management' ? 'Brief description of your school and hiring needs...' : 'Brief description of your teaching experience and philosophy...'}
                         className="w-full px-4 py-2.5 text-sm bg-white border border-gray-200 rounded-lg outline-none focus:border-xyroots-teal resize-none"
                       />
                     </div>

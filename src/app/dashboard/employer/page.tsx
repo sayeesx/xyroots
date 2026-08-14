@@ -9,14 +9,16 @@ import EditJobModal from "@/components/EditJobModal";
 import {
   FaUsers, FaRegFileLines, FaCirclePlus, FaShieldHalved,
   FaLocationDot, FaSpinner, FaBriefcase,
-  FaBuilding, FaChartBar, FaGear, FaArrowRight, FaPencil
+  FaBuilding, FaChartBar, FaGear, FaArrowRight, FaPencil,
+  FaBookmark, FaRegBookmark, FaXmark
 } from "react-icons/fa6";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Loader from "@/components/Loader";
+import GetVerifiedModal from "@/components/GetVerifiedModal";
 
-type Tab = "candidates" | "vacancies" | "pipeline" | "settings";
+type Tab = "candidates" | "vacancies" | "pipeline" | "watchlist" | "settings";
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "bg-blue-50 text-blue-700",
@@ -37,11 +39,63 @@ export default function EmployerDashboard() {
   const [applications, setApplications] = useState<any[]>([]);
   const [jobs, setJobs] = useState<any[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
+  const [showGetVerified, setShowGetVerified] = useState(false);
   const supabase = createClient();
+
+  // Watchlist state
+  const [watchlistTeacherIds, setWatchlistTeacherIds] = useState<string[]>([]);
+  const [watchlistJobIds, setWatchlistJobIds] = useState<string[]>([]);
+  const [watchlistTeachers, setWatchlistTeachers] = useState<any[]>([]);
+  const [watchlistJobs, setWatchlistJobs] = useState<any[]>([]);
+  const [watchlistLoading, setWatchlistLoading] = useState(false);
 
   useEffect(() => {
     if (!loading && (!isAuthenticated || role !== "management")) router.push("/");
   }, [loading, isAuthenticated, role, router]);
+
+  // Load watchlist from localStorage
+  useEffect(() => {
+    try {
+      const tIds = JSON.parse(localStorage.getItem("agency_watchlist_teachers") || "[]");
+      const jIds = JSON.parse(localStorage.getItem("xyroots_watchlist") || "[]");
+      setWatchlistTeacherIds(tIds);
+      setWatchlistJobIds(jIds);
+    } catch { /* ignore */ }
+  }, []);
+
+  // Fetch watchlist data when tab opens
+  useEffect(() => {
+    if (tab !== "watchlist") return;
+    const load = async () => {
+      setWatchlistLoading(true);
+      const [tRes, jRes] = await Promise.all([
+        watchlistTeacherIds.length > 0
+          ? supabase.from("teacher_profiles").select("id, title, subject, location, experience_years, professional_qualification, profiles(full_name, avatar_url)").in("id", watchlistTeacherIds.slice(0, 20))
+          : Promise.resolve({ data: [] }),
+        watchlistJobIds.length > 0
+          ? supabase.from("jobs").select("id, title, school_name, location, employment_type, salary_min, salary_max").in("id", watchlistJobIds.slice(0, 20))
+          : Promise.resolve({ data: [] }),
+      ]);
+      setWatchlistTeachers((tRes.data as any[]) || []);
+      setWatchlistJobs((jRes.data as any[]) || []);
+      setWatchlistLoading(false);
+    };
+    load();
+  }, [tab, watchlistTeacherIds, watchlistJobIds]); // eslint-disable-line
+
+  const removeWatchlistTeacher = (id: string) => {
+    const next = watchlistTeacherIds.filter(i => i !== id);
+    setWatchlistTeacherIds(next);
+    setWatchlistTeachers(prev => prev.filter(t => t.id !== id));
+    localStorage.setItem("agency_watchlist_teachers", JSON.stringify(next));
+  };
+
+  const removeWatchlistJob = (id: string) => {
+    const next = watchlistJobIds.filter(i => i !== id);
+    setWatchlistJobIds(next);
+    setWatchlistJobs(prev => prev.filter(j => j.id !== id));
+    localStorage.setItem("xyroots_watchlist", JSON.stringify(next));
+  };
 
   const fetchData = useCallback(async () => {
     if (!isAuthenticated || !profile) return;
@@ -117,13 +171,22 @@ export default function EmployerDashboard() {
                   <p className="text-sm text-gray-500">School / Institution · {profile?.email}</p>
                 </div>
               </div>
-              <button
-                onClick={() => setShowPostJob(true)}
-                className="flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm font-bold hover:bg-black transition-colors self-start sm:self-auto"
-                style={{ borderRadius: "0.875rem" }}
-              >
-                <FaCirclePlus className="w-4 h-4" /> Post New Vacancy
-              </button>
+              <div className="flex items-center gap-3 flex-wrap self-start sm:self-auto">
+                <button
+                  onClick={() => setShowGetVerified(true)}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-800 text-sm font-semibold hover:bg-gray-200 transition-colors"
+                  style={{ borderRadius: "0.875rem" }}
+                >
+                  <FaShieldHalved className="w-4 h-4 text-[#00a264]" /> Get Verified
+                </button>
+                <button
+                  onClick={() => setShowPostJob(true)}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm font-bold hover:bg-black transition-colors"
+                  style={{ borderRadius: "0.875rem" }}
+                >
+                  <FaCirclePlus className="w-4 h-4" /> Post New Vacancy
+                </button>
+              </div>
             </div>
 
             {/* Stats */}
@@ -150,6 +213,7 @@ export default function EmployerDashboard() {
               { id: "candidates", label: `Applicants (${applications.length})`, icon: FaUsers },
               { id: "vacancies", label: `Vacancies (${jobs.length})`, icon: FaRegFileLines },
               { id: "pipeline", label: "Pipeline", icon: FaChartBar },
+              { id: "watchlist", label: "Watchlist", icon: FaBookmark },
               { id: "settings", label: "Settings", icon: FaGear },
             ] as const).map(t => (
               <button
@@ -284,6 +348,116 @@ export default function EmployerDashboard() {
             </div>
           )}
 
+          {/* Watchlist Tab */}
+          {tab === "watchlist" && (
+            <div className="space-y-6">
+              {watchlistLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <FaSpinner className="w-6 h-6 text-[#00a264] animate-spin" />
+                </div>
+              ) : (
+                <>
+                  {/* Saved Teachers */}
+                  <div>
+                    <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+                      <FaUsers className="w-4 h-4 text-[#00a264]" /> Saved Teacher Profiles
+                      <span className="text-xs font-medium text-gray-400 ml-1">({watchlistTeachers.length})</span>
+                    </h2>
+                    {watchlistTeachers.length === 0 ? (
+                      <div className="bg-white border border-gray-100 p-8 text-center" style={{ borderRadius: "1rem" }}>
+                        <FaUsers className="w-8 h-8 text-gray-200 mx-auto mb-2" />
+                        <p className="text-sm text-gray-500">No teacher profiles saved yet.</p>
+                        <p className="text-xs text-gray-400 mt-1">Browse teachers and shortlist them to track here.</p>
+                        <Link href="/teachers" className="inline-flex items-center gap-1.5 mt-4 px-4 py-2 bg-[#00a264] text-white text-xs font-bold hover:bg-[#008f58] transition-colors" style={{ borderRadius: "0.625rem" }}>
+                          Browse Teachers <FaArrowRight className="w-3 h-3" />
+                        </Link>
+                      </div>
+                    ) : (
+                      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        {watchlistTeachers.map((t: any) => (
+                          <div key={t.id} className="bg-white border border-gray-200 p-4 flex flex-col gap-3" style={{ borderRadius: "1rem" }}>
+                            <div className="flex items-start gap-3">
+                              <div className="w-10 h-10 shrink-0 flex items-center justify-center font-bold text-sm overflow-hidden bg-gray-200 text-gray-600" style={{ borderRadius: "50%" }}>
+                                {t.profiles?.avatar_url
+                                  ? <img src={t.profiles.avatar_url} className="w-full h-full object-cover" alt={t.profiles?.full_name} style={{ borderRadius: "50%" }} />
+                                  : (t.profiles?.full_name || "T").charAt(0).toUpperCase()}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-bold text-gray-900 truncate">{t.profiles?.full_name || "Unknown"}</p>
+                                <p className="text-xs text-gray-500 truncate">{t.title || t.subject || "Educator"}</p>
+                                {t.location && (
+                                  <p className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
+                                    <FaLocationDot className="w-2.5 h-2.5 shrink-0" />{t.location}
+                                  </p>
+                                )}
+                              </div>
+                              <button onClick={() => removeWatchlistTeacher(t.id)} className="text-gray-300 hover:text-red-400 transition-colors shrink-0">
+                                <FaXmark className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                            <div className="flex flex-wrap gap-1.5">
+                              {t.subject && <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 font-medium" style={{ borderRadius: "0.375rem" }}>{t.subject}</span>}
+                              {t.experience_years != null && <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 font-medium" style={{ borderRadius: "0.375rem" }}>{t.experience_years} yrs</span>}
+                              {t.professional_qualification && <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 font-medium" style={{ borderRadius: "0.375rem" }}>{t.professional_qualification}</span>}
+                            </div>
+                            <Link href={`/teachers/${t.id}`} className="w-full py-2 text-xs font-bold text-center bg-gray-900 text-white hover:bg-black transition-colors" style={{ borderRadius: "0.5rem" }}>
+                              View Profile
+                            </Link>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Saved Jobs */}
+                  <div>
+                    <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+                      <FaBriefcase className="w-4 h-4 text-[#00a264]" /> Saved Job Listings
+                      <span className="text-xs font-medium text-gray-400 ml-1">({watchlistJobs.length})</span>
+                    </h2>
+                    {watchlistJobs.length === 0 ? (
+                      <div className="bg-white border border-gray-100 p-8 text-center" style={{ borderRadius: "1rem" }}>
+                        <FaRegBookmark className="w-8 h-8 text-gray-200 mx-auto mb-2" />
+                        <p className="text-sm text-gray-500">No jobs saved yet.</p>
+                        <p className="text-xs text-gray-400 mt-1">Bookmark jobs while browsing to track them here.</p>
+                        <Link href="/jobs" className="inline-flex items-center gap-1.5 mt-4 px-4 py-2 bg-[#00a264] text-white text-xs font-bold hover:bg-[#008f58] transition-colors" style={{ borderRadius: "0.625rem" }}>
+                          Browse Jobs <FaArrowRight className="w-3 h-3" />
+                        </Link>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {watchlistJobs.map((job: any) => (
+                          <div key={job.id} className="bg-white border border-gray-200 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3" style={{ borderRadius: "1rem" }}>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-bold text-gray-900">{job.title}</p>
+                              <p className="text-xs text-gray-500 mt-0.5">{[job.school_name, job.location].filter(Boolean).join(" · ")}</p>
+                              <div className="flex flex-wrap gap-1.5 mt-2">
+                                {job.employment_type && <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 font-medium" style={{ borderRadius: "0.375rem" }}>{job.employment_type}</span>}
+                                {(job.salary_min || job.salary_max) && (
+                                  <span className="text-xs px-2 py-0.5 bg-[#e6f7ed] text-[#00a264] font-medium" style={{ borderRadius: "0.375rem" }}>
+                                    ₹{job.salary_min ? `${(job.salary_min/1000).toFixed(0)}k` : "?"}–{job.salary_max ? `${(job.salary_max/1000).toFixed(0)}k` : "?"}/mo
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              <Link href={`/jobs/${job.id}`} className="px-3 py-1.5 text-xs font-bold bg-[#00a264] text-white hover:bg-[#008f58] transition-colors" style={{ borderRadius: "0.5rem" }}>
+                                View Job
+                              </Link>
+                              <button onClick={() => removeWatchlistJob(job.id)} className="p-1.5 text-gray-300 hover:text-red-400 transition-colors border border-gray-200" style={{ borderRadius: "0.5rem" }}>
+                                <FaXmark className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
           {/* Settings */}
           {tab === "settings" && (
             <div className="bg-white border border-gray-100 p-6" style={{ borderRadius: "1rem" }}>
@@ -310,6 +484,7 @@ export default function EmployerDashboard() {
       <Footer />
       <PostJobModal isOpen={showPostJob} onClose={() => setShowPostJob(false)} onSuccess={fetchData} />
       <EditJobModal isOpen={!!editingJob} onClose={() => setEditingJob(null)} job={editingJob} onSuccess={fetchData} />
+      <GetVerifiedModal isOpen={showGetVerified} onClose={() => setShowGetVerified(false)} />
     </div>
   );
 }

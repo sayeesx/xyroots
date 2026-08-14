@@ -7,10 +7,10 @@ import AuthGuardedLink from "@/components/AuthGuardedLink";
 
 function JobCard({ job, isAuthenticated }: { job: any, isAuthenticated: boolean }) {
   return (
-    <div className="flex flex-col h-full border border-gray-200 bg-white hover:border-gray-400 transition-all group" style={{ borderRadius: "0.75rem" }}>
+    <div className="flex flex-col h-full border border-gray-200 bg-white hover:border-gray-400 transition-all group shadow-sm" style={{ borderRadius: "0.75rem", background: "linear-gradient(135deg, #fff 80%, #f0fdf4 100%)" }}>
       <div className="flex flex-1 flex-col">
         {/* Top header */}
-        <div className="bg-gray-50 border-b border-gray-100 px-4 py-3" style={{ borderRadius: "0.75rem 0.75rem 0 0" }}>
+        <div className="border-b border-gray-100 px-4 py-3" style={{ borderRadius: "0.75rem 0.75rem 0 0", background: "linear-gradient(to right, #f9fafb, #f0fdf4)" }}>
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
               {/* Institution type chip */}
@@ -60,7 +60,7 @@ function JobCard({ job, isAuthenticated }: { job: any, isAuthenticated: boolean 
         </div>
 
         {/* Footer */}
-        <div className="px-4 py-2.5 border-t border-gray-100 bg-gray-50/60 flex items-center justify-between" style={{ borderRadius: "0 0 0.75rem 0.75rem" }}>
+        <div className="px-4 py-2.5 border-t border-gray-100 flex items-center justify-between" style={{ borderRadius: "0 0 0.75rem 0.75rem", background: "linear-gradient(to right, #f9fafb, #f0fdf4)" }}>
           <span className="flex items-center gap-1 text-sm text-gray-500">
             <FaLocationDot className="inline w-2.5 h-2.5 text-gray-400" />
             {job.location}
@@ -76,13 +76,15 @@ function JobCard({ job, isAuthenticated }: { job: any, isAuthenticated: boolean 
 
 function TeacherCard({ teacher, isAuthenticated }: { teacher: any, isAuthenticated: boolean }) {
   return (
-    <div className="flex flex-col h-full border border-gray-200 bg-white hover:border-gray-400 transition-all group" style={{ borderRadius: "0.75rem" }}>
+    <div className="flex flex-col h-full border border-gray-200 bg-white hover:border-gray-400 transition-all group shadow-sm" style={{ borderRadius: "0.75rem", background: "linear-gradient(135deg, #fff 80%, #f0fdf4 100%)" }}>
       {/* Top header */}
-      <div className="bg-gray-50 border-b border-gray-100 px-4 py-3" style={{ borderRadius: "0.75rem 0.75rem 0 0" }}>
+      <div className="border-b border-gray-100 px-4 py-3" style={{ borderRadius: "0.75rem 0.75rem 0 0", background: "linear-gradient(to right, #f9fafb, #f0fdf4)" }}>
         <div className="flex items-center gap-3">
-          {/* Initials avatar — no image */}
-          <div className="w-12 h-12 shrink-0 flex items-center justify-center bg-gray-200 text-gray-600 font-bold text-base border border-gray-200" style={{ borderRadius: "0.5rem" }}>
-            {(teacher.name || "T").charAt(0).toUpperCase()}
+          {/* Avatar — photo or initials */}
+          <div className="w-12 h-12 shrink-0 flex items-center justify-center bg-gray-200 text-gray-600 font-bold text-base border border-gray-200 overflow-hidden" style={{ borderRadius: "0.5rem" }}>
+            {teacher.avatar_url
+              ? <img src={teacher.avatar_url} alt={teacher.name} className="w-full h-full object-cover" style={{ borderRadius: "0.5rem" }} />
+              : (teacher.name || "T").charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
             <span className="inline-block text-[10px] font-semibold uppercase tracking-wider bg-gray-100 text-gray-500 px-2 py-0.5 mb-1 leading-tight" style={{ borderRadius: "0.25rem" }}>
@@ -139,9 +141,9 @@ function TeacherCard({ teacher, isAuthenticated }: { teacher: any, isAuthenticat
       </div>
 
       {/* Footer */}
-      <div className="px-4 py-2.5 border-t border-gray-100 bg-gray-50/60 flex items-center justify-between" style={{ borderRadius: "0 0 0.75rem 0.75rem" }}>
+      <div className="px-4 py-2.5 border-t border-gray-100 flex items-center justify-between" style={{ borderRadius: "0 0 0.75rem 0.75rem", background: "linear-gradient(to right, #f9fafb, #f0fdf4)" }}>
         <span className="text-[10px] font-mono text-gray-400">{teacher.id}</span>
-        <span className="text-[11px] text-gray-600 font-semibold flex items-center gap-1">
+        <span className="text-[11px] text-[#00a264] font-semibold flex items-center gap-1">
           <FaCircleCheck className="inline w-3 h-3" /> Verified
         </span>
       </div>
@@ -171,7 +173,7 @@ export default async function LatestVacancies() {
   const [{ data: rawJobs }, { data: rawTeachers }] = await Promise.all([
     supabase.from("jobs").select("id, title, level, created_at, qualification, experience_min, experience_max, salary_min, salary_max, location").eq("status", "published").limit(limit).order("created_at", { ascending: false }),
     role
-      ? supabase.from("teacher_profiles").select("id, subject, title, location, experience_years, professional_qualification, languages, availability, profiles(full_name)").eq("is_visible", true).limit(limit).order("created_at", { ascending: false })
+      ? supabase.from("teacher_profiles").select("id, subject, title, location, experience_years, professional_qualification, languages, availability, profiles(full_name, avatar_url)").eq("is_visible", true).limit(limit).order("created_at", { ascending: false })
       : Promise.resolve({ data: null }),
   ]);
 
@@ -205,7 +207,9 @@ export default async function LatestVacancies() {
   } else {
     teacherCards = ((rawTeachers as any[]) || []).map((t: any) => ({
       id: t.id.substring(0,8).toUpperCase(),
+      fullId: t.id,
       name: t.profiles?.full_name || "Anonymous Educator",
+      avatar_url: t.profiles?.avatar_url || null,
       designation: t.title || "Subject Teacher",
       subject: t.subject || "General",
       experience: t.experience_years ? `${t.experience_years} Years` : 'Fresher',

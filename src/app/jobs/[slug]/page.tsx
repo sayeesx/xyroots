@@ -114,7 +114,7 @@ export default function JobDetailPage() {
           <div className="text-center p-12">
             <h2 className="text-2xl font-bold text-gray-900 mb-3">Job Not Found</h2>
             <p className="text-gray-500 text-sm mb-6">This vacancy may have been removed or the link is invalid.</p>
-            <button onClick={() => router.push('/jobs')} className="inline-flex items-center gap-2 px-5 py-2.5 bg-xyroots-teal text-white text-sm font-semibold" style={{ borderRadius: "0.75rem" }}>
+            <button onClick={() => router.push('/jobs')} className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#00a264] text-white text-sm font-semibold" style={{ borderRadius: "0.75rem" }}>
               <FaArrowLeft className="w-3.5 h-3.5" /> Browse All Jobs
             </button>
           </div>
@@ -265,7 +265,7 @@ export default function JobDetailPage() {
                   <ul className="space-y-3">
                     {job.responsibilities.map((r: string, i: number) => (
                       <li key={i} className="flex items-start gap-3 text-sm text-gray-700">
-                        <FaCircleCheck className="w-4 h-4 text-xyroots-teal shrink-0 mt-0.5" /> {r}
+                        <FaCircleCheck className="w-4 h-4 text-[#00a264] shrink-0 mt-0.5" /> {r}
                       </li>
                     ))}
                   </ul>
@@ -284,7 +284,7 @@ export default function JobDetailPage() {
                   <ul className="space-y-3">
                     {job.requirements.map((r: string, i: number) => (
                       <li key={i} className="flex items-start gap-3 text-sm text-gray-700">
-                        <FaCircleCheck className="w-4 h-4 text-xyroots-teal shrink-0 mt-0.5" /> {r}
+                        <FaCircleCheck className="w-4 h-4 text-[#00a264] shrink-0 mt-0.5" /> {r}
                       </li>
                     ))}
                   </ul>
@@ -333,8 +333,8 @@ export default function JobDetailPage() {
                     onClick={handleApply}
                     disabled={applyLoading || applied}
                     className={`w-full py-3.5 px-6 font-bold text-sm transition-all flex items-center justify-center gap-2 ${
-                      applied ? "bg-green-100 text-green-700 cursor-default" :
-                      "bg-xyroots-teal text-white hover:bg-[#068050] active:scale-[0.98]"
+                      applied ? "bg-[#e6f7ed] text-[#00a264] cursor-default" :
+                      "bg-[#00a264] text-white hover:bg-[#008f58] active:scale-[0.98]"
                     }`}
                     style={{ borderRadius: "0.75rem" }}
                   >
@@ -346,7 +346,7 @@ export default function JobDetailPage() {
                   <button
                     onClick={toggleSave}
                     className={`w-full py-3 px-6 font-semibold text-sm border transition-all flex items-center justify-center gap-2 ${
-                      saved ? "bg-amber-50 border-amber-200 text-amber-700" : "border-gray-200 text-gray-700 hover:border-xyroots-teal hover:text-xyroots-teal"
+                      saved ? "bg-[#e6f7ed] border-[#00a264]/30 text-[#00a264]" : "border-gray-200 text-gray-700 hover:border-[#00a264] hover:text-[#00a264]"
                     }`}
                     style={{ borderRadius: "0.75rem" }}
                   >
@@ -382,7 +382,7 @@ export default function JobDetailPage() {
                   </div>
                   <div>
                     <p className="text-sm font-bold text-gray-900 flex items-center gap-1">
-                      {job.school} {job.schoolVerified && <FaShieldHalved className="w-3.5 h-3.5 text-xyroots-teal" />}
+                      {job.school} {job.schoolVerified && <FaShieldHalved className="w-3.5 h-3.5 text-[#00a264]" />}
                     </p>
                     <p className="text-xs text-gray-500">{job.location}</p>
                   </div>
@@ -421,7 +421,7 @@ export default function JobDetailPage() {
             </div>
             <button
               onClick={() => { navigator.clipboard?.writeText(window.location.href); setShowShareModal(false); }}
-              className="w-full py-3 bg-xyroots-teal text-white font-bold text-sm hover:bg-[#068050] transition-colors"
+              className="w-full py-3 bg-[#00a264] text-white font-bold text-sm hover:bg-[#008f58] transition-colors"
               style={{ borderRadius: "0.75rem" }}
             >
               Copy Link

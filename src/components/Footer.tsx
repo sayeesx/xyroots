@@ -114,6 +114,12 @@ export default function Footer() {
           <p className="text-sm text-gray-500">
             © 2026 Xyroots. All rights reserved.
           </p>
+          <p className="text-xs text-gray-500">
+            Built &amp; Licensed by{" "}
+            <a href="https://www.narrs.in" target="_blank" rel="noopener noreferrer" className="text-[#00a264] hover:underline font-medium">
+              Narrs
+            </a>
+          </p>
           <div className="flex items-center gap-6">
             <Link href="/privacy-policy" className="text-sm text-gray-500 hover:text-white transition-colors">
               Privacy

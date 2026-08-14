@@ -62,7 +62,7 @@ export default function TeacherSection() {
 
           {/* Right - Teacher Profile Mockup */}
           <div className="relative">
-            <div className="bg-white rounded-2xl dashboard-shadow border border-xyroots-border overflow-hidden max-w-sm mx-auto lg:ml-auto">
+            <div className="bg-white rounded-2xl dashboard-shadow border border-xyroots-border overflow-hidden max-w-sm mx-auto lg:ml-auto" style={{ background: "linear-gradient(160deg, #fff 70%, #f0fdf4 100%)" }}>
               {/* Cover */}
               <div className="h-40 sm:h-48 bg-gray-200 relative overflow-hidden">
                 <Image

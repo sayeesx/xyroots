@@ -14,7 +14,7 @@ interface Props {
 }
 
 export default function AuthGuardedLink({ href, type, className, style, children }: Props) {
-  const { isAuthenticated, requireTeacher, requireInstitution } = useAuth();
+  const { isAuthenticated, role, requireTeacher, requireInstitution } = useAuth();
   const router = useRouter();
 
   const handleClick = (e: React.MouseEvent) => {
@@ -26,6 +26,7 @@ export default function AuthGuardedLink({ href, type, className, style, children
         requireInstitution(() => router.push(href));
       }
     } else {
+      // Agencies can access both teacher profiles and job pages
       router.push(href);
     }
   };

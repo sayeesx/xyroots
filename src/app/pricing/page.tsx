@@ -1,7 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { FaCircleCheck, FaArrowRight, FaShieldHalved, FaBolt, FaWandMagicSparkles } from "react-icons/fa6";
-import Link from "next/link";
 
 const teacherPlans = [
   {
@@ -167,9 +166,13 @@ export default function PricingPage() {
                       </li>
                     ))}
                   </ul>
-                  <Link href={plan.href} className={`w-full py-3 text-sm font-bold text-center transition-colors ${plan.highlighted ? "bg-xyroots-yellow text-xyroots-dark hover:bg-yellow-300" : "bg-gray-900 text-white hover:bg-black"}`} style={{ borderRadius: "0.75rem" }}>
+                  <button
+                    type="button"
+                    className={`w-full py-3 text-sm font-bold text-center cursor-default ${plan.highlighted ? "bg-xyroots-yellow text-xyroots-dark" : "bg-gray-900 text-white"}`}
+                    style={{ borderRadius: "0.75rem" }}
+                  >
                     {plan.cta}
-                  </Link>
+                  </button>
                 </div>
               ))}
             </div>
@@ -210,9 +213,13 @@ export default function PricingPage() {
                       </li>
                     ))}
                   </ul>
-                  <Link href={plan.href} className={`w-full py-3 text-sm font-bold text-center transition-colors ${plan.highlighted ? "bg-xyroots-yellow text-xyroots-dark hover:bg-yellow-300" : "bg-gray-900 text-white hover:bg-black"}`} style={{ borderRadius: "0.75rem" }}>
+                  <button
+                    type="button"
+                    className={`w-full py-3 text-sm font-bold text-center cursor-default ${plan.highlighted ? "bg-xyroots-yellow text-xyroots-dark" : "bg-gray-900 text-white"}`}
+                    style={{ borderRadius: "0.75rem" }}
+                  >
                     {plan.cta}
-                  </Link>
+                  </button>
                 </div>
               ))}
             </div>
@@ -260,12 +267,12 @@ export default function PricingPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-3">Ready to get started?</h2>
             <p className="text-gray-500 text-sm mb-8">Create your free profile today. No credit card required.</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/register/teacher" className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white font-semibold text-sm hover:bg-black transition-colors" style={{ borderRadius: "0.75rem" }}>
+              <button type="button" className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white font-semibold text-sm cursor-default" style={{ borderRadius: "0.75rem" }}>
                 Register as Teacher — Free <FaArrowRight className="w-3.5 h-3.5" />
-              </Link>
-              <Link href="/register/employer" className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-700 font-semibold text-sm hover:border-gray-500 hover:text-gray-800 transition-colors" style={{ borderRadius: "0.75rem" }}>
+              </button>
+              <button type="button" className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-700 font-semibold text-sm cursor-default" style={{ borderRadius: "0.75rem" }}>
                 Register as Institution
-              </Link>
+              </button>
             </div>
           </div>
         </section>

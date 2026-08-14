@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import { formatSalary } from "@/lib/utils";
 import {
   FaMagnifyingGlass, FaLocationDot, FaBookmark, FaRegBookmark, FaCircleCheck,
-  FaBars, FaTableCellsLarge, FaBriefcase, FaFilter, FaXmark, FaIndianRupeeSign
+  FaBars, FaTableCellsLarge, FaBriefcase, FaFilter, FaXmark, FaIndianRupeeSign, FaSort
 } from "react-icons/fa6";
 import { useAuth } from "@/lib/auth/AuthProvider";
 
@@ -18,19 +18,47 @@ const SUBJECTS = [
   "Geography", "Sanskrit", "Physical Education"
 ];
 
+const INDIA_STATES = [
+  "All States",
+  "Maharashtra",
+  "Uttar Pradesh",
+  "Tamil Nadu",
+  "Karnataka",
+  "Delhi",
+  "West Bengal",
+  "Telangana",
+  "Gujarat",
+  "Rajasthan",
+  "Kerala",
+];
+
+const SORT_OPTIONS = [
+  { value: "default", label: "Newest First" },
+  { value: "salary_desc", label: "Salary: High to Low" },
+  { value: "salary_asc", label: "Salary: Low to High" },
+  { value: "title_asc", label: "Title: A–Z" },
+];
+
+const SALARY_MIN = 15000;
+const SALARY_MAX = 150000;
+
 // ─── Filter Panel ─────────────────────────────────────────────────────────────
 function FilterPanel({
   selectedJobTypes, setSelectedJobTypes,
   openToRemote, setOpenToRemote,
-  selectedSalaryRanges, setSelectedSalaryRanges,
-  useCustomSalary, setUseCustomSalary,
-  customSalaryMin, setCustomSalaryMin,
-  customSalaryMax, setCustomSalaryMax,
+  salaryRange, setSalaryRange,
   selectedExperiences, setSelectedExperiences,
+  selectedState, setSelectedState,
+  sortBy, setSortBy,
   clearAll,
 }: any) {
   const toggleCheckbox = (state: string[], setState: any, val: string) => {
     setState((prev: string[]) => prev.includes(val) ? prev.filter((i: string) => i !== val) : [...prev, val]);
+  };
+
+  const formatSalaryLabel = (val: number) => {
+    if (val >= SALARY_MAX) return "₹1,50,000+";
+    return `₹${(val / 1000).toFixed(0)},000`;
   };
 
   return (
@@ -41,6 +69,32 @@ function FilterPanel({
         </h2>
         <button onClick={clearAll} className="text-xs font-semibold text-gray-600 hover:text-black">Clear All</button>
       </div>
+
+      {/* Sort */}
+      <div>
+        <p className="font-semibold mb-2 text-gray-800 flex items-center gap-1.5"><FaSort className="w-3 h-3" /> Sort By</p>
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          className="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-gray-500 text-gray-700"
+        >
+          {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </select>
+      </div>
+      <hr className="border-gray-200" />
+
+      {/* State */}
+      <div>
+        <p className="font-semibold mb-2 text-gray-800 flex items-center gap-1.5"><FaLocationDot className="w-3 h-3" /> State</p>
+        <select
+          value={selectedState}
+          onChange={(e) => setSelectedState(e.target.value)}
+          className="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-gray-500 text-gray-700"
+        >
+          {INDIA_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+        </select>
+      </div>
+      <hr className="border-gray-200" />
 
       {/* Job Type */}
       <div>
@@ -71,42 +125,58 @@ function FilterPanel({
       </div>
       <hr className="border-gray-200" />
 
-      {/* Salary */}
+      {/* Salary Range Slider */}
       <div>
         <p className="font-semibold mb-3 text-gray-800">Salary Range</p>
-        <div className="space-y-2.5 mb-3">
-          {[
-            { label: "Less than ₹20,000", key: "lt20" },
-            { label: "₹20,000 – ₹40,000", key: "20-40" },
-            { label: "₹40,000 – ₹60,000", key: "40-60" },
-            { label: "More than ₹60,000", key: "gt60" },
-          ].map(range => (
-            <label key={range.key} className="flex items-center gap-3 cursor-pointer group" onClick={(e) => { e.preventDefault(); if (useCustomSalary) setUseCustomSalary(false); toggleCheckbox(selectedSalaryRanges, setSelectedSalaryRanges, range.key); }}>
-              <div className={`w-[18px] h-[18px] rounded flex items-center justify-center border transition-colors shrink-0 ${!useCustomSalary && selectedSalaryRanges.includes(range.key) ? 'bg-gray-900 border-gray-900' : 'border-gray-300 group-hover:border-gray-500 bg-white'}`}>
-                {!useCustomSalary && selectedSalaryRanges.includes(range.key) && <FaCircleCheck className="w-3 h-3 text-white" />}
-              </div>
-              <span className="text-gray-600 group-hover:text-gray-900 select-none">{range.label}</span>
-            </label>
-          ))}
+        <div className="space-y-3">
+          <div className="flex justify-between text-xs text-gray-500">
+            <span>{formatSalaryLabel(salaryRange[0])}</span>
+            <span>{formatSalaryLabel(salaryRange[1])}</span>
+          </div>
+          <div className="relative h-5 flex items-center">
+            {/* Track */}
+            <div className="absolute left-0 right-0 h-1.5 bg-gray-200 rounded-full" />
+            {/* Active track */}
+            <div
+              className="absolute h-1.5 bg-[#00a264] rounded-full"
+              style={{
+                left: `${((salaryRange[0] - SALARY_MIN) / (SALARY_MAX - SALARY_MIN)) * 100}%`,
+                right: `${100 - ((salaryRange[1] - SALARY_MIN) / (SALARY_MAX - SALARY_MIN)) * 100}%`
+              }}
+            />
+            {/* Min thumb */}
+            <input
+              type="range"
+              min={SALARY_MIN}
+              max={SALARY_MAX}
+              step={5000}
+              value={salaryRange[0]}
+              onChange={(e) => {
+                const val = Math.min(Number(e.target.value), salaryRange[1] - 5000);
+                setSalaryRange([val, salaryRange[1]]);
+              }}
+              className="absolute w-full h-1.5 appearance-none bg-transparent cursor-pointer salary-slider-thumb"
+              style={{ zIndex: salaryRange[0] > SALARY_MAX - 5000 ? 5 : 3 }}
+            />
+            {/* Max thumb */}
+            <input
+              type="range"
+              min={SALARY_MIN}
+              max={SALARY_MAX}
+              step={5000}
+              value={salaryRange[1]}
+              onChange={(e) => {
+                const val = Math.max(Number(e.target.value), salaryRange[0] + 5000);
+                setSalaryRange([salaryRange[0], val]);
+              }}
+              className="absolute w-full h-1.5 appearance-none bg-transparent cursor-pointer salary-slider-thumb"
+              style={{ zIndex: 4 }}
+            />
+          </div>
+          <p className="text-xs text-center text-gray-500 font-medium">
+            {formatSalaryLabel(salaryRange[0])} – {formatSalaryLabel(salaryRange[1])}
+          </p>
         </div>
-        <label className="flex items-center gap-3 cursor-pointer group" onClick={(e) => { e.preventDefault(); setUseCustomSalary(!useCustomSalary); if (!useCustomSalary) setSelectedSalaryRanges([]); }}>
-          <div className={`w-[18px] h-[18px] rounded flex items-center justify-center border transition-colors shrink-0 ${useCustomSalary ? 'bg-gray-900 border-gray-900' : 'border-gray-300 group-hover:border-gray-500 bg-white'}`}>
-            {useCustomSalary && <FaCircleCheck className="w-3 h-3 text-white" />}
-          </div>
-          <span className="text-gray-600 group-hover:text-gray-900 select-none font-medium">Custom Range</span>
-        </label>
-        {useCustomSalary && (
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <div>
-              <label className="text-[10px] text-gray-400 font-bold uppercase mb-1 block">Min (₹)</label>
-              <input type="number" value={customSalaryMin} onChange={(e) => setCustomSalaryMin(Number(e.target.value))} className="w-full px-2 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg text-gray-800 outline-none focus:border-gray-500" step={5000} min={0} />
-            </div>
-            <div>
-              <label className="text-[10px] text-gray-400 font-bold uppercase mb-1 block">Max (₹)</label>
-              <input type="number" value={customSalaryMax} onChange={(e) => setCustomSalaryMax(Number(e.target.value))} className="w-full px-2 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg text-gray-800 outline-none focus:border-gray-500" step={5000} min={0} />
-            </div>
-          </div>
-        )}
       </div>
       <hr className="border-gray-200" />
 
@@ -204,11 +274,10 @@ function JobsPageInner() {
   // Filters
   const [selectedJobTypes, setSelectedJobTypes] = useState<string[]>([]);
   const [openToRemote, setOpenToRemote] = useState(false);
-  const [selectedSalaryRanges, setSelectedSalaryRanges] = useState<string[]>([]);
-  const [useCustomSalary, setUseCustomSalary] = useState(false);
-  const [customSalaryMin, setCustomSalaryMin] = useState(10000);
-  const [customSalaryMax, setCustomSalaryMax] = useState(100000);
+  const [salaryRange, setSalaryRange] = useState<[number, number]>([SALARY_MIN, SALARY_MAX]);
   const [selectedExperiences, setSelectedExperiences] = useState<string[]>([]);
+  const [selectedState, setSelectedState] = useState("All States");
+  const [sortBy, setSortBy] = useState("default");
 
   // Watchlist — stores actual job UUIDs
   const [watchlist, setWatchlist] = useState<string[]>([]);
@@ -229,16 +298,17 @@ function JobsPageInner() {
 
   const clearAll = () => {
     setSelectedJobTypes([]);
-    setSelectedSalaryRanges([]);
+    setSalaryRange([SALARY_MIN, SALARY_MAX]);
     setSelectedExperiences([]);
-    setUseCustomSalary(false);
+    setSelectedState("All States");
     setOpenToRemote(false);
+    setSortBy("default");
   };
 
-  const activeFilterCount = selectedJobTypes.length + selectedSalaryRanges.length + selectedExperiences.length + (openToRemote ? 1 : 0);
+  const activeFilterCount = selectedJobTypes.length + selectedExperiences.length + (openToRemote ? 1 : 0) + (selectedState !== "All States" ? 1 : 0) + (salaryRange[0] > SALARY_MIN || salaryRange[1] < SALARY_MAX ? 1 : 0);
 
   const filteredJobs = useMemo(() => {
-    return dbJobs.filter(job => {
+    let result = dbJobs.filter(job => {
       // Subject bubble filter
       if (activeSubject && activeSubject !== "All") {
         const jobSubject = (job.subject || "").toLowerCase();
@@ -259,7 +329,22 @@ function JobsPageInner() {
           return false;
         }
       }
+      if (selectedState && selectedState !== "All States") {
+        if (!(job.location ?? '').toLowerCase().includes(selectedState.toLowerCase())) return false;
+      }
       if (selectedJobTypes.length > 0 && !selectedJobTypes.includes(job.employmentType)) return false;
+
+      // Salary range filter
+      if (salaryRange[0] > SALARY_MIN || salaryRange[1] < SALARY_MAX) {
+        const jobMin = job.salaryMin ?? 0;
+        const jobMax = job.salaryMax ?? job.salaryMin ?? 0;
+        if (jobMin === 0 && jobMax === 0) {
+          // No salary info — only filter out if user has active salary filter
+        } else {
+          if (jobMax < salaryRange[0] || jobMin > salaryRange[1]) return false;
+        }
+      }
+
       if (selectedExperiences.length > 0) {
         const expMin = job.experienceMin ?? 0;
         const hasMatch = selectedExperiences.some(e => {
@@ -274,12 +359,16 @@ function JobsPageInner() {
       }
       return true;
     });
-  }, [searchTerm, citySearch, activeSubject, dbJobs, selectedJobTypes, selectedExperiences]);
 
-  const filterProps = { selectedJobTypes, setSelectedJobTypes, openToRemote, setOpenToRemote, selectedSalaryRanges, setSelectedSalaryRanges, useCustomSalary, setUseCustomSalary, customSalaryMin, setCustomSalaryMin, customSalaryMax, setCustomSalaryMax, selectedExperiences, setSelectedExperiences, clearAll };
+    // Sort
+    if (sortBy === "salary_desc") result = [...result].sort((a, b) => (b.salaryMax ?? b.salaryMin ?? 0) - (a.salaryMax ?? a.salaryMin ?? 0));
+    else if (sortBy === "salary_asc") result = [...result].sort((a, b) => (a.salaryMin ?? 0) - (b.salaryMin ?? 0));
+    else if (sortBy === "title_asc") result = [...result].sort((a, b) => (a.title || "").localeCompare(b.title || ""));
 
-  const INITIAL_COLORS = ['#f3f4f6', '#f3f4f6', '#f3f4f6', '#f3f4f6'];
-  const INITIAL_TEXT_COLORS = ['#374151', '#374151', '#374151', '#374151'];
+    return result;
+  }, [searchTerm, citySearch, activeSubject, dbJobs, selectedJobTypes, selectedExperiences, selectedState, salaryRange, sortBy]);
+
+  const filterProps = { selectedJobTypes, setSelectedJobTypes, openToRemote, setOpenToRemote, salaryRange, setSalaryRange, selectedExperiences, setSelectedExperiences, selectedState, setSelectedState, sortBy, setSortBy, clearAll };
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f7f8fa]">
@@ -334,6 +423,16 @@ function JobsPageInner() {
                   className="w-full text-sm outline-none bg-transparent placeholder-gray-400 text-gray-900 font-medium min-w-0"
                 />
               </div>
+              {/* State Dropdown */}
+              <div className="flex items-center px-3 py-2.5 border-b sm:border-b-0 sm:border-r border-gray-200 min-w-0">
+                <select
+                  value={selectedState}
+                  onChange={(e) => setSelectedState(e.target.value)}
+                  className="w-full text-sm outline-none bg-transparent text-gray-700 font-medium min-w-0 cursor-pointer"
+                >
+                  {INDIA_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
               <button className="bg-[#00a264] text-white rounded-lg px-6 py-2.5 text-sm font-semibold hover:bg-[#008f58] transition-colors shrink-0 flex items-center justify-center gap-2 m-1">
                 <FaMagnifyingGlass className="w-3.5 h-3.5" /> Search
               </button>
@@ -387,13 +486,26 @@ function JobsPageInner() {
                     <span className="font-bold text-gray-900">{isLoading ? "..." : filteredJobs.length}</span> jobs found
                   </p>
                 </div>
-                <div className="flex items-center bg-white rounded-lg p-0.5 border border-gray-200 shadow-sm">
-                  <button onClick={() => setViewMode("grid")} className={`p-1.5 rounded-md transition-all ${viewMode === 'grid' ? 'bg-gray-100 text-gray-900' : 'text-gray-400 hover:text-gray-700'}`}>
-                    <FaTableCellsLarge className="w-3.5 h-3.5" />
-                  </button>
-                  <button onClick={() => setViewMode("list")} className={`p-1.5 rounded-md transition-all ${viewMode === 'list' ? 'bg-gray-100 text-gray-900' : 'text-gray-400 hover:text-gray-700'}`}>
-                    <FaBars className="w-3.5 h-3.5" />
-                  </button>
+                <div className="flex items-center gap-2">
+                  {/* Sort on desktop */}
+                  <div className="hidden sm:flex items-center gap-1.5">
+                    <FaSort className="w-3.5 h-3.5 text-gray-400" />
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="text-xs text-gray-600 bg-white border border-gray-200 rounded-lg px-2 py-1.5 outline-none focus:border-gray-400"
+                    >
+                      {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                    </select>
+                  </div>
+                  <div className="flex items-center bg-white rounded-lg p-0.5 border border-gray-200 shadow-sm">
+                    <button onClick={() => setViewMode("grid")} className={`p-1.5 rounded-md transition-all ${viewMode === 'grid' ? 'bg-gray-100 text-gray-900' : 'text-gray-400 hover:text-gray-700'}`}>
+                      <FaTableCellsLarge className="w-3.5 h-3.5" />
+                    </button>
+                    <button onClick={() => setViewMode("list")} className={`p-1.5 rounded-md transition-all ${viewMode === 'list' ? 'bg-gray-100 text-gray-900' : 'text-gray-400 hover:text-gray-700'}`}>
+                      <FaBars className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -477,3 +589,4 @@ export default function JobsPage() {
     </Suspense>
   );
 }
+

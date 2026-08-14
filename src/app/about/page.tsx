@@ -48,9 +48,6 @@ export default function AboutPage() {
                 </p>
               </div>
               <div className="flex gap-3 shrink-0">
-                <Link href="/jobs" className="px-5 py-2.5 bg-gray-900 text-white font-semibold text-sm hover:bg-black transition-colors" style={{ borderRadius: "0.75rem" }}>
-                  Explore Jobs
-                </Link>
                 <Link href="/contact" className="px-5 py-2.5 border border-gray-200 text-gray-700 font-semibold text-sm hover:border-gray-400 transition-colors" style={{ borderRadius: "0.75rem" }}>
                   Contact Us
                 </Link>

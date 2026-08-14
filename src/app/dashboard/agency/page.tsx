@@ -204,6 +204,7 @@ export default function AgencyDashboard() {
               { id: "candidates", label: `Applicants (${applications.length})`, icon: FaUsers },
               { id: "vacancies", label: `Vacancies (${jobs.length})`, icon: FaRegFileLines },
               { id: "pipeline", label: "Pipeline", icon: FaChartBar },
+              { id: "watchlist", label: `Watchlist`, icon: FaBookmark },
               { id: "settings", label: "Settings", icon: FaGear },
             ] as const).map(t => (
               <button key={t.id} onClick={() => setTab(t.id)}
@@ -252,7 +253,7 @@ export default function AgencyDashboard() {
                         {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
                       </span>
                       {teacherProfileId && (
-                        <Link href={`/teachers/${p.id}`} className="px-3 py-1.5 text-xs font-bold border border-gray-200 text-gray-700 hover:border-xyroots-teal hover:text-xyroots-teal transition-colors" style={{ borderRadius: "0.5rem" }}>
+                        <Link href={`/teachers/${teacherProfileId}`} className="px-3 py-1.5 text-xs font-bold border border-gray-200 text-gray-700 hover:border-[#00a264] hover:text-[#00a264] transition-colors" style={{ borderRadius: "0.5rem" }}>
                           View Profile
                         </Link>
                       )}
@@ -268,7 +269,7 @@ export default function AgencyDashboard() {
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <h2 className="text-lg font-bold text-gray-900">Managed Vacancies</h2>
-                <button onClick={() => setShowPostJob(true)} className="flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-xyroots-teal text-white hover:bg-xyroots-dark transition-colors" style={{ borderRadius: "0.75rem" }}>
+                <button onClick={() => setShowPostJob(true)} className="flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-[#00a264] text-white hover:bg-[#008f58] transition-colors" style={{ borderRadius: "0.75rem" }}>
                   <FaCirclePlus className="w-4 h-4" /> New Vacancy
                 </button>
               </div>
@@ -277,7 +278,7 @@ export default function AgencyDashboard() {
                   <FaBuilding className="w-10 h-10 text-gray-300 mx-auto mb-3" />
                   <h3 className="text-lg font-bold text-gray-900 mb-1">No Vacancies Yet</h3>
                   <p className="text-gray-500 text-sm mb-4">Post your first teaching vacancy.</p>
-                  <button onClick={() => setShowPostJob(true)} className="inline-flex items-center gap-2 px-5 py-2.5 bg-xyroots-teal text-white text-sm font-semibold" style={{ borderRadius: "0.75rem" }}>
+                  <button onClick={() => setShowPostJob(true)} className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#00a264] text-white text-sm font-semibold" style={{ borderRadius: "0.75rem" }}>
                     Post First Vacancy <FaArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -325,6 +326,120 @@ export default function AgencyDashboard() {
             </div>
           )}
 
+          {/* Watchlist Tab */}
+          {tab === "watchlist" && (
+            <div className="space-y-6">
+              {watchlistLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <FaSpinner className="w-6 h-6 text-[#00a264] animate-spin" />
+                </div>
+              ) : (
+                <>
+                  {/* Saved Teachers */}
+                  <div>
+                    <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+                      <FaUsers className="w-4 h-4 text-[#00a264]" /> Saved Teacher Profiles
+                      <span className="text-xs font-medium text-gray-400 ml-1">({watchlistTeachers.length})</span>
+                    </h2>
+                    {watchlistTeachers.length === 0 ? (
+                      <div className="bg-white border border-gray-100 p-8 text-center" style={{ borderRadius: "1rem" }}>
+                        <FaUsers className="w-8 h-8 text-gray-200 mx-auto mb-2" />
+                        <p className="text-sm text-gray-500">No teacher profiles saved yet.</p>
+                        <p className="text-xs text-gray-400 mt-1">Browse teacher profiles and bookmark them to see them here.</p>
+                        <Link href="/teachers" className="inline-flex items-center gap-1.5 mt-4 px-4 py-2 bg-[#00a264] text-white text-xs font-bold hover:bg-[#008f58] transition-colors" style={{ borderRadius: "0.625rem" }}>
+                          Browse Teachers <FaArrowRight className="w-3 h-3" />
+                        </Link>
+                      </div>
+                    ) : (
+                      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        {watchlistTeachers.map((t: any) => (
+                          <div key={t.id} className="bg-white border border-gray-200 p-4 flex flex-col gap-3" style={{ borderRadius: "1rem" }}>
+                            <div className="flex items-start gap-3">
+                              <div className="w-10 h-10 shrink-0 flex items-center justify-center font-bold text-sm overflow-hidden bg-gray-200 text-gray-600" style={{ borderRadius: "50%" }}>
+                                {t.profiles?.avatar_url
+                                  ? <img src={t.profiles.avatar_url} className="w-full h-full object-cover" alt={t.profiles?.full_name} style={{ borderRadius: "50%" }} />
+                                  : (t.profiles?.full_name || "T").charAt(0).toUpperCase()}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-bold text-gray-900 truncate">{t.profiles?.full_name || "Unknown"}</p>
+                                <p className="text-xs text-gray-500 truncate">{t.title || t.subject || "Educator"}</p>
+                                {t.location && (
+                                  <p className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
+                                    <FaLocationDot className="w-2.5 h-2.5 shrink-0" />{t.location}
+                                  </p>
+                                )}
+                              </div>
+                              <button onClick={() => removeWatchlistTeacher(t.id)} className="text-gray-300 hover:text-red-400 transition-colors shrink-0">
+                                <FaXmark className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                            <div className="flex flex-wrap gap-1.5">
+                              {t.subject && <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 font-medium" style={{ borderRadius: "0.375rem" }}>{t.subject}</span>}
+                              {t.experience_years != null && <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 font-medium" style={{ borderRadius: "0.375rem" }}>{t.experience_years} yrs</span>}
+                              {t.professional_qualification && <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 font-medium" style={{ borderRadius: "0.375rem" }}>{t.professional_qualification}</span>}
+                            </div>
+                            <Link href={`/teachers/${t.id}`} className="w-full py-2 text-xs font-bold text-center bg-gray-900 text-white hover:bg-black transition-colors" style={{ borderRadius: "0.5rem" }}>
+                              View Profile
+                            </Link>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Saved Jobs */}
+                  <div>
+                    <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+                      <FaBriefcase className="w-4 h-4 text-[#00a264]" /> Saved Job Listings
+                      <span className="text-xs font-medium text-gray-400 ml-1">({watchlistJobs.length})</span>
+                    </h2>
+                    {watchlistJobs.length === 0 ? (
+                      <div className="bg-white border border-gray-100 p-8 text-center" style={{ borderRadius: "1rem" }}>
+                        <FaRegBookmark className="w-8 h-8 text-gray-200 mx-auto mb-2" />
+                        <p className="text-sm text-gray-500">No jobs saved yet.</p>
+                        <p className="text-xs text-gray-400 mt-1">Browse job listings and bookmark them to track here.</p>
+                        <Link href="/jobs" className="inline-flex items-center gap-1.5 mt-4 px-4 py-2 bg-[#00a264] text-white text-xs font-bold hover:bg-[#008f58] transition-colors" style={{ borderRadius: "0.625rem" }}>
+                          Browse Jobs <FaArrowRight className="w-3 h-3" />
+                        </Link>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {watchlistJobs.map((job: any) => (
+                          <div key={job.id} className="bg-white border border-gray-200 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3" style={{ borderRadius: "1rem" }}>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start gap-2">
+                                <div>
+                                  <p className="text-sm font-bold text-gray-900">{job.title}</p>
+                                  <p className="text-xs text-gray-500 mt-0.5">{[job.school_name, job.location].filter(Boolean).join(" · ")}</p>
+                                  <div className="flex flex-wrap gap-1.5 mt-2">
+                                    {job.employment_type && <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 font-medium" style={{ borderRadius: "0.375rem" }}>{job.employment_type}</span>}
+                                    {(job.salary_min || job.salary_max) && (
+                                      <span className="text-xs px-2 py-0.5 bg-[#e6f7ed] text-[#00a264] font-medium" style={{ borderRadius: "0.375rem" }}>
+                                        ₹{job.salary_min ? `${(job.salary_min/1000).toFixed(0)}k` : "?"}–{job.salary_max ? `${(job.salary_max/1000).toFixed(0)}k` : "?"}/mo
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              <Link href={`/jobs/${job.id}`} className="px-3 py-1.5 text-xs font-bold bg-[#00a264] text-white hover:bg-[#008f58] transition-colors" style={{ borderRadius: "0.5rem" }}>
+                                View Job
+                              </Link>
+                              <button onClick={() => removeWatchlistJob(job.id)} className="p-1.5 text-gray-300 hover:text-red-400 transition-colors border border-gray-200" style={{ borderRadius: "0.5rem" }}>
+                                <FaXmark className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
           {/* Settings */}
           {tab === "settings" && (
             <div className="bg-white border border-gray-100 p-6" style={{ borderRadius: "1rem" }}>
@@ -340,7 +455,7 @@ export default function AgencyDashboard() {
                 </div>
               </div>
               <div className="mt-5 flex gap-3">
-                <button className="px-5 py-2.5 text-sm font-semibold bg-xyroots-teal text-white hover:bg-xyroots-dark transition-colors" style={{ borderRadius: "0.75rem" }}>Save Changes</button>
+                <button className="px-5 py-2.5 text-sm font-semibold bg-[#00a264] text-white hover:bg-[#008f58] transition-colors" style={{ borderRadius: "0.75rem" }}>Save Changes</button>
                 <Link href="/profile" className="px-5 py-2.5 text-sm font-semibold border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors" style={{ borderRadius: "0.75rem" }}>Account Settings</Link>
               </div>
             </div>

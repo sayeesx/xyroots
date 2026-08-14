@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { FaXmark, FaSpinner, FaCircleCheck } from "react-icons/fa6";
-import ResumeUpload from "@/components/ResumeUpload";
-import type { ResumeData } from "@/lib/resume/schema";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth/AuthProvider";
 
@@ -42,22 +40,6 @@ export default function PostTeacherProfileModal({ isOpen, onClose, onSuccess }: 
   });
 
   const set = (key: string, val: string) => setForm(f => ({ ...f, [key]: val }));
-
-  const handleResumeExtracted = (data: ResumeData) => {
-    setForm(prev => ({
-      ...prev,
-      fullName: prev.fullName || data.fullName || "",
-      email: prev.email || data.email || "",
-      phone: prev.phone || data.phone || "",
-      location: prev.location || data.location || data.city || "",
-      title: prev.title || data.title || "",
-      subject: prev.subject || data.subject || "",
-      qualification: prev.qualification || data.qualification || "",
-      professional_qualification: prev.professional_qualification || data.professionalQualification || "",
-      experience_years: prev.experience_years || (data.experienceYears ? String(data.experienceYears) : ""),
-      skills: prev.skills || (data.skills?.join(", ") || ""),
-    }));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -173,20 +155,6 @@ export default function PostTeacherProfileModal({ isOpen, onClose, onSuccess }: 
               </div>
             )}
 
-            {/* Resume Upload */}
-            <div className="p-4 bg-gray-50 border border-gray-200" style={{ borderRadius: "0.75rem" }}>
-              <ResumeUpload onExtracted={handleResumeExtracted} />
-            </div>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200" />
-              </div>
-              <div className="relative flex justify-center">
-                <span className="bg-white px-3 text-xs text-gray-500 font-bold uppercase">Or Enter Manually</span>
-              </div>
-            </div>
-
             {/* Personal */}
             <div>
               <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Personal Information</p>
@@ -194,25 +162,25 @@ export default function PostTeacherProfileModal({ isOpen, onClose, onSuccess }: 
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1.5">Full Name <span className="text-red-500">*</span></label>
                   <input value={form.fullName} onChange={e => set("fullName", e.target.value)} placeholder="e.g. Anjali Menon"
-                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
+                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-[#00a264] focus:bg-white transition-all"
                     style={{ borderRadius: "0.75rem" }} />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1.5">Email</label>
                   <input type="email" value={form.email} onChange={e => set("email", e.target.value)} placeholder="teacher@example.com"
-                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
+                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-[#00a264] focus:bg-white transition-all"
                     style={{ borderRadius: "0.75rem" }} />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1.5">Phone</label>
                   <input type="tel" value={form.phone} onChange={e => set("phone", e.target.value)} placeholder="+91 98765 43210"
-                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
+                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-[#00a264] focus:bg-white transition-all"
                     style={{ borderRadius: "0.75rem" }} />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1.5">Location</label>
                   <input value={form.location} onChange={e => set("location", e.target.value)} placeholder="e.g. Kochi, Kerala"
-                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
+                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-[#00a264] focus:bg-white transition-all"
                     style={{ borderRadius: "0.75rem" }} />
                 </div>
               </div>
@@ -225,13 +193,13 @@ export default function PostTeacherProfileModal({ isOpen, onClose, onSuccess }: 
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1.5">Professional Title</label>
                   <input value={form.title} onChange={e => set("title", e.target.value)} placeholder="e.g. Senior Mathematics Teacher"
-                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
+                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-[#00a264] focus:bg-white transition-all"
                     style={{ borderRadius: "0.75rem" }} />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1.5">Primary Subject <span className="text-red-500">*</span></label>
                   <select value={form.subject} onChange={e => set("subject", e.target.value)}
-                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
+                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-[#00a264] focus:bg-white transition-all"
                     style={{ borderRadius: "0.75rem" }}>
                     <option value="">Select subject</option>
                     {subjectOptions.map(s => <option key={s}>{s}</option>)}
@@ -240,25 +208,25 @@ export default function PostTeacherProfileModal({ isOpen, onClose, onSuccess }: 
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1.5">Academic Qualification</label>
                   <input value={form.qualification} onChange={e => set("qualification", e.target.value)} placeholder="e.g. M.Sc Mathematics"
-                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
+                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-[#00a264] focus:bg-white transition-all"
                     style={{ borderRadius: "0.75rem" }} />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1.5">Teaching Qualification</label>
                   <input value={form.professional_qualification} onChange={e => set("professional_qualification", e.target.value)} placeholder="e.g. B.Ed"
-                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
+                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-[#00a264] focus:bg-white transition-all"
                     style={{ borderRadius: "0.75rem" }} />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1.5">Years of Experience</label>
                   <input type="number" min="0" value={form.experience_years} onChange={e => set("experience_years", e.target.value)} placeholder="e.g. 5"
-                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
+                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-[#00a264] focus:bg-white transition-all"
                     style={{ borderRadius: "0.75rem" }} />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1.5">Skills (comma-separated)</label>
                   <input value={form.skills} onChange={e => set("skills", e.target.value)} placeholder="e.g. Mathematics, Problem Solving"
-                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
+                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-[#00a264] focus:bg-white transition-all"
                     style={{ borderRadius: "0.75rem" }} />
                 </div>
               </div>
@@ -268,7 +236,7 @@ export default function PostTeacherProfileModal({ isOpen, onClose, onSuccess }: 
               <label className="block text-xs font-bold text-gray-700 mb-1.5">Professional Bio (Optional)</label>
               <textarea value={form.bio} onChange={e => set("bio", e.target.value)} rows={3}
                 placeholder="Brief description of the teacher's background and expertise..."
-                className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all resize-none"
+                className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-[#00a264] focus:bg-white transition-all resize-none"
                 style={{ borderRadius: "0.75rem" }} />
             </div>
 
@@ -279,7 +247,7 @@ export default function PostTeacherProfileModal({ isOpen, onClose, onSuccess }: 
                 Cancel
               </button>
               <button type="submit" disabled={loading}
-                className="flex-[2] px-6 py-3 text-sm font-semibold bg-xyroots-teal text-white hover:bg-xyroots-dark transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
+                className="flex-[2] px-6 py-3 text-sm font-semibold bg-[#00a264] text-white hover:bg-[#008f58] transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
                 style={{ borderRadius: "0.75rem" }}>
                 {loading ? (
                   <><FaSpinner className="w-4 h-4 animate-spin" /> Saving...</>

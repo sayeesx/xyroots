@@ -70,31 +70,31 @@ h1, h2, h3, h4, h5, h6 {
   background: transparent;
 }
 .modal-scrollbar::-webkit-scrollbar-thumb {
-  background: #c8eed6;
+  background: #d1d5db;
   border-radius: 4px;
 }
 .modal-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #00a264;
+  background: #9ca3af;
 }
 .modal-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: #00a264 transparent;
+  scrollbar-color: #9ca3af transparent;
 }
 
 .page-bg {
-  background: linear-gradient(180deg, #f7f9f8 0%, #e6f7ed 35%, #f0f4f2 70%, #f7f9f8 100%);
+  background: linear-gradient(180deg, #f7f9f8 0%, #f3f4f6 35%, #f7f8fa 70%, #f7f9f8 100%);
   min-height: 100vh;
 }
 
 /* Smooth fade gradient section breaks (no hard box borders) */
 .section-blend-1 {
-  background: linear-gradient(180deg, #ffffff 0%, #f7f9f8 50%, #e6f7ed 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #f7f9f8 50%, #f3f4f6 100%);
 }
 .section-blend-2 {
-  background: linear-gradient(180deg, #e6f7ed 0%, #f0f4f2 50%, #ffffff 100%);
+  background: linear-gradient(180deg, #f3f4f6 0%, #f7f8fa 50%, #ffffff 100%);
 }
 .section-blend-3 {
-  background: linear-gradient(180deg, #ffffff 0%, #e6f7ed 50%, #f7f9f8 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #f3f4f6 50%, #f7f9f8 100%);
 }
 .section-blend-4 {
   background: linear-gradient(180deg, #f7f9f8 0%, #ffffff 100%);
@@ -122,7 +122,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Re-allow minimal focus rings on inputs */
 input:focus, textarea:focus, select:focus {
-  box-shadow: 0 0 0 2px var(--color-xyroots-teal) !important;
+  box-shadow: 0 0 0 2px #374151 !important;
 }
 
 /* Floating animations */
@@ -150,7 +150,7 @@ input:focus, textarea:focus, select:focus {
 
 /* Focus outlines */
 *:focus-visible {
-  outline: 2px solid var(--color-xyroots-teal);
+  outline: 2px solid #374151;
   outline-offset: 2px;
 }
 
@@ -172,12 +172,12 @@ a, button {
   background: transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: var(--color-xyroots-teal);
+  background-color: #00a264;
   border-radius: 20px;
 }
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-xyroots-teal) transparent;
+  scrollbar-color: #00a264 transparent;
 }
 
 /* Loader CSS */

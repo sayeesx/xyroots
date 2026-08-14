@@ -1,43 +1,34 @@
 import Link from "next/link";
-import { FaBuilding, FaUsers, FaStar, FaBookmark, FaArrowRight, FaLocationDot, FaPeopleGroup, FaBook, FaBriefcase, FaUser, FaEnvelope, FaCircleCheck } from "react-icons/fa6";
+import { FaBuilding, FaUsers, FaBookmark, FaArrowRight, FaLocationDot, FaPeopleGroup, FaBook, FaBriefcase, FaUser, FaEnvelope, FaCircleCheck } from "react-icons/fa6";
 import { createClient } from "@/lib/supabase/server";
 import AuthGuardedLink from "@/components/AuthGuardedLink";
 
 // ─── Data types mapped to static structures for UI compatibility ───────────────
 
 function JobCard({ job, isAuthenticated }: { job: any, isAuthenticated: boolean }) {
-  const ctaLink = isAuthenticated ? `/jobs/${job.slug}` : "/register/teacher";
-
   return (
-    <div className="flex flex-col h-full border-2 border-[#00a264]/20 bg-white hover:border-[#00a264] hover:bg-[#f9fcfb] transition-all hover:shadow-md group rounded-xl">
-      {/* Green left accent bar */}
+    <div className="flex flex-col h-full border border-gray-200 bg-white hover:border-gray-400 transition-all group" style={{ borderRadius: "0.75rem" }}>
       <div className="flex flex-1 flex-col">
         {/* Top header */}
-        <div className="bg-[#f0f7f4] border-b-2 border-[#00a264]/20 px-4 py-3 rounded-t-xl">
+        <div className="bg-gray-50 border-b border-gray-100 px-4 py-3" style={{ borderRadius: "0.75rem 0.75rem 0 0" }}>
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
               {/* Institution type chip */}
-              <span className="inline-block text-[10px] font-semibold uppercase tracking-wider bg-[#00a264]/10 text-[#00a264] px-2 py-0.5 mb-1.5 rounded-sm">
+              <span className="inline-block text-[10px] font-semibold uppercase tracking-wider bg-gray-100 text-gray-600 px-2 py-0.5 mb-1.5" style={{ borderRadius: "0.25rem" }}>
                 {job.type}
               </span>
-              <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="block text-black font-semibold text-sm leading-snug hover:text-[#00a264] transition-colors line-clamp-2 text-left">
+              <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="block text-gray-900 font-semibold text-sm leading-snug hover:text-black transition-colors line-clamp-2 text-left">
                 {job.title}
               </AuthGuardedLink>
             </div>
-            {/* Rating */}
-            {job.rating && (
-              <span className="inline-flex items-center gap-1 bg-[#00a264] text-white text-[11px] font-bold px-1.5 py-0.5 shrink-0 rounded-sm">
-                {job.rating} <FaStar className="inline w-2.5 h-2.5" />
-              </span>
-            )}
           </div>
         </div>
 
         {/* Action buttons row */}
-        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-[#e8f0ec]">
-          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-medium py-1.5 border border-[#c8d8d0] text-gray-600 hover:border-[#00a264] hover:text-[#00a264] flex items-center justify-center gap-1 transition-colors rounded-lg"><FaBookmark className="inline w-2.5 h-2.5" /> Save</AuthGuardedLink>
-          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-semibold py-1.5 bg-[#00a264] text-white hover:opacity-90 flex items-center justify-center gap-1 transition-opacity rounded-lg">Apply Now <FaArrowRight className="inline w-2.5 h-2.5" /></AuthGuardedLink>
-          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-medium py-1.5 border border-[#c8d8d0] text-gray-600 hover:border-[#00a264] hover:text-[#00a264] transition-colors rounded-lg flex items-center justify-center">Quick Apply</AuthGuardedLink>
+        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-100">
+          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-medium py-1.5 border border-gray-200 text-gray-600 hover:border-gray-400 hover:text-gray-900 flex items-center justify-center gap-1 transition-colors" style={{ borderRadius: "0.5rem" }}><FaBookmark className="inline w-2.5 h-2.5" /> Save</AuthGuardedLink>
+          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-semibold py-1.5 bg-gray-900 text-white hover:bg-black flex items-center justify-center gap-1 transition-colors" style={{ borderRadius: "0.5rem" }}>Apply Now <FaArrowRight className="inline w-2.5 h-2.5" /></AuthGuardedLink>
+          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-medium py-1.5 border border-gray-200 text-gray-600 hover:border-gray-400 hover:text-gray-900 transition-colors flex items-center justify-center" style={{ borderRadius: "0.5rem" }}>Quick Apply</AuthGuardedLink>
         </div>
 
         {/* Meta + Details */}
@@ -47,7 +38,7 @@ function JobCard({ job, isAuthenticated }: { job: any, isAuthenticated: boolean 
               Posted: <span className="text-gray-700 font-medium">{job.postedDate}</span>
             </span>
             <span className="flex items-center gap-1">
-              <FaPeopleGroup className="inline w-2.5 h-2.5 text-[#00a264]" />
+              <FaPeopleGroup className="inline w-2.5 h-2.5 text-gray-400" />
               Openings: <span className="text-gray-700 font-medium ml-0.5">{job.openings}</span>
             </span>
           </div>
@@ -69,9 +60,9 @@ function JobCard({ job, isAuthenticated }: { job: any, isAuthenticated: boolean 
         </div>
 
         {/* Footer */}
-        <div className="px-4 py-2.5 border-t border-[#e8f0ec] bg-[#f9fcfb] flex items-center justify-between rounded-b-xl">
+        <div className="px-4 py-2.5 border-t border-gray-100 bg-gray-50/60 flex items-center justify-between" style={{ borderRadius: "0 0 0.75rem 0.75rem" }}>
           <span className="flex items-center gap-1 text-sm text-gray-500">
-            <FaLocationDot className="inline w-2.5 h-2.5 text-[#00a264]" />
+            <FaLocationDot className="inline w-2.5 h-2.5 text-gray-400" />
             {job.location}
           </span>
           <span className="text-[10px] font-mono text-gray-400">{job.id}</span>
@@ -84,37 +75,35 @@ function JobCard({ job, isAuthenticated }: { job: any, isAuthenticated: boolean 
 // ─── Teacher Card ──────────────────────────────────────────────────────────────
 
 function TeacherCard({ teacher, isAuthenticated }: { teacher: any, isAuthenticated: boolean }) {
-  const ctaLink = isAuthenticated ? `/teachers/${teacher.slug}` : "/register/employer";
-
   return (
-    <div className="flex flex-col h-full border-2 border-[#1e63c3]/20 bg-white hover:border-[#1e63c3] hover:bg-[#f6f9ff] transition-all hover:shadow-md group rounded-xl">
-      {/* Top header — Blue palette for teachers */}
-      <div className="bg-[#eef3fb] border-b-2 border-[#1e63c3]/20 px-4 py-3 rounded-t-xl">
+    <div className="flex flex-col h-full border border-gray-200 bg-white hover:border-gray-400 transition-all group" style={{ borderRadius: "0.75rem" }}>
+      {/* Top header */}
+      <div className="bg-gray-50 border-b border-gray-100 px-4 py-3" style={{ borderRadius: "0.75rem 0.75rem 0 0" }}>
         <div className="flex items-center gap-3">
-          {/* Avatar */}
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl border border-[#1e63c3]/25 flex items-center justify-center shrink-0 overflow-hidden bg-[#eef3fb]">
-            <img src={teacher.image} alt={teacher.name} className="w-full h-full object-cover" />
+          {/* Initials avatar — no image */}
+          <div className="w-12 h-12 shrink-0 flex items-center justify-center bg-gray-200 text-gray-600 font-bold text-base border border-gray-200" style={{ borderRadius: "0.5rem" }}>
+            {(teacher.name || "T").charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
-            <span className="inline-block text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider bg-[#1e63c3]/10 text-[#1e63c3] px-2 py-0.5 mb-1 leading-tight whitespace-nowrap overflow-hidden rounded-sm" style={{maxWidth:"100%",fontSize:"clamp(7px,1.8vw,10px)"}}>
+            <span className="inline-block text-[10px] font-semibold uppercase tracking-wider bg-gray-100 text-gray-500 px-2 py-0.5 mb-1 leading-tight" style={{ borderRadius: "0.25rem" }}>
               {teacher.designation}
             </span>
-            <AuthGuardedLink href={`/teachers/${teacher.slug}`} type="institution" className="block text-black font-semibold text-sm leading-snug hover:text-[#1e63c3] transition-colors text-left">
+            <AuthGuardedLink href={`/teachers/${teacher.slug}`} type="institution" className="block text-gray-900 font-semibold text-sm leading-snug hover:text-black transition-colors text-left">
               {teacher.name}
             </AuthGuardedLink>
             <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
-              <FaBook className="inline w-2.5 h-2.5 text-[#1e63c3]" />
+              <FaBook className="inline w-2.5 h-2.5 text-gray-400" />
               {teacher.subject}
             </p>
           </div>
           <div className="flex flex-col flex-1 items-end justify-start gap-1.5 shrink-0 pt-0.5">
             <div className="text-xs text-gray-500 text-right flex flex-col gap-1">
               <span className="flex items-center justify-end gap-1">
-                <FaBriefcase className="inline w-2.5 h-2.5 text-[#1e63c3]" />
+                <FaBriefcase className="inline w-2.5 h-2.5 text-gray-400" />
                 {teacher.experience}
               </span>
               <span className="flex items-center justify-end gap-1">
-                <FaLocationDot className="inline w-2.5 h-2.5 text-[#1e63c3]" />
+                <FaLocationDot className="inline w-2.5 h-2.5 text-gray-400" />
                 {teacher.location.split(',')[0]}
               </span>
             </div>
@@ -123,15 +112,14 @@ function TeacherCard({ teacher, isAuthenticated }: { teacher: any, isAuthenticat
       </div>
 
       {/* Action buttons */}
-      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-[#dce7f5]">
-        <AuthGuardedLink href={`/teachers/${teacher.slug}`} type="institution" className="flex-1 text-center text-xs font-semibold py-1.5 bg-[#1e63c3] text-white hover:opacity-90 flex items-center justify-center gap-1 transition-opacity rounded-lg"><FaUser className="inline w-2.5 h-2.5" /> View Profile</AuthGuardedLink>
-        <AuthGuardedLink href={`/teachers/${teacher.slug}`} type="institution" className="flex-1 text-center text-xs font-medium py-1.5 border border-[#c0cfe0] text-gray-600 hover:border-[#1e63c3] hover:text-[#1e63c3] flex items-center justify-center gap-1 transition-colors rounded-lg"><FaEnvelope className="inline w-2.5 h-2.5" /> Contact</AuthGuardedLink>
-        <AuthGuardedLink href={`/teachers/${teacher.slug}`} type="institution" className="flex-1 text-center text-xs font-medium py-1.5 border border-[#c0cfe0] text-gray-600 hover:border-[#1e63c3] hover:text-[#1e63c3] flex items-center justify-center gap-1 transition-colors rounded-lg"><FaBookmark className="inline w-2.5 h-2.5" /> Shortlist</AuthGuardedLink>
+      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-100">
+        <AuthGuardedLink href={`/teachers/${teacher.slug}`} type="institution" className="flex-1 text-center text-xs font-semibold py-1.5 bg-gray-900 text-white hover:bg-black flex items-center justify-center gap-1 transition-colors" style={{ borderRadius: "0.5rem" }}><FaUser className="inline w-2.5 h-2.5" /> View Profile</AuthGuardedLink>
+        <AuthGuardedLink href={`/teachers/${teacher.slug}`} type="institution" className="flex-1 text-center text-xs font-medium py-1.5 border border-gray-200 text-gray-600 hover:border-gray-400 hover:text-gray-900 flex items-center justify-center gap-1 transition-colors" style={{ borderRadius: "0.5rem" }}><FaEnvelope className="inline w-2.5 h-2.5" /> Contact</AuthGuardedLink>
+        <AuthGuardedLink href={`/teachers/${teacher.slug}`} type="institution" className="flex-1 text-center text-xs font-medium py-1.5 border border-gray-200 text-gray-600 hover:border-gray-400 hover:text-gray-900 flex items-center justify-center gap-1 transition-colors" style={{ borderRadius: "0.5rem" }}><FaBookmark className="inline w-2.5 h-2.5" /> Shortlist</AuthGuardedLink>
       </div>
 
       {/* Details */}
       <div className="px-4 py-3 flex-1 flex flex-col justify-center">
-
         <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs mt-1">
           <div>
             <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Qualification</p>
@@ -141,7 +129,7 @@ function TeacherCard({ teacher, isAuthenticated }: { teacher: any, isAuthenticat
             <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Languages</p>
             <div className="flex flex-wrap gap-1">
               {teacher.languages?.map((lang: string) => (
-                <span key={lang} className="px-1.5 py-0.5 bg-[#eef3fb] text-[#1e63c3] text-[11px] border border-[#c0cfe0] rounded-sm">
+                <span key={lang} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[11px] border border-gray-200" style={{ borderRadius: "0.25rem" }}>
                   {lang}
                 </span>
               ))}
@@ -151,9 +139,9 @@ function TeacherCard({ teacher, isAuthenticated }: { teacher: any, isAuthenticat
       </div>
 
       {/* Footer */}
-      <div className="px-4 py-2.5 border-t border-[#dce7f5] bg-[#f6f9ff] flex items-center justify-between rounded-b-xl">
+      <div className="px-4 py-2.5 border-t border-gray-100 bg-gray-50/60 flex items-center justify-between" style={{ borderRadius: "0 0 0.75rem 0.75rem" }}>
         <span className="text-[10px] font-mono text-gray-400">{teacher.id}</span>
-        <span className="text-[11px] text-[#1e63c3] font-semibold flex items-center gap-1">
+        <span className="text-[11px] text-gray-600 font-semibold flex items-center gap-1">
           <FaCircleCheck className="inline w-3 h-3" /> Verified
         </span>
       </div>
@@ -168,9 +156,10 @@ import { teachers as mockTeachers } from "@/data/teachers";
 export default async function LatestVacancies() {
   const supabase = await createClient();
 
-  // Inspect auth
-  let role: string | null = null;
+  // Inspect auth + fetch data in parallel
   const { data: { user } } = await supabase.auth.getUser();
+
+  let role: string | null = null;
   if (user) {
     const { data: profile } = await supabase.from('profiles').select('role').eq('auth_user_id', user.id).single();
     if (profile) role = (profile as any).role;
@@ -178,19 +167,13 @@ export default async function LatestVacancies() {
   
   const limit = role ? 4 : 3;
 
-  // Fetch jobs
-  const { data: rawJobs } = await supabase
-    .from("jobs")
-    .select("*")
-    .limit(limit)
-    .order("created_at", { ascending: false });
-
-  // Fetch teachers
-  const { data: rawTeachers } = await supabase
-    .from("teacher_profiles")
-    .select(`*, profiles(full_name, avatar_url)`)
-    .limit(limit)
-    .order("created_at", { ascending: false });
+  // Fetch jobs and teachers in parallel
+  const [{ data: rawJobs }, { data: rawTeachers }] = await Promise.all([
+    supabase.from("jobs").select("id, title, level, created_at, qualification, experience_min, experience_max, salary_min, salary_max, location").eq("status", "published").limit(limit).order("created_at", { ascending: false }),
+    role
+      ? supabase.from("teacher_profiles").select("id, subject, title, location, experience_years, professional_qualification, languages, availability, profiles(full_name)").eq("is_visible", true).limit(limit).order("created_at", { ascending: false })
+      : Promise.resolve({ data: null }),
+  ]);
 
   const jobCards = ((rawJobs as any[]) || []).map((j: any) => ({
     id: j.id.substring(0,8).toUpperCase(),
@@ -202,13 +185,11 @@ export default async function LatestVacancies() {
     experience: j.experience_min ? `${j.experience_min}-${j.experience_max} Years` : "Fresher",
     salary: j.salary_min ? `${(j.salary_min/1000).toFixed(0)}k-${(j.salary_max/1000).toFixed(0)}k` : "As per std",
     location: j.location || "Remote",
-    rating: 4,
     slug: `${(j.title || "Untitled Job").toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${j.id}`,
   }));
 
-  let teacherCards = [];
+  let teacherCards: any[] = [];
   if (!role) {
-    // Show dummy teachers if not authenticated
     teacherCards = mockTeachers.slice(0, 3).map((t) => ({
       id: t.id,
       name: t.name,
@@ -220,7 +201,6 @@ export default async function LatestVacancies() {
       languages: t.languages,
       availability: t.availability,
       slug: t.slug,
-      image: t.avatar?.startsWith("http") ? t.avatar : `https://api.dicebear.com/7.x/initials/svg?seed=${t.name}&chars=2`
     }));
   } else {
     teacherCards = ((rawTeachers as any[]) || []).map((t: any) => ({
@@ -229,12 +209,11 @@ export default async function LatestVacancies() {
       designation: t.title || "Subject Teacher",
       subject: t.subject || "General",
       experience: t.experience_years ? `${t.experience_years} Years` : 'Fresher',
-      qualification: "B.Ed", // mock mapping
-      location: t.location || t.profiles?.location || "India",
+      qualification: t.professional_qualification || "B.Ed",
+      location: t.location || "India",
       languages: t.languages || ["English"],
       availability: t.availability || "Immediate",
       slug: `${(t.profiles?.full_name || "Anonymous").toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${t.id}`,
-      image: t.profiles?.avatar_url || t.profile_image_url || `https://api.dicebear.com/7.x/initials/svg?seed=${t.profiles?.full_name || "M"}&chars=2`
     }));
   }
 
@@ -260,10 +239,10 @@ export default async function LatestVacancies() {
             <div className={`${role === 'teacher' ? 'md:col-span-2' : ''}`}>
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                  <FaBuilding className="w-4 h-4 text-[#00a264]" />
+                  <FaBuilding className="w-4 h-4 text-gray-500" />
                   Institutions Hiring
                 </h3>
-                <AuthGuardedLink href="/jobs" type="teacher" className="text-xs text-[#00a264] hover:underline font-medium">
+                <AuthGuardedLink href="/jobs" type="teacher" className="text-xs text-gray-600 hover:text-black hover:underline font-medium">
                   Browse All →
                 </AuthGuardedLink>
               </div>
@@ -280,10 +259,10 @@ export default async function LatestVacancies() {
             <div className={`${role === 'management' ? 'md:col-span-2' : ''}`}>
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                  <FaUsers className="w-4 h-4 text-[#1e63c3]" />
+                  <FaUsers className="w-4 h-4 text-gray-500" />
                   Teacher Profiles
                 </h3>
-                <AuthGuardedLink href="/teachers" type="institution" className="text-xs text-[#1e63c3] hover:underline font-medium">
+                <AuthGuardedLink href="/teachers" type="institution" className="text-xs text-gray-600 hover:text-black hover:underline font-medium">
                   Browse All →
                 </AuthGuardedLink>
               </div>
@@ -298,9 +277,9 @@ export default async function LatestVacancies() {
         </div>
 
         {/* Bottom CTA strip */}
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#dde5e0] pt-6">
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-200 pt-6">
           <p className="text-sm text-gray-500">
-            Showing 3 of <span className="font-semibold text-gray-700">247</span> open vacancies across India
+            Showing {jobCards.length} of <span className="font-semibold text-gray-700">247</span> open vacancies across India
           </p>
           <div className="flex items-center gap-3">
             {!role && (
@@ -308,14 +287,16 @@ export default async function LatestVacancies() {
                 <AuthGuardedLink
                   href="/jobs"
                   type="teacher"
-                  className="px-5 py-2 text-sm font-semibold border border-[#1e63c3] text-[#1e63c3] hover:bg-[#1e63c3] hover:text-white transition-colors rounded-lg"
+                  className="px-5 py-2 text-sm font-semibold border border-gray-300 text-gray-700 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-colors"
+                  style={{ borderRadius: "0.5rem" }}
                 >
                   Post Your Profile
                 </AuthGuardedLink>
                 <AuthGuardedLink
                   href="/teachers"
                   type="institution"
-                  className="px-5 py-2 text-sm font-semibold bg-[#00a264] text-white hover:bg-[#008f58] transition-colors rounded-lg"
+                  className="px-5 py-2 text-sm font-semibold bg-gray-900 text-white hover:bg-black transition-colors"
+                  style={{ borderRadius: "0.5rem" }}
                 >
                   Post a Job
                 </AuthGuardedLink>

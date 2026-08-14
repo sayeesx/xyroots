@@ -69,7 +69,7 @@ export default function TestimonialsPage() {
       <main className="flex-1">
         {/* Hero */}
         <section className="bg-[#f7f8fa] border-b border-gray-100 py-20 px-4 text-center">
-          <span className="inline-block text-xs font-bold uppercase tracking-widest text-xyroots-teal bg-xyroots-mint px-3 py-1 mb-5" style={{ borderRadius: "999px" }}>
+          <span className="inline-block text-xs font-bold uppercase tracking-widest text-gray-500 bg-gray-100 px-3 py-1 mb-5" style={{ borderRadius: "999px" }}>
             Testimonials
           </span>
           <div className="flex justify-center gap-1 mb-4">
@@ -88,7 +88,7 @@ export default function TestimonialsPage() {
           <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
             {stats.map(s => (
               <div key={s.label}>
-                <p className="text-3xl font-bold text-xyroots-teal mb-1">{s.value}</p>
+                <p className="text-3xl font-bold text-gray-900 mb-1">{s.value}</p>
                 <p className="text-xs text-gray-500 font-medium">{s.label}</p>
               </div>
             ))}
@@ -113,7 +113,7 @@ export default function TestimonialsPage() {
                         className="w-9 h-9 flex items-center justify-center text-white font-bold text-xs shrink-0"
                         style={{
                           borderRadius: "50%",
-                          backgroundColor: t.type === 'teacher' ? '#00a264' : '#1565c0',
+                          backgroundColor: t.type === 'teacher' ? '#374151' : '#374151',
                         }}
                       >
                         {initials}
@@ -131,21 +131,7 @@ export default function TestimonialsPage() {
           </div>
         </section>
 
-        {/* CTA */}
-        <section className="py-16 px-4 bg-white border-t border-gray-100 text-center">
-          <div className="max-w-xl mx-auto">
-            <h2 className="text-2xl font-bold text-gray-900 mb-3">Join thousands of educators</h2>
-            <p className="text-gray-500 text-sm mb-8">Create your free profile and connect with the best institutions in India.</p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/jobs" className="inline-flex items-center gap-2 px-6 py-3 bg-xyroots-teal text-white font-semibold text-sm hover:bg-xyroots-dark transition-colors" style={{ borderRadius: "0.75rem" }}>
-                Find Teaching Jobs
-              </Link>
-              <Link href="/register/teacher" className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-700 font-semibold text-sm hover:border-xyroots-teal hover:text-xyroots-teal transition-colors" style={{ borderRadius: "0.75rem" }}>
-                Create Free Profile
-              </Link>
-            </div>
-          </div>
-        </section>
+        {/* CTA — removed as requested */}
       </main>
 
       <Footer />

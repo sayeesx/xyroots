@@ -32,9 +32,9 @@ function FilterPanel({
     <div className="space-y-5 text-sm text-gray-700">
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-          <FaFilter className="w-3.5 h-3.5 text-xyroots-teal" /> Filters
+          <FaFilter className="w-3.5 h-3.5 text-gray-600" /> Filters
         </h2>
-        <button onClick={clearAll} className="text-xs font-semibold text-xyroots-teal hover:text-black">Clear All</button>
+        <button onClick={clearAll} className="text-xs font-semibold text-gray-600 hover:text-black">Clear All</button>
       </div>
 
       {/* Status */}
@@ -43,7 +43,7 @@ function FilterPanel({
         <div className="space-y-2.5">
           {["Verified Only", "Profile > 80%"].map(type => (
             <label key={type} className="flex items-center gap-3 cursor-pointer group" onClick={(e) => { e.preventDefault(); toggleCheckbox(selectedVerification, setSelectedVerification, type); }}>
-              <div className={`w-[18px] h-[18px] rounded flex items-center justify-center border transition-colors shrink-0 ${selectedVerification.includes(type) ? 'bg-xyroots-teal border-xyroots-teal' : 'border-gray-300 group-hover:border-xyroots-teal/50 bg-white'}`}>
+              <div className={`w-[18px] h-[18px] rounded flex items-center justify-center border transition-colors shrink-0 ${selectedVerification.includes(type) ? 'bg-gray-900 border-gray-900' : 'border-gray-300 group-hover:border-gray-500 bg-white'}`}>
                 {selectedVerification.includes(type) && <FaCircleCheck className="w-3 h-3 text-white" />}
               </div>
               <span className="text-gray-600 group-hover:text-gray-900 select-none">{type}</span>
@@ -59,7 +59,7 @@ function FilterPanel({
         <div className="space-y-2.5">
           {["B.Ed", "M.Ed", "M.Sc", "Ph.D", "NET Qualified"].map(q => (
             <label key={q} className="flex items-center gap-3 cursor-pointer group" onClick={(e) => { e.preventDefault(); toggleCheckbox(selectedQuals, setSelectedQuals, q); }}>
-              <div className={`w-[18px] h-[18px] rounded flex items-center justify-center border transition-colors shrink-0 ${selectedQuals.includes(q) ? 'bg-xyroots-teal border-xyroots-teal' : 'border-gray-300 group-hover:border-xyroots-teal/50 bg-white'}`}>
+              <div className={`w-[18px] h-[18px] rounded flex items-center justify-center border transition-colors shrink-0 ${selectedQuals.includes(q) ? 'bg-gray-900 border-gray-900' : 'border-gray-300 group-hover:border-gray-500 bg-white'}`}>
                 {selectedQuals.includes(q) && <FaCircleCheck className="w-3 h-3 text-white" />}
               </div>
               <span className="text-gray-600 group-hover:text-gray-900 select-none">{q}</span>
@@ -75,7 +75,7 @@ function FilterPanel({
         <div className="space-y-2.5">
           {["Less than a year", "1-3 years", "3-5 years", "5-10 years", "More than 10 years"].map(exp => (
             <label key={exp} className="flex items-center gap-3 cursor-pointer group" onClick={(e) => { e.preventDefault(); toggleCheckbox(selectedExperiences, setSelectedExperiences, exp); }}>
-              <div className={`w-[18px] h-[18px] rounded flex items-center justify-center border transition-colors shrink-0 ${selectedExperiences.includes(exp) ? 'bg-xyroots-teal border-xyroots-teal' : 'border-gray-300 group-hover:border-xyroots-teal/50 bg-white'}`}>
+              <div className={`w-[18px] h-[18px] rounded flex items-center justify-center border transition-colors shrink-0 ${selectedExperiences.includes(exp) ? 'bg-gray-900 border-gray-900' : 'border-gray-300 group-hover:border-gray-500 bg-white'}`}>
                 {selectedExperiences.includes(exp) && <FaCircleCheck className="w-3 h-3 text-white" />}
               </div>
               <span className="text-gray-600 group-hover:text-gray-900 select-none">{exp}</span>
@@ -144,7 +144,7 @@ function TeachersPageInner() {
     setIsLoading(true);
     supabase
       .from('teacher_profiles')
-      .select('id, subject, title, location, experience_years, professional_qualification, profile_completion, skills, boards, profiles!inner(full_name, avatar_url)')
+      .select('id, subject, title, location, experience_years, professional_qualification, profile_completion, profiles!inner(full_name, avatar_url)')
       .eq('is_visible', true)
       .limit(50)
       .then(({ data }) => {
@@ -246,7 +246,7 @@ function TeachersPageInner() {
               <FilterPanel {...filterProps} />
             </div>
             <div className="p-4 border-t border-gray-100">
-              <button onClick={() => setMobileFilterOpen(false)} className="w-full py-3 rounded-xl bg-xyroots-teal text-white font-bold text-sm">
+              <button onClick={() => setMobileFilterOpen(false)} className="w-full py-3 rounded-xl bg-gray-900 text-white font-bold text-sm">
                 Show {filteredTeachers.length} Results
               </button>
             </div>
@@ -280,7 +280,7 @@ function TeachersPageInner() {
                   className="w-full text-sm outline-none bg-transparent placeholder-gray-400 text-gray-900 font-medium min-w-0"
                 />
               </div>
-              <button className="bg-xyroots-teal text-white rounded-lg px-6 py-2.5 text-sm font-semibold hover:bg-[#068050] transition-colors shrink-0 flex items-center justify-center gap-2 m-1">
+              <button className="bg-[#00a264] text-white rounded-lg px-6 py-2.5 text-sm font-semibold hover:bg-[#008f58] transition-colors shrink-0 flex items-center justify-center gap-2 m-1">
                 <FaMagnifyingGlass className="w-3.5 h-3.5" /> Find
               </button>
             </div>
@@ -294,8 +294,8 @@ function TeachersPageInner() {
                 onClick={() => setActiveSubject(subject)}
                 className={`px-4 py-1.5 text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
                   activeSubject === subject
-                    ? "bg-xyroots-teal text-white"
-                    : "bg-white border border-gray-200 text-gray-700 hover:border-xyroots-teal"
+                    ? "bg-[#00a264] text-white"
+                    : "bg-white border border-gray-200 text-gray-700 hover:border-[#00a264]"
                 }`}
                 style={{ borderRadius: "999px" }}
               >
@@ -308,7 +308,7 @@ function TeachersPageInner() {
           <div className="flex gap-6 lg:gap-8">
 
             {/* Desktop Sidebar */}
-            <aside className="hidden lg:block w-60 shrink-0 sticky top-20 self-start overflow-y-auto max-h-[calc(100vh-5rem)] pb-10">
+            <aside className="hidden lg:block w-60 shrink-0 sticky top-20 self-start overflow-y-auto max-h-[calc(100vh-5rem)] pb-10 custom-scrollbar">
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
                 <FilterPanel {...filterProps} />
               </div>
@@ -321,12 +321,12 @@ function TeachersPageInner() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setMobileFilterOpen(true)}
-                    className="lg:hidden flex items-center gap-2 px-3 py-2 rounded-xl bg-white border border-gray-200 text-sm font-semibold text-gray-700 shadow-sm hover:border-xyroots-teal transition-colors"
+                    className="lg:hidden flex items-center gap-2 px-3 py-2 rounded-xl bg-white border border-gray-200 text-sm font-semibold text-gray-700 shadow-sm hover:border-gray-400 transition-colors"
                   >
-                    <FaFilter className="w-3.5 h-3.5 text-xyroots-teal" />
+                    <FaFilter className="w-3.5 h-3.5 text-gray-600" />
                     Filters
                     {activeFilterCount > 0 && (
-                      <span className="w-5 h-5 rounded-full bg-xyroots-teal text-white text-[10px] font-bold flex items-center justify-center">{activeFilterCount}</span>
+                      <span className="w-5 h-5 rounded-full bg-gray-900 text-white text-[10px] font-bold flex items-center justify-center">{activeFilterCount}</span>
                     )}
                   </button>
                   <p className="text-[13px] text-gray-500">
@@ -359,16 +359,16 @@ function TeachersPageInner() {
                     return (
                       <div
                         key={tp.id}
-                        className="bg-white border border-gray-100 overflow-hidden hover:border-xyroots-teal/30 transition-all group flex flex-col"
+                        className="bg-white border border-gray-200 overflow-hidden hover:border-gray-400 transition-all group flex flex-col"
                         style={{ borderRadius: "1rem" }}
                       >
                         <div className="p-5 flex-1">
                           {/* Top row: initial circle + name/title */}
                           <div className="flex items-start gap-3 mb-3">
-                            {/* Colored initial circle — shows avatar if available */}
+                            {/* Profile image or initial */}
                             <div
-                              className="w-11 h-11 shrink-0 flex items-center justify-center text-sm font-bold text-white overflow-hidden"
-                              style={{ borderRadius: "50%", backgroundColor: "#00a264" }}
+                              className="w-11 h-11 shrink-0 flex items-center justify-center text-sm font-bold overflow-hidden"
+                              style={{ borderRadius: "50%", backgroundColor: tp.avatar_url ? "transparent" : "#e5e7eb", color: "#4b5563" }}
                             >
                               {tp.avatar_url ? (
                                 <img src={tp.avatar_url} alt={name} className="w-full h-full object-cover" style={{ borderRadius: "50%" }} />
@@ -378,10 +378,10 @@ function TeachersPageInner() {
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-1.5">
-                                <h3 className="text-sm font-bold text-gray-900 group-hover:text-xyroots-teal transition-colors truncate">
+                                <h3 className="text-sm font-bold text-gray-900 group-hover:text-black transition-colors truncate">
                                   {name}
                                 </h3>
-                                {tp.verified && <FaCircleCheck className="w-3 h-3 text-xyroots-teal shrink-0" />}
+                                {tp.verified && <FaCircleCheck className="w-3 h-3 text-[#00a264] shrink-0" />}
                               </div>
                               <p className="text-xs text-gray-500 truncate">{tp.title}</p>
                             </div>
@@ -396,7 +396,7 @@ function TeachersPageInner() {
                           {/* Badges */}
                           <div className="flex flex-wrap gap-1.5">
                             {tp.subject && (
-                              <span className="text-xs px-2 py-0.5 bg-xyroots-mint text-xyroots-teal font-semibold" style={{ borderRadius: "0.375rem" }}>
+                              <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 font-semibold border border-gray-200" style={{ borderRadius: "0.375rem" }}>
                                 {tp.subject}
                               </span>
                             )}
@@ -413,13 +413,12 @@ function TeachersPageInner() {
 
                         {/* Footer */}
                         <div
-                          className="px-5 py-3 border-t border-gray-100 flex items-center justify-between"
-                          style={{ backgroundColor: "rgba(247,249,248,0.4)" }}
+                          className="px-5 py-3 border-t border-gray-100 flex items-center justify-between bg-gray-50/60"
                         >
                           <span className="text-xs text-gray-400">{tp.location?.split(",")[0]}</span>
                           <Link
                             href={`/teachers/${tp.id}`}
-                            className="px-3 py-1.5 text-xs font-bold text-black hover:bg-xyroots-teal hover:text-white transition-all border border-xyroots-teal/20"
+                            className="px-3 py-1.5 text-xs font-bold text-white bg-[#00a264] hover:bg-[#008f58] transition-all"
                             style={{ borderRadius: "0.5rem" }}
                           >
                             View

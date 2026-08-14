@@ -3,15 +3,17 @@
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { useRouter } from "next/navigation";
 import { ReactNode } from "react";
+import React from "react";
 
 interface Props {
   href: string;
   type: "teacher" | "institution";
   className?: string;
+  style?: React.CSSProperties;
   children: ReactNode;
 }
 
-export default function AuthGuardedLink({ href, type, className, children }: Props) {
+export default function AuthGuardedLink({ href, type, className, style, children }: Props) {
   const { isAuthenticated, requireTeacher, requireInstitution } = useAuth();
   const router = useRouter();
 
@@ -29,7 +31,7 @@ export default function AuthGuardedLink({ href, type, className, children }: Pro
   };
 
   return (
-    <button onClick={handleClick} className={className}>
+    <button onClick={handleClick} className={className} style={style}>
       {children}
     </button>
   );

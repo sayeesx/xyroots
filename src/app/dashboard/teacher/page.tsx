@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { getMyApplications } from "@/lib/actions/jobs";
 import { getMyInterviews } from "@/lib/actions/interviews";
+import Loader from "@/components/Loader";
 
 type Tab = "applications" | "saved" | "interviews" | "profile";
 
@@ -24,7 +25,7 @@ const STATUS_STYLE: Record<string, string> = {
   pending: "bg-blue-50 text-blue-700",
   reviewed: "bg-purple-50 text-purple-700",
   shortlisted: "bg-amber-50 text-amber-700",
-  interview: "bg-green-50 text-green-700",
+  interview: "bg-gray-100 text-gray-700",
   offered: "bg-emerald-50 text-emerald-700",
   rejected: "bg-red-50 text-red-700",
   withdrawn: "bg-gray-100 text-gray-500",
@@ -36,7 +37,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 const INTERVIEW_STATUS_STYLE: Record<string, string> = {
   scheduled: "bg-blue-50 text-blue-700",
-  confirmed: "bg-green-50 text-green-700",
+  confirmed: "bg-gray-100 text-gray-700",
   cancelled: "bg-red-50 text-red-700",
   completed: "bg-gray-100 text-gray-600",
 };
@@ -58,7 +59,7 @@ function ProfileCompletionBanner({ pct, onEdit }: { pct: number; onEdit: () => v
           <p className="text-xs text-gray-500 mt-0.5">Complete your profile to get more interview calls</p>
         </div>
         <div className="text-right">
-          <span className="text-2xl font-bold text-xyroots-teal">{pct}%</span>
+          <span className="text-2xl font-bold text-gray-900">{pct}%</span>
         </div>
       </div>
       {/* Segmented bar */}
@@ -66,7 +67,7 @@ function ProfileCompletionBanner({ pct, onEdit }: { pct: number; onEdit: () => v
         {[25, 50, 75, 100].map(threshold => (
           <div key={threshold} className="flex-1 h-1.5 transition-all" style={{
             borderRadius: "999px",
-            backgroundColor: pct >= threshold ? "#00a264" : "#e5e7eb"
+            backgroundColor: pct >= threshold ? "#111827" : "#e5e7eb"
           }} />
         ))}
       </div>
@@ -75,15 +76,15 @@ function ProfileCompletionBanner({ pct, onEdit }: { pct: number; onEdit: () => v
           {segments.map(s => (
             <div key={s.label} className="flex items-center gap-1">
               {s.done
-                ? <FaCheckDouble className="w-3 h-3 text-xyroots-teal" />
+                ? <FaCheckDouble className="w-3 h-3 text-gray-700" />
                 : <div className="w-3 h-3 border border-gray-300" style={{ borderRadius: "50%" }} />}
-              <span className={`text-[10px] font-medium ${s.done ? "text-xyroots-teal" : "text-gray-400"}`}>{s.label}</span>
+              <span className={`text-[10px] font-medium ${s.done ? "text-gray-800" : "text-gray-400"}`}>{s.label}</span>
             </div>
           ))}
         </div>
         <button
           onClick={onEdit}
-          className="text-xs font-semibold text-xyroots-teal hover:underline flex items-center gap-1"
+          className="text-xs font-semibold text-gray-700 hover:underline flex items-center gap-1"
         >
           Complete now <FaArrowRight className="w-3 h-3" />
         </button>
@@ -124,17 +125,16 @@ export default function TeacherDashboard() {
     const load = async () => {
       setIsLoadingData(true);
 
-      // Teacher profile
-      const { data: tp } = await supabase
-        .from("teacher_profiles").select("*").eq("profile_id", profile.id).single();
-      if (tp) { setTeacherProfile(tp); setIsProfileVisible((tp as any).is_visible ?? true); }
+      // Fetch teacher profile, applications and interviews in parallel
+      const [tpResult, appsResult, intResult] = await Promise.all([
+        supabase.from("teacher_profiles").select("*").eq("profile_id", profile.id).single() as unknown as Promise<{ data: any; error: any }>,
+        getMyApplications(),
+        getMyInterviews(),
+      ]);
 
-      // Real applications
-      const appsResult = await getMyApplications();
+      const tp = (tpResult as any).data;
+      if (tp) { setTeacherProfile(tp); setIsProfileVisible(tp.is_visible ?? true); }
       if (appsResult.success && appsResult.data) setApplications(appsResult.data as any[]);
-
-      // Interviews scheduled by recruiters
-      const intResult = await getMyInterviews();
       if (intResult.success && intResult.data) setInterviews(intResult.data);
 
       setIsLoadingData(false);
@@ -159,7 +159,7 @@ export default function TeacherDashboard() {
       <div className="min-h-screen flex flex-col bg-[#f7f8fa]">
         <Navbar />
         <div className="flex-1 flex items-center justify-center">
-          <FaSpinner className="w-8 h-8 text-xyroots-teal animate-spin" />
+          <Loader />
         </div>
       </div>
     );
@@ -186,7 +186,7 @@ export default function TeacherDashboard() {
                 <img src={avatar} alt={profile?.full_name || "Teacher"}
                   className="w-14 h-14 sm:w-16 sm:h-16 object-cover border-2 border-gray-200"
                   style={{ borderRadius: "50%" }} />
-                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-xyroots-teal flex items-center justify-center" style={{ borderRadius: "50%" }}>
+                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-gray-800 flex items-center justify-center" style={{ borderRadius: "50%" }}>
                   <FaCircleCheck className="w-2.5 h-2.5 text-white" />
                 </div>
               </div>
@@ -198,7 +198,7 @@ export default function TeacherDashboard() {
                   {/* Not verified by default — show Get Verified */}
                   <button
                     onClick={() => setShowVerifiedModal(true)}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-bold border border-dashed border-gray-300 text-gray-500 hover:border-xyroots-teal hover:text-xyroots-teal transition-colors"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-bold border border-dashed border-gray-300 text-gray-500 hover:border-gray-500 hover:text-gray-700 transition-colors"
                     style={{ borderRadius: "0.5rem" }}
                   >
                     <FaShieldHalved className="w-3 h-3" /> Get Verified
@@ -229,9 +229,9 @@ export default function TeacherDashboard() {
                   { label: "Active", value: activeCount, accent: true },
                   { label: "Saved", value: savedIds.length, accent: false },
                 ].map(s => (
-                  <div key={s.label} className={`text-center px-2.5 sm:px-4 py-1.5 sm:py-2 border ${s.accent ? "bg-xyroots-mint border-xyroots-teal/20" : "bg-gray-50 border-gray-200"}`} style={{ borderRadius: "0.75rem" }}>
-                    <p className={`text-lg sm:text-2xl font-bold ${s.accent ? "text-xyroots-teal" : "text-gray-900"}`}>{s.value}</p>
-                    <p className={`text-[10px] sm:text-xs font-medium ${s.accent ? "text-xyroots-teal" : "text-gray-500"}`}>{s.label}</p>
+                  <div key={s.label} className={`text-center px-2.5 sm:px-4 py-1.5 sm:py-2 border ${s.accent ? "bg-gray-100 border-gray-200" : "bg-gray-50 border-gray-200"}`} style={{ borderRadius: "0.75rem" }}>
+                    <p className={`text-lg sm:text-2xl font-bold ${s.accent ? "text-gray-900" : "text-gray-900"}`}>{s.value}</p>
+                    <p className={`text-[10px] sm:text-xs font-medium ${s.accent ? "text-gray-600" : "text-gray-500"}`}>{s.label}</p>
                   </div>
                 ))}
               </div>
@@ -249,7 +249,7 @@ export default function TeacherDashboard() {
               <button key={t.id} onClick={() => setTab(t.id as Tab)}
                 className={`flex items-center gap-1 sm:gap-2 px-2.5 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold transition-all -mb-px whitespace-nowrap shrink-0 ${
                   tab === t.id
-                    ? "text-xyroots-teal border-b-2 border-xyroots-teal"
+                    ? "text-gray-900 border-b-2 border-gray-900"
                     : "text-gray-400 hover:text-gray-700"
                 }`}
               >
@@ -257,7 +257,7 @@ export default function TeacherDashboard() {
                 {t.label}
                 {t.count !== null && t.count > 0 && (
                   <span className={`text-[10px] px-1.5 py-0.5 font-bold ${
-                    tab === t.id ? "bg-xyroots-mint text-xyroots-teal" : "bg-gray-100 text-gray-500"
+                    tab === t.id ? "bg-gray-100 text-gray-800" : "bg-gray-100 text-gray-500"
                   }`} style={{ borderRadius: "999px" }}>{t.count}</span>
                 )}
               </button>
@@ -272,7 +272,7 @@ export default function TeacherDashboard() {
                   <FaBriefcase className="w-9 h-9 text-gray-200 mx-auto mb-3" />
                   <h3 className="text-base font-bold text-gray-900 mb-1">No Applications Yet</h3>
                   <p className="text-gray-500 text-sm mb-5">Start applying to teaching vacancies to see your status here.</p>
-                  <Link href="/jobs" className="inline-flex items-center gap-2 px-5 py-2.5 bg-xyroots-teal text-white text-sm font-semibold" style={{ borderRadius: "0.75rem" }}>
+                  <Link href="/jobs" className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold" style={{ borderRadius: "0.75rem" }}>
                     Browse Jobs <FaArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
@@ -281,7 +281,7 @@ export default function TeacherDashboard() {
                 return (
                   <div key={app.id} className="bg-white border border-gray-100 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3" style={{ borderRadius: "1rem" }}>
                     <div className="flex items-start gap-3 sm:gap-4 min-w-0">
-                      <div className="w-10 h-10 shrink-0 flex items-center justify-center text-sm font-bold" style={{ borderRadius: "0.75rem", backgroundColor: "#e6f7ed", color: "#00a264" }}>
+                      <div className="w-10 h-10 shrink-0 flex items-center justify-center text-sm font-bold" style={{ borderRadius: "0.75rem", backgroundColor: "#f3f4f6", color: "#374151" }}>
                         {(job.school_name || job.title || "?").charAt(0).toUpperCase()}
                       </div>
                       <div className="min-w-0 flex-1">
@@ -323,13 +323,13 @@ export default function TeacherDashboard() {
                   <FaBookmark className="w-9 h-9 text-gray-200 mx-auto mb-3" />
                   <h3 className="text-base font-bold text-gray-900 mb-1">No Saved Jobs</h3>
                   <p className="text-gray-500 text-sm mb-5">Bookmark jobs while browsing to revisit them here.</p>
-                  <Link href="/jobs" className="inline-flex items-center gap-2 px-5 py-2.5 bg-xyroots-teal text-white text-sm font-semibold" style={{ borderRadius: "0.75rem" }}>
+                  <Link href="/jobs" className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold" style={{ borderRadius: "0.75rem" }}>
                     Find Jobs <FaArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
               ) : savedJobs.length === 0 ? (
                 <div className="bg-white border border-gray-100 p-8 text-center" style={{ borderRadius: "1rem" }}>
-                  <FaSpinner className="w-6 h-6 text-xyroots-teal animate-spin mx-auto" />
+                  <FaSpinner className="w-6 h-6 text-gray-400 animate-spin mx-auto" />
                 </div>
               ) : savedJobs.map((job: any) => (
                 <div key={job.id} className="bg-white border border-gray-100 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3" style={{ borderRadius: "1rem" }}>
@@ -341,13 +341,13 @@ export default function TeacherDashboard() {
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       {job.employment_type && <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 font-medium" style={{ borderRadius: "0.375rem" }}>{job.employment_type}</span>}
                       {(job.salary_min || job.salary_max) && (
-                        <span className="text-xs px-2 py-0.5 bg-green-50 text-green-700 font-medium" style={{ borderRadius: "0.375rem" }}>
+                        <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 font-medium" style={{ borderRadius: "0.375rem" }}>
                           ₹{job.salary_min ? `${(job.salary_min/1000).toFixed(0)}k` : "?"}–{job.salary_max ? `${(job.salary_max/1000).toFixed(0)}k` : "?"}
                         </span>
                       )}
                     </div>
                   </div>
-                  <Link href={`/jobs/${job.id}`} className="px-4 py-2 text-sm font-semibold bg-xyroots-teal text-white hover:bg-xyroots-dark transition-colors shrink-0" style={{ borderRadius: "0.75rem" }}>
+                  <Link href={`/jobs/${job.id}`} className="px-4 py-2 text-sm font-semibold bg-gray-900 text-white hover:bg-black transition-colors shrink-0" style={{ borderRadius: "0.75rem" }}>
                     Apply
                   </Link>
                 </div>
@@ -376,10 +376,9 @@ export default function TeacherDashboard() {
                       </div>
                       <p className="text-xs text-gray-500 mb-2">{iv.interview_type}</p>
                       <div className="flex flex-wrap gap-3 text-xs text-gray-600">
-                        <span className="flex items-center gap-1"><FaCalendarDays className="w-3 h-3 text-xyroots-teal" />
-                          {new Date(iv.interview_date).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" })}
+                        <span className="flex items-center gap-1"><FaCalendarDays className="w-3 h-3 text-gray-500" />{new Date(iv.interview_date).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" })}
                         </span>
-                        <span className="flex items-center gap-1"><FaClock className="w-3 h-3 text-xyroots-teal" />{iv.time_slot}</span>
+                        <span className="flex items-center gap-1"><FaClock className="w-3 h-3 text-gray-500" />{iv.time_slot}</span>
                       </div>
                       {iv.message && <p className="text-xs text-gray-500 mt-2 italic">&ldquo;{iv.message}&rdquo;</p>}
                     </div>
@@ -418,7 +417,7 @@ export default function TeacherDashboard() {
                         setIsProfileVisible(v);
                         await supabase.from("teacher_profiles").update({ is_visible: v }).eq("profile_id", profile?.id);
                       }}
-                      className={`relative shrink-0 transition-colors ${isProfileVisible ? "bg-xyroots-teal" : "bg-gray-300"}`}
+                      className={`relative shrink-0 transition-colors ${isProfileVisible ? "bg-gray-800" : "bg-gray-300"}`}
                       style={{ width: 38, height: 20, borderRadius: 999 }}
                     >
                       <div className="absolute top-[2px] w-4 h-4 bg-white shadow transition-all" style={{ borderRadius: "50%", left: isProfileVisible ? 18 : 2 }} />
@@ -428,13 +427,13 @@ export default function TeacherDashboard() {
                   {/* Get Verified */}
                   <button
                     onClick={() => setShowVerifiedModal(true)}
-                    className="w-full mt-3 py-2.5 text-sm font-semibold border border-dashed border-gray-300 text-gray-600 hover:border-xyroots-teal hover:text-xyroots-teal transition-colors flex items-center justify-center gap-2"
+                    className="w-full mt-3 py-2.5 text-sm font-semibold border border-dashed border-gray-300 text-gray-600 hover:border-gray-500 hover:text-gray-700 transition-colors flex items-center justify-center gap-2"
                     style={{ borderRadius: "0.75rem" }}
                   >
                     <FaShieldHalved className="w-3.5 h-3.5" /> Get Verified
                   </button>
 
-                  <button onClick={() => setShowEditModal(true)} className="w-full mt-2 py-2.5 text-sm font-semibold bg-xyroots-teal text-white hover:bg-xyroots-dark transition-colors flex items-center justify-center gap-2" style={{ borderRadius: "0.75rem" }}>
+                  <button onClick={() => setShowEditModal(true)} className="w-full mt-2 py-2.5 text-sm font-semibold bg-gray-900 text-white hover:bg-black transition-colors flex items-center justify-center gap-2" style={{ borderRadius: "0.75rem" }}>
                     <FaPencil className="w-3.5 h-3.5" /> Edit Profile
                   </button>
                   <Link href="/profile" className="block w-full mt-2 py-2.5 text-sm font-semibold border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors text-center" style={{ borderRadius: "0.75rem" }}>
@@ -447,7 +446,7 @@ export default function TeacherDashboard() {
                     <h3 className="text-sm font-bold text-gray-900 mb-3">Skills</h3>
                     <div className="flex flex-wrap gap-1.5">
                       {teacherProfile.skills.map((skill: string) => (
-                        <span key={skill} className="text-xs px-2.5 py-1 bg-xyroots-mint text-xyroots-teal font-medium" style={{ borderRadius: "0.5rem" }}>{skill}</span>
+                        <span key={skill} className="text-xs px-2.5 py-1 bg-gray-100 text-gray-700 font-medium" style={{ borderRadius: "0.5rem" }}>{skill}</span>
                       ))}
                     </div>
                   </div>
@@ -456,14 +455,14 @@ export default function TeacherDashboard() {
 
               <div className="lg:col-span-2 space-y-4">
                 <div className="bg-white border border-gray-100 p-6" style={{ borderRadius: "1rem" }}>
-                  <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2"><FaStar className="w-4 h-4 text-xyroots-teal" /> Professional Summary</h3>
+                  <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2"><FaStar className="w-4 h-4 text-gray-500" /> Professional Summary</h3>
                   {teacherProfile?.bio
                     ? <p className="text-sm text-gray-700 leading-relaxed">{teacherProfile.bio}</p>
                     : <p className="text-sm text-gray-400 italic">No bio added yet.</p>}
                 </div>
 
                 <div className="bg-white border border-gray-100 p-6" style={{ borderRadius: "1rem" }}>
-                  <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2"><FaGraduationCap className="w-4 h-4 text-xyroots-teal" /> Teaching Information</h3>
+                  <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2"><FaGraduationCap className="w-4 h-4 text-gray-500" /> Teaching Information</h3>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                     {[
                       { label: "Subject", value: teacherProfile?.subject },
@@ -483,11 +482,11 @@ export default function TeacherDashboard() {
 
                 {teacherProfile?.experience_details?.length > 0 && (
                   <div className="bg-white border border-gray-100 p-6" style={{ borderRadius: "1rem" }}>
-                    <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2"><FaBriefcase className="w-4 h-4 text-xyroots-teal" /> Work Experience</h3>
+                    <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2"><FaBriefcase className="w-4 h-4 text-gray-500" /> Work Experience</h3>
                     <div className="space-y-4">
                       {teacherProfile.experience_details.map((exp: any, i: number) => (
                         <div key={i} className="flex gap-3">
-                          <div className="w-1 bg-xyroots-mint shrink-0 mt-1" style={{ borderRadius: "999px" }} />
+                          <div className="w-1 bg-gray-200 shrink-0 mt-1" style={{ borderRadius: "999px" }} />
                           <div>
                             <p className="text-sm font-bold text-gray-900">{exp.role || exp.jobTitle || "Teacher"}</p>
                             <p className="text-xs text-gray-500">{exp.school || exp.organization || ""}</p>
@@ -501,11 +500,11 @@ export default function TeacherDashboard() {
 
                 {teacherProfile?.education?.length > 0 && (
                   <div className="bg-white border border-gray-100 p-6" style={{ borderRadius: "1rem" }}>
-                    <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2"><FaGraduationCap className="w-4 h-4 text-xyroots-teal" /> Education</h3>
+                    <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2"><FaGraduationCap className="w-4 h-4 text-gray-500" /> Education</h3>
                     <div className="space-y-3">
                       {teacherProfile.education.map((edu: any, i: number) => (
                         <div key={i} className="flex gap-3">
-                          <div className="w-1 bg-xyroots-mint shrink-0 mt-1" style={{ borderRadius: "999px" }} />
+                          <div className="w-1 bg-gray-200 shrink-0 mt-1" style={{ borderRadius: "999px" }} />
                           <div>
                             <p className="text-sm font-bold text-gray-900">{edu.degree || ""}{edu.fieldOfStudy ? ` in ${edu.fieldOfStudy}` : ""}</p>
                             <p className="text-xs text-gray-500">{edu.institution || ""}</p>

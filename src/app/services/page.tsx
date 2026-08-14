@@ -1,3 +1,6 @@
+"use client";
+
+import { useAuth } from "@/lib/auth/AuthProvider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { FaCircleCheck, FaUsers, FaBriefcase, FaMagnifyingGlass, FaBuilding, FaArrowRight } from "react-icons/fa6";
@@ -43,6 +46,7 @@ const services = [
 ];
 
 export default function ServicesPage() {
+  const { user } = useAuth();
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
@@ -51,11 +55,11 @@ export default function ServicesPage() {
         {/* Hero — clean, minimal */}
         <section className="bg-[#f7f8fa] border-b border-gray-100 py-20 px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <span className="inline-block text-xs font-bold uppercase tracking-widest text-xyroots-teal bg-xyroots-mint px-3 py-1 mb-5" style={{ borderRadius: "999px" }}>
+            <span className="inline-block text-xs font-bold uppercase tracking-widest text-gray-600 bg-gray-100 px-3 py-1 mb-5" style={{ borderRadius: "999px" }}>
               Platform
             </span>
             <h1 className="font-editorial text-4xl sm:text-5xl text-gray-900 mb-5 leading-tight">
-              Everything You Need to<br /><span className="text-xyroots-teal">Hire or Get Hired</span>
+              Everything You Need to<br /><span className="text-gray-900">Hire or Get Hired</span>
             </h1>
             <p className="text-gray-500 text-lg max-w-xl mx-auto">
               A full-stack education recruitment platform built for teachers, schools, and staffing agencies across India.
@@ -94,7 +98,8 @@ export default function ServicesPage() {
           </div>
         </section>
 
-        {/* CTA — clean white */}
+        {/* CTA — only show when not logged in */}
+        {!user && (
         <section className="py-16 px-4 bg-[#f7f8fa] border-t border-gray-100">
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">Ready to get started?</h2>
@@ -109,6 +114,7 @@ export default function ServicesPage() {
             </div>
           </div>
         </section>
+        )}
       </main>
 
       <Footer />

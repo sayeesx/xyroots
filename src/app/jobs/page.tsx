@@ -37,9 +37,9 @@ function FilterPanel({
     <div className="space-y-5 text-sm text-gray-700">
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-          <FaFilter className="w-3.5 h-3.5 text-xyroots-teal" /> Filters
+          <FaFilter className="w-3.5 h-3.5 text-gray-600" /> Filters
         </h2>
-        <button onClick={clearAll} className="text-xs font-semibold text-xyroots-teal hover:text-black">Clear All</button>
+        <button onClick={clearAll} className="text-xs font-semibold text-gray-600 hover:text-black">Clear All</button>
       </div>
 
       {/* Job Type */}
@@ -48,7 +48,7 @@ function FilterPanel({
         <div className="space-y-2.5">
           {["Contract", "Full-time", "Part-time", "Internship"].map(type => (
             <label key={type} className="flex items-center gap-3 cursor-pointer group" onClick={(e) => { e.preventDefault(); toggleCheckbox(selectedJobTypes, setSelectedJobTypes, type); }}>
-              <div className={`w-[18px] h-[18px] rounded flex items-center justify-center border transition-colors shrink-0 ${selectedJobTypes.includes(type) ? 'bg-xyroots-teal border-xyroots-teal' : 'border-gray-300 group-hover:border-xyroots-teal/50 bg-white'}`}>
+              <div className={`w-[18px] h-[18px] rounded flex items-center justify-center border transition-colors shrink-0 ${selectedJobTypes.includes(type) ? 'bg-gray-900 border-gray-900' : 'border-gray-300 group-hover:border-gray-500 bg-white'}`}>
                 {selectedJobTypes.includes(type) && <FaCircleCheck className="w-3 h-3 text-white" />}
               </div>
               <span className="text-gray-600 group-hover:text-gray-900 select-none">{type}</span>
@@ -63,7 +63,7 @@ function FilterPanel({
         <span className="font-semibold text-gray-800">Open to remote</span>
         <button
           onClick={() => setOpenToRemote(!openToRemote)}
-          className={`relative transition-colors shrink-0 ${openToRemote ? 'bg-xyroots-teal' : 'bg-gray-300'}`}
+          className={`relative transition-colors shrink-0 ${openToRemote ? 'bg-[#00a264]' : 'bg-gray-300'}`}
           style={{ width: 40, height: 22, borderRadius: 999 }}
         >
           <div className={`absolute top-[3px] w-4 h-4 rounded-full bg-white shadow transition-all ${openToRemote ? 'left-[20px]' : 'left-[3px]'}`} />
@@ -82,7 +82,7 @@ function FilterPanel({
             { label: "More than ₹60,000", key: "gt60" },
           ].map(range => (
             <label key={range.key} className="flex items-center gap-3 cursor-pointer group" onClick={(e) => { e.preventDefault(); if (useCustomSalary) setUseCustomSalary(false); toggleCheckbox(selectedSalaryRanges, setSelectedSalaryRanges, range.key); }}>
-              <div className={`w-[18px] h-[18px] rounded flex items-center justify-center border transition-colors shrink-0 ${!useCustomSalary && selectedSalaryRanges.includes(range.key) ? 'bg-xyroots-teal border-xyroots-teal' : 'border-gray-300 group-hover:border-xyroots-teal/50 bg-white'}`}>
+              <div className={`w-[18px] h-[18px] rounded flex items-center justify-center border transition-colors shrink-0 ${!useCustomSalary && selectedSalaryRanges.includes(range.key) ? 'bg-gray-900 border-gray-900' : 'border-gray-300 group-hover:border-gray-500 bg-white'}`}>
                 {!useCustomSalary && selectedSalaryRanges.includes(range.key) && <FaCircleCheck className="w-3 h-3 text-white" />}
               </div>
               <span className="text-gray-600 group-hover:text-gray-900 select-none">{range.label}</span>
@@ -90,7 +90,7 @@ function FilterPanel({
           ))}
         </div>
         <label className="flex items-center gap-3 cursor-pointer group" onClick={(e) => { e.preventDefault(); setUseCustomSalary(!useCustomSalary); if (!useCustomSalary) setSelectedSalaryRanges([]); }}>
-          <div className={`w-[18px] h-[18px] rounded flex items-center justify-center border transition-colors shrink-0 ${useCustomSalary ? 'bg-xyroots-teal border-xyroots-teal' : 'border-gray-300 group-hover:border-xyroots-teal/50 bg-white'}`}>
+          <div className={`w-[18px] h-[18px] rounded flex items-center justify-center border transition-colors shrink-0 ${useCustomSalary ? 'bg-gray-900 border-gray-900' : 'border-gray-300 group-hover:border-gray-500 bg-white'}`}>
             {useCustomSalary && <FaCircleCheck className="w-3 h-3 text-white" />}
           </div>
           <span className="text-gray-600 group-hover:text-gray-900 select-none font-medium">Custom Range</span>
@@ -99,11 +99,11 @@ function FilterPanel({
           <div className="mt-3 grid grid-cols-2 gap-2">
             <div>
               <label className="text-[10px] text-gray-400 font-bold uppercase mb-1 block">Min (₹)</label>
-              <input type="number" value={customSalaryMin} onChange={(e) => setCustomSalaryMin(Number(e.target.value))} className="w-full px-2 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg text-gray-800 outline-none focus:border-xyroots-teal" step={5000} min={0} />
+              <input type="number" value={customSalaryMin} onChange={(e) => setCustomSalaryMin(Number(e.target.value))} className="w-full px-2 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg text-gray-800 outline-none focus:border-gray-500" step={5000} min={0} />
             </div>
             <div>
               <label className="text-[10px] text-gray-400 font-bold uppercase mb-1 block">Max (₹)</label>
-              <input type="number" value={customSalaryMax} onChange={(e) => setCustomSalaryMax(Number(e.target.value))} className="w-full px-2 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg text-gray-800 outline-none focus:border-xyroots-teal" step={5000} min={0} />
+              <input type="number" value={customSalaryMax} onChange={(e) => setCustomSalaryMax(Number(e.target.value))} className="w-full px-2 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg text-gray-800 outline-none focus:border-gray-500" step={5000} min={0} />
             </div>
           </div>
         )}
@@ -116,7 +116,7 @@ function FilterPanel({
         <div className="space-y-2.5">
           {["Less than a year", "1-3 years", "3-5 years", "5-10 years", "More than 10 years"].map(exp => (
             <label key={exp} className="flex items-center gap-3 cursor-pointer group" onClick={(e) => { e.preventDefault(); toggleCheckbox(selectedExperiences, setSelectedExperiences, exp); }}>
-              <div className={`w-[18px] h-[18px] rounded flex items-center justify-center border transition-colors shrink-0 ${selectedExperiences.includes(exp) ? 'bg-xyroots-teal border-xyroots-teal' : 'border-gray-300 group-hover:border-xyroots-teal/50 bg-white'}`}>
+              <div className={`w-[18px] h-[18px] rounded flex items-center justify-center border transition-colors shrink-0 ${selectedExperiences.includes(exp) ? 'bg-gray-900 border-gray-900' : 'border-gray-300 group-hover:border-gray-500 bg-white'}`}>
                 {selectedExperiences.includes(exp) && <FaCircleCheck className="w-3 h-3 text-white" />}
               </div>
               <span className="text-gray-600 group-hover:text-gray-900 select-none">{exp}</span>
@@ -278,8 +278,8 @@ function JobsPageInner() {
 
   const filterProps = { selectedJobTypes, setSelectedJobTypes, openToRemote, setOpenToRemote, selectedSalaryRanges, setSelectedSalaryRanges, useCustomSalary, setUseCustomSalary, customSalaryMin, setCustomSalaryMin, customSalaryMax, setCustomSalaryMax, selectedExperiences, setSelectedExperiences, clearAll };
 
-  const INITIAL_COLORS = ['#E6F4EA', '#E3F2FD', '#FDE7E9', '#FFF3E0'];
-  const INITIAL_TEXT_COLORS = ['#1e8e3e', '#1976d2', '#d32f2f', '#f57c00'];
+  const INITIAL_COLORS = ['#f3f4f6', '#f3f4f6', '#f3f4f6', '#f3f4f6'];
+  const INITIAL_TEXT_COLORS = ['#374151', '#374151', '#374151', '#374151'];
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f7f8fa]">
@@ -300,7 +300,7 @@ function JobsPageInner() {
               <FilterPanel {...filterProps} />
             </div>
             <div className="p-4 border-t border-gray-100">
-              <button onClick={() => setMobileFilterOpen(false)} className="w-full py-3 rounded-xl bg-xyroots-teal text-white font-bold text-sm">
+              <button onClick={() => setMobileFilterOpen(false)} className="w-full py-3 rounded-xl bg-gray-900 text-white font-bold text-sm">
                 Show {filteredJobs.length} Jobs
               </button>
             </div>
@@ -334,7 +334,7 @@ function JobsPageInner() {
                   className="w-full text-sm outline-none bg-transparent placeholder-gray-400 text-gray-900 font-medium min-w-0"
                 />
               </div>
-              <button className="bg-xyroots-teal text-white rounded-lg px-6 py-2.5 text-sm font-semibold hover:bg-[#068050] transition-colors shrink-0 flex items-center justify-center gap-2 m-1">
+              <button className="bg-[#00a264] text-white rounded-lg px-6 py-2.5 text-sm font-semibold hover:bg-[#008f58] transition-colors shrink-0 flex items-center justify-center gap-2 m-1">
                 <FaMagnifyingGlass className="w-3.5 h-3.5" /> Search
               </button>
             </div>
@@ -348,8 +348,8 @@ function JobsPageInner() {
                 onClick={() => setActiveSubject(subject)}
                 className={`px-4 py-1.5 text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
                   activeSubject === subject
-                    ? "bg-xyroots-teal text-white"
-                    : "bg-white border border-gray-200 text-gray-700 hover:border-xyroots-teal"
+                    ? "bg-[#00a264] text-white"
+                    : "bg-white border border-gray-200 text-gray-700 hover:border-[#00a264]"
                 }`}
                 style={{ borderRadius: "999px" }}
               >
@@ -362,7 +362,7 @@ function JobsPageInner() {
           <div className="flex gap-6 lg:gap-8">
 
             {/* Desktop Sidebar */}
-            <aside className="hidden lg:block w-60 shrink-0 sticky top-20 self-start overflow-y-auto max-h-[calc(100vh-5rem)] pb-10">
+            <aside className="hidden lg:block w-60 shrink-0 sticky top-20 self-start overflow-y-auto max-h-[calc(100vh-5rem)] pb-10 custom-scrollbar">
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
                 <FilterPanel {...filterProps} />
               </div>
@@ -375,12 +375,12 @@ function JobsPageInner() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setMobileFilterOpen(true)}
-                    className="lg:hidden flex items-center gap-2 px-3 py-2 rounded-xl bg-white border border-gray-200 text-sm font-semibold text-gray-700 shadow-sm hover:border-xyroots-teal transition-colors"
+                    className="lg:hidden flex items-center gap-2 px-3 py-2 rounded-xl bg-white border border-gray-200 text-sm font-semibold text-gray-700 shadow-sm hover:border-gray-400 transition-colors"
                   >
-                    <FaFilter className="w-3.5 h-3.5 text-xyroots-teal" />
+                    <FaFilter className="w-3.5 h-3.5 text-gray-600" />
                     Filters
                     {activeFilterCount > 0 && (
-                      <span className="w-5 h-5 rounded-full bg-xyroots-teal text-white text-[10px] font-bold flex items-center justify-center">{activeFilterCount}</span>
+                      <span className="w-5 h-5 rounded-full bg-gray-900 text-white text-[10px] font-bold flex items-center justify-center">{activeFilterCount}</span>
                     )}
                   </button>
                   <p className="text-[13px] text-gray-500">
@@ -411,54 +411,39 @@ function JobsPageInner() {
                   {filteredJobs.map((job, i) => {
                     const isSaved = watchlist.includes(job.id);
                     return (
-                      <div key={job.id} className="bg-white border border-gray-100 overflow-hidden hover:shadow-[0_4px_20px_rgb(0,0,0,0.06)] hover:border-xyroots-teal/30 transition-all group flex flex-col" style={{ borderRadius: "1rem" }}>
+                      <div key={job.id} className="bg-white border border-gray-200 overflow-hidden hover:border-gray-400 transition-all group flex flex-col" style={{ borderRadius: "1rem" }}>
                         <div className="p-4 flex-1">
                           <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-start gap-2.5 min-w-0">
-                              {/* School initial box — no avatar */}
-                              <div
-                                className="w-9 h-9 flex items-center justify-center shrink-0 border border-gray-100 shadow-sm"
-                                style={{
-                                  borderRadius: "0.75rem",
-                                  backgroundColor: INITIAL_COLORS[i % 4],
-                                }}
-                              >
-                                <span className="font-bold text-xs" style={{ color: INITIAL_TEXT_COLORS[i % 4] }}>
-                                  {(job.school || 'S').charAt(0)}
-                                </span>
-                              </div>
-                              <div className="min-w-0">
-                                <h3 className="text-[14px] font-bold text-gray-900 group-hover:text-xyroots-teal transition-colors line-clamp-1 leading-tight mb-0.5">{job.title}</h3>
-                                <p className="text-[11px] text-gray-500 line-clamp-1">{job.school} • {job.location}</p>
-                              </div>
+                            <div className="min-w-0 flex-1">
+                              <h3 className="text-[14px] font-bold text-gray-900 group-hover:text-black transition-colors line-clamp-1 leading-tight mb-0.5">{job.title}</h3>
+                              <p className="text-[11px] text-gray-500 line-clamp-1">{job.school} • {job.location}</p>
                             </div>
                             <button
                               onClick={() => toggleWatchlist(job.id)}
-                              className={`transition-colors shrink-0 ml-1 ${isSaved ? 'text-xyroots-teal' : 'text-gray-300 hover:text-xyroots-teal'}`}
+                              className={`transition-colors shrink-0 ml-2 ${isSaved ? 'text-gray-800' : 'text-gray-300 hover:text-gray-600'}`}
                             >
                               {isSaved ? <FaBookmark className="w-3.5 h-3.5" /> : <FaRegBookmark className="w-3.5 h-3.5" />}
                             </button>
                           </div>
 
                           <div className="flex flex-wrap gap-1.5 mb-2">
-                            <span className="px-2 py-0.5 bg-gray-50 border border-gray-100 text-[#4d5c6f] text-[10px] font-semibold rounded">{job.employmentType}</span>
-                            {job.board && <span className="px-2 py-0.5 bg-gray-50 border border-gray-100 text-[#4d5c6f] text-[10px] font-semibold rounded">{job.board}</span>}
-                            <span className="px-2 py-0.5 bg-gray-50 border border-gray-100 text-[#4d5c6f] text-[10px] font-semibold rounded">{job.experienceMin ?? 0}–{job.experienceMax ?? '?'} Yrs</span>
+                            <span className="px-2 py-0.5 bg-gray-100 border border-gray-200 text-gray-600 text-[10px] font-semibold rounded">{job.employmentType}</span>
+                            {job.board && <span className="px-2 py-0.5 bg-gray-100 border border-gray-200 text-gray-600 text-[10px] font-semibold rounded">{job.board}</span>}
+                            <span className="px-2 py-0.5 bg-gray-100 border border-gray-200 text-gray-600 text-[10px] font-semibold rounded">{job.experienceMin ?? 0}–{job.experienceMax ?? '?'} Yrs</span>
                           </div>
                         </div>
 
-                        <div className="px-4 py-3 flex items-center justify-between border-t border-gray-100/60 bg-gray-50/40">
-                          <div className="text-[13px] font-bold text-xyroots-teal flex items-center gap-0.5">
+                        <div className="px-4 py-3 flex items-center justify-between border-t border-gray-100 bg-gray-50/60">
+                          <div className="text-[13px] font-bold text-gray-800 flex items-center gap-0.5">
                             <FaIndianRupeeSign className="w-3 h-3" />
                             {job.salaryMin && job.salaryMax
                               ? `${(job.salaryMin / 1000).toFixed(0)}k–${(job.salaryMax / 1000).toFixed(0)}k`
                               : 'Negotiable'}
-                            {job.salaryMin && <span className="text-[10px] font-medium text-xyroots-teal/70">/mo</span>}
+                            {job.salaryMin && <span className="text-[10px] font-medium text-gray-500">/mo</span>}
                           </div>
-                          {/* Apply Now links to /jobs/{uuid} */}
                           <Link
                             href={`/jobs/${job.id}`}
-                            className="px-3 py-1.5 bg-xyroots-mint/40 text-black hover:bg-xyroots-teal hover:text-white text-[11px] font-bold transition-all border border-xyroots-teal/20 hover:border-xyroots-teal"
+                            className="px-3 py-1.5 bg-[#00a264] text-white hover:bg-[#008f58] text-[11px] font-bold transition-all"
                             style={{ borderRadius: "0.5rem" }}
                           >
                             Apply Now

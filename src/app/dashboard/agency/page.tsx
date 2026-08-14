@@ -10,13 +10,14 @@ import EditJobModal from "@/components/EditJobModal";
 import {
   FaUsers, FaRegFileLines, FaCirclePlus, FaShieldHalved,
   FaSpinner, FaBriefcase, FaBuilding, FaChartBar, FaGear,
-  FaArrowRight, FaUserPlus, FaPencil
+  FaArrowRight, FaUserPlus, FaPencil, FaBookmark, FaRegBookmark,
+  FaLocationDot, FaXmark
 } from "react-icons/fa6";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-type Tab = "candidates" | "vacancies" | "pipeline" | "settings";
+type Tab = "candidates" | "vacancies" | "pipeline" | "watchlist" | "settings";
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "bg-blue-50 text-blue-700",
@@ -40,9 +41,60 @@ export default function AgencyDashboard() {
   const [isLoadingData, setIsLoadingData] = useState(true);
   const supabase = createClient();
 
+  // Watchlist — stored in localStorage
+  const [watchlistTeacherIds, setWatchlistTeacherIds] = useState<string[]>([]);
+  const [watchlistJobIds, setWatchlistJobIds] = useState<string[]>([]);
+  const [watchlistTeachers, setWatchlistTeachers] = useState<any[]>([]);
+  const [watchlistJobs, setWatchlistJobs] = useState<any[]>([]);
+  const [watchlistLoading, setWatchlistLoading] = useState(false);
+
   useEffect(() => {
     if (!loading && (!isAuthenticated || role !== "agency")) router.push("/");
   }, [loading, isAuthenticated, role, router]);
+
+  // Load watchlist IDs from localStorage
+  useEffect(() => {
+    try {
+      const tIds = JSON.parse(localStorage.getItem("agency_watchlist_teachers") || "[]");
+      const jIds = JSON.parse(localStorage.getItem("xyroots_watchlist") || "[]");
+      setWatchlistTeacherIds(tIds);
+      setWatchlistJobIds(jIds);
+    } catch { /* ignore */ }
+  }, []);
+
+  // Fetch watchlist data when tab is opened
+  useEffect(() => {
+    if (tab !== "watchlist") return;
+    const loadWatchlist = async () => {
+      setWatchlistLoading(true);
+      const [tRes, jRes] = await Promise.all([
+        watchlistTeacherIds.length > 0
+          ? supabase.from("teacher_profiles").select("id, title, subject, location, experience_years, professional_qualification, profiles(full_name, avatar_url)").in("id", watchlistTeacherIds.slice(0, 20))
+          : Promise.resolve({ data: [] }),
+        watchlistJobIds.length > 0
+          ? supabase.from("jobs").select("id, title, school_name, location, employment_type, salary_min, salary_max, created_at").in("id", watchlistJobIds.slice(0, 20))
+          : Promise.resolve({ data: [] }),
+      ]);
+      setWatchlistTeachers((tRes.data as any[]) || []);
+      setWatchlistJobs((jRes.data as any[]) || []);
+      setWatchlistLoading(false);
+    };
+    loadWatchlist();
+  }, [tab, watchlistTeacherIds, watchlistJobIds]); // eslint-disable-line
+
+  const removeWatchlistTeacher = (id: string) => {
+    const next = watchlistTeacherIds.filter(i => i !== id);
+    setWatchlistTeacherIds(next);
+    setWatchlistTeachers(prev => prev.filter(t => t.id !== id));
+    localStorage.setItem("agency_watchlist_teachers", JSON.stringify(next));
+  };
+
+  const removeWatchlistJob = (id: string) => {
+    const next = watchlistJobIds.filter(i => i !== id);
+    setWatchlistJobIds(next);
+    setWatchlistJobs(prev => prev.filter(j => j.id !== id));
+    localStorage.setItem("xyroots_watchlist", JSON.stringify(next));
+  };
 
   const fetchData = useCallback(async () => {
     if (!isAuthenticated || !profile) return;
@@ -64,7 +116,7 @@ export default function AgencyDashboard() {
           id, status, created_at, job_id,
           jobs(title, location, school_name),
           profiles!applicant_profile_id(id, full_name, avatar_url,
-            teacher_profiles(title, subject, location, experience_years, professional_qualification)
+            teacher_profiles(id, title, subject, location, experience_years, professional_qualification)
           )
         `)
         .in("job_id", jobIds)
@@ -86,7 +138,7 @@ export default function AgencyDashboard() {
       <div className="min-h-screen flex flex-col bg-[#f7f8fa]">
         <Navbar />
         <div className="flex-1 flex items-center justify-center">
-          <FaSpinner className="w-8 h-8 text-xyroots-teal animate-spin" />
+          <FaSpinner className="w-8 h-8 text-[#00a264] animate-spin" />
         </div>
       </div>
     );
@@ -103,7 +155,7 @@ export default function AgencyDashboard() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
               <div className="flex items-center gap-4">
                 <div
-                  className="w-14 h-14 bg-xyroots-yellow text-xyroots-dark font-bold text-xl flex items-center justify-center shrink-0 overflow-hidden"
+                  className="w-14 h-14 bg-gray-200 text-gray-700 font-bold text-xl flex items-center justify-center shrink-0 overflow-hidden"
                   style={{ borderRadius: "0.875rem" }}
                 >
                   {profile?.avatar_url
@@ -113,7 +165,7 @@ export default function AgencyDashboard() {
                 <div>
                   <div className="flex items-center gap-2 mb-0.5">
                     <h1 className="text-lg font-bold text-gray-900">{profile?.full_name}</h1>
-                    <FaShieldHalved className="w-4 h-4 text-xyroots-teal" />
+                    <FaShieldHalved className="w-4 h-4 text-[#00a264]" />
                   </div>
                   <p className="text-sm text-gray-500">Consultancy / Agency · {profile?.email}</p>
                 </div>
@@ -122,7 +174,7 @@ export default function AgencyDashboard() {
                 <button onClick={() => setShowPostTeacher(true)} className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-800 text-sm font-semibold hover:bg-gray-200 transition-colors" style={{ borderRadius: "0.75rem" }}>
                   <FaUserPlus className="w-4 h-4" /> Post Teacher Profile
                 </button>
-                <button onClick={() => setShowPostJob(true)} className="flex items-center gap-2 px-4 py-2.5 bg-xyroots-teal text-white text-sm font-semibold hover:bg-xyroots-dark transition-colors" style={{ borderRadius: "0.75rem" }}>
+                <button onClick={() => setShowPostJob(true)} className="flex items-center gap-2 px-4 py-2.5 bg-[#00a264] text-white text-sm font-semibold hover:bg-[#008f58] transition-colors" style={{ borderRadius: "0.75rem" }}>
                   <FaCirclePlus className="w-4 h-4" /> Post Vacancy
                 </button>
               </div>
@@ -132,9 +184,9 @@ export default function AgencyDashboard() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
               {[
                 { label: "Total Vacancies", value: jobs.length, color: "text-gray-900" },
-                { label: "Live", value: publishedJobs.length, color: "text-xyroots-teal" },
+                { label: "Live", value: publishedJobs.length, color: "text-[#00a264]" },
                 { label: "Drafts", value: draftJobs.length, color: "text-gray-900" },
-                { label: "Applicants", value: applications.length, color: "text-xyroots-teal" },
+                { label: "Applicants", value: applications.length, color: "text-[#00a264]" },
               ].map(s => (
                 <div key={s.label} className="bg-gray-50 border border-gray-200 px-4 py-3" style={{ borderRadius: "0.75rem" }}>
                   <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
@@ -156,7 +208,7 @@ export default function AgencyDashboard() {
             ] as const).map(t => (
               <button key={t.id} onClick={() => setTab(t.id)}
                 className={`flex items-center gap-2 px-5 py-2.5 text-sm font-semibold transition-all -mb-px shrink-0 ${
-                  tab === t.id ? "text-xyroots-teal border-b-2 border-xyroots-teal" : "text-gray-500 hover:text-gray-900"
+                  tab === t.id ? "text-[#00a264] border-b-2 border-[#00a264]" : "text-gray-500 hover:text-gray-900"
                 }`}
               >
                 <t.icon className="w-4 h-4" /> {t.label}
@@ -176,11 +228,12 @@ export default function AgencyDashboard() {
               ) : applications.map((app: any) => {
                 const p = app.profiles;
                 const tp = Array.isArray(p?.teacher_profiles) ? p?.teacher_profiles?.[0] : p?.teacher_profiles;
+                const teacherProfileId = tp?.id;
                 const job = app.jobs;
                 return (
                   <div key={app.id} className="bg-white border border-gray-100 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4" style={{ borderRadius: "1rem" }}>
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-xyroots-mint flex items-center justify-center text-xyroots-teal font-bold text-sm shrink-0 overflow-hidden" style={{ borderRadius: "50%" }}>
+                      <div className="w-10 h-10 bg-gray-100 flex items-center justify-center text-gray-600 font-bold text-sm shrink-0 overflow-hidden" style={{ borderRadius: "50%" }}>
                         {p?.avatar_url
                           ? <img src={p.avatar_url} className="w-full h-full object-cover" alt={p?.full_name} />
                           : (p?.full_name || "?").charAt(0).toUpperCase()}
@@ -198,7 +251,7 @@ export default function AgencyDashboard() {
                       <span className={`text-xs font-bold px-2.5 py-1 ${STATUS_COLORS[app.status] || STATUS_COLORS.pending}`} style={{ borderRadius: "0.5rem" }}>
                         {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
                       </span>
-                      {p?.id && (
+                      {teacherProfileId && (
                         <Link href={`/teachers/${p.id}`} className="px-3 py-1.5 text-xs font-bold border border-gray-200 text-gray-700 hover:border-xyroots-teal hover:text-xyroots-teal transition-colors" style={{ borderRadius: "0.5rem" }}>
                           View Profile
                         </Link>
@@ -234,7 +287,7 @@ export default function AgencyDashboard() {
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-bold text-gray-900">{job.title}</h3>
                       <span className={`text-xs px-2 py-0.5 font-bold ${
-                        job.status === "published" ? "bg-green-50 text-green-700" :
+                        job.status === "published" ? "bg-[#e6f7ed] text-[#00a264]" :
                         job.status === "draft" ? "bg-amber-50 text-amber-700" : "bg-gray-100 text-gray-500"
                       }`} style={{ borderRadius: "0.375rem" }}>
                         {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
@@ -244,7 +297,7 @@ export default function AgencyDashboard() {
                       {job.board && `${job.board} · `}{job.location || "India"} · Posted {new Date(job.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
                     </p>
                   </div>
-                  <button onClick={() => setEditingJob(job)} className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold border border-gray-200 text-gray-700 hover:border-xyroots-teal hover:text-xyroots-teal transition-colors shrink-0" style={{ borderRadius: "0.625rem" }}>
+                  <button onClick={() => setEditingJob(job)} className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold border border-gray-200 text-gray-700 hover:border-[#00a264] hover:text-[#00a264] transition-colors shrink-0" style={{ borderRadius: "0.625rem" }}>
                     <FaPencil className="w-3 h-3" /> Edit / Manage
                   </button>
                 </div>
@@ -279,7 +332,7 @@ export default function AgencyDashboard() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl">
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase">Agency / Contact Name</label>
-                  <input defaultValue={profile?.full_name || ""} className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal" style={{ borderRadius: "0.75rem" }} />
+                  <input defaultValue={profile?.full_name || ""} className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-[#00a264]" style={{ borderRadius: "0.75rem" }} />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase">Email Address</label>

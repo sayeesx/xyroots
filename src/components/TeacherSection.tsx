@@ -64,7 +64,7 @@ export default function TeacherSection() {
           <div className="relative">
             <div className="bg-white rounded-2xl dashboard-shadow border border-xyroots-border overflow-hidden max-w-sm mx-auto lg:ml-auto">
               {/* Cover */}
-              <div className="h-40 sm:h-48 bg-[#00a264] relative overflow-hidden">
+              <div className="h-40 sm:h-48 bg-gray-200 relative overflow-hidden">
                 <Image
                   src="/institution.webp"
                   alt="Institution Cover"
@@ -76,7 +76,7 @@ export default function TeacherSection() {
 
               <div className="p-5 sm:p-6 relative pt-12 sm:pt-14">
                 {/* Profile Picture */}
-                <div className="absolute -top-10 left-5 sm:left-6 w-20 h-20 rounded-full border-4 border-white overflow-hidden bg-xyroots-teal z-10 shadow-sm">
+                <div className="absolute -top-10 left-5 sm:left-6 w-20 h-20 rounded-full border-4 border-white overflow-hidden bg-gray-100 z-10 shadow-sm">
                   <Image
                     src="/lady-teacher.webp"
                     alt="Kavya T Profile"
@@ -103,8 +103,8 @@ export default function TeacherSection() {
 
                 {/* Info badges */}
                 <div className="flex flex-wrap gap-2 mb-3">
-                  <span className="text-xs px-2.5 py-1 bg-xyroots-mint rounded-full text-xyroots-teal font-medium">B.Ed</span>
-                  <span className="text-xs px-2.5 py-1 bg-xyroots-mint rounded-full text-xyroots-teal font-medium">M.Sc Mathematics</span>
+                  <span className="text-xs px-2.5 py-1 bg-[#e6f7ed] rounded-full text-[#00a264] font-medium">B.Ed</span>
+                  <span className="text-xs px-2.5 py-1 bg-[#e6f7ed] rounded-full text-[#00a264] font-medium">M.Sc Mathematics</span>
                   <span className="text-xs px-2.5 py-1 bg-xyroots-cream rounded-full text-xyroots-text font-medium">5 Years Experience</span>
                 </div>
 
@@ -140,10 +140,10 @@ export default function TeacherSection() {
 
                 {/* CTAs */}
                 <div className="flex gap-3">
-                  <button className="flex-1 px-4 py-2.5 text-sm font-semibold rounded-xl bg-xyroots-teal text-white hover:bg-xyroots-dark transition-colors">
+                  <button className="flex-1 px-4 py-2.5 text-sm font-semibold rounded-xl bg-[#00a264] text-white hover:bg-[#008f58] transition-colors">
                     View Profile
                   </button>
-                  <button className="w-12 h-10 flex items-center justify-center rounded-xl border-2 border-xyroots-border text-black hover:border-xyroots-teal transition-colors">
+                  <button className="w-12 h-10 flex items-center justify-center rounded-xl border-2 border-xyroots-border text-black hover:border-[#00a264] transition-colors">
                     <i className="bi bi-bookmark"></i>
                   </button>
                 </div>

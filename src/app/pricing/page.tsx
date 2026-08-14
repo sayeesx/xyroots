@@ -115,7 +115,7 @@ export default function PricingPage() {
       <main className="flex-1">
         {/* Hero */}
         <section className="bg-[#f7f8fa] border-b border-gray-100 py-20 px-4 text-center">
-          <span className="inline-block text-xs font-bold uppercase tracking-widest text-xyroots-teal bg-xyroots-mint px-3 py-1 mb-5" style={{ borderRadius: "999px" }}>
+          <span className="inline-block text-xs font-bold uppercase tracking-widest text-gray-600 bg-gray-100 px-3 py-1 mb-5" style={{ borderRadius: "999px" }}>
             Pricing
           </span>
           <h1 className="font-editorial text-4xl sm:text-5xl text-gray-900 mb-4 leading-tight">
@@ -124,7 +124,7 @@ export default function PricingPage() {
           <p className="text-gray-500 text-lg max-w-xl mx-auto mb-6">
             Free for teachers forever. Affordable plans for schools and agencies.
           </p>
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-xyroots-mint text-xyroots-teal text-sm font-bold" style={{ borderRadius: "999px" }}>
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 text-sm font-bold" style={{ borderRadius: "999px" }}>
             <FaWandMagicSparkles className="w-4 h-4 text-xyroots-yellow" />
             Always 100% Free for Teachers
           </div>
@@ -151,7 +151,7 @@ export default function PricingPage() {
                   <div className="mb-5">
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className={`text-lg font-bold ${plan.highlighted ? "text-white" : "text-gray-900"}`}>{plan.name}</h3>
-                      {plan.highlighted && <FaShieldHalved className="w-4 h-4 text-xyroots-teal" />}
+                      {plan.highlighted && <FaShieldHalved className="w-4 h-4 text-gray-400" />}
                     </div>
                     <p className={`text-xs ${plan.highlighted ? "text-gray-400" : "text-gray-500"}`}>{plan.desc}</p>
                   </div>
@@ -162,12 +162,12 @@ export default function PricingPage() {
                   <ul className="space-y-2.5 mb-7 flex-1">
                     {plan.features.map(f => (
                       <li key={f} className="flex items-start gap-2.5 text-sm">
-                        <FaCircleCheck className={`w-4 h-4 shrink-0 mt-0.5 ${plan.highlighted ? "text-xyroots-teal" : "text-xyroots-teal"}`} />
+                        <FaCircleCheck className={`w-4 h-4 shrink-0 mt-0.5 ${plan.highlighted ? "text-white/70" : "text-gray-500"}`} />
                         <span className={plan.highlighted ? "text-gray-200" : "text-gray-700"}>{f}</span>
                       </li>
                     ))}
                   </ul>
-                  <Link href={plan.href} className={`w-full py-3 text-sm font-bold text-center transition-colors ${plan.highlighted ? "bg-xyroots-yellow text-xyroots-dark hover:bg-yellow-300" : "bg-xyroots-teal text-white hover:bg-xyroots-dark"}`} style={{ borderRadius: "0.75rem" }}>
+                  <Link href={plan.href} className={`w-full py-3 text-sm font-bold text-center transition-colors ${plan.highlighted ? "bg-xyroots-yellow text-xyroots-dark hover:bg-yellow-300" : "bg-gray-900 text-white hover:bg-black"}`} style={{ borderRadius: "0.75rem" }}>
                     {plan.cta}
                   </Link>
                 </div>
@@ -205,12 +205,12 @@ export default function PricingPage() {
                   <ul className="space-y-2.5 mb-7 flex-1">
                     {plan.features.map(f => (
                       <li key={f} className="flex items-start gap-2.5 text-sm">
-                        <FaCircleCheck className="w-4 h-4 shrink-0 mt-0.5 text-xyroots-teal" />
+                        <FaCircleCheck className="w-4 h-4 shrink-0 mt-0.5 text-gray-500" />
                         <span className={plan.highlighted ? "text-gray-200" : "text-gray-700"}>{f}</span>
                       </li>
                     ))}
                   </ul>
-                  <Link href={plan.href} className={`w-full py-3 text-sm font-bold text-center transition-colors ${plan.highlighted ? "bg-xyroots-yellow text-xyroots-dark hover:bg-yellow-300" : "bg-xyroots-teal text-white hover:bg-xyroots-dark"}`} style={{ borderRadius: "0.75rem" }}>
+                  <Link href={plan.href} className={`w-full py-3 text-sm font-bold text-center transition-colors ${plan.highlighted ? "bg-xyroots-yellow text-xyroots-dark hover:bg-yellow-300" : "bg-gray-900 text-white hover:bg-black"}`} style={{ borderRadius: "0.75rem" }}>
                     {plan.cta}
                   </Link>
                 </div>
@@ -229,7 +229,7 @@ export default function PricingPage() {
               { value: "4.9/5", label: "Avg. Rating" },
             ].map(s => (
               <div key={s.label}>
-                <p className="text-3xl font-bold text-xyroots-teal mb-1">{s.value}</p>
+                <p className="text-3xl font-bold text-gray-900 mb-1">{s.value}</p>
                 <p className="text-xs text-gray-500 font-medium">{s.label}</p>
               </div>
             ))}
@@ -244,7 +244,7 @@ export default function PricingPage() {
               {faqs.map((faq, i) => (
                 <div key={i} className="bg-white border border-gray-100 p-5" style={{ borderRadius: "0.875rem" }}>
                   <p className="text-sm font-bold text-gray-900 mb-2 flex items-start gap-2">
-                    <FaBolt className="w-3.5 h-3.5 text-xyroots-teal shrink-0 mt-0.5" />
+                    <FaBolt className="w-3.5 h-3.5 text-gray-500 shrink-0 mt-0.5" />
                     {faq.q}
                   </p>
                   <p className="text-sm text-gray-500 leading-relaxed pl-5">{faq.a}</p>
@@ -260,10 +260,10 @@ export default function PricingPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-3">Ready to get started?</h2>
             <p className="text-gray-500 text-sm mb-8">Create your free profile today. No credit card required.</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/register/teacher" className="inline-flex items-center gap-2 px-6 py-3 bg-xyroots-teal text-white font-semibold text-sm hover:bg-xyroots-dark transition-colors" style={{ borderRadius: "0.75rem" }}>
+              <Link href="/register/teacher" className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white font-semibold text-sm hover:bg-black transition-colors" style={{ borderRadius: "0.75rem" }}>
                 Register as Teacher — Free <FaArrowRight className="w-3.5 h-3.5" />
               </Link>
-              <Link href="/register/employer" className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-700 font-semibold text-sm hover:border-xyroots-teal hover:text-xyroots-teal transition-colors" style={{ borderRadius: "0.75rem" }}>
+              <Link href="/register/employer" className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-700 font-semibold text-sm hover:border-gray-500 hover:text-gray-800 transition-colors" style={{ borderRadius: "0.75rem" }}>
                 Register as Institution
               </Link>
             </div>

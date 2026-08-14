@@ -14,6 +14,7 @@ import { createClient } from "@/lib/supabase/client";
 import { formatSalary } from "@/lib/utils";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { applyToJob } from "@/lib/actions/jobs";
+import Loader from "@/components/Loader";
 
 export default function JobDetailPage() {
   const params = useParams();
@@ -99,10 +100,7 @@ export default function JobDetailPage() {
       <div className="min-h-screen flex flex-col bg-[#f7f8fa]">
         <Navbar />
         <main className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-12 h-12 border-2 border-xyroots-teal border-t-transparent animate-spin mx-auto mb-4" style={{ borderRadius: "50%" }} />
-            <p className="text-sm text-gray-500">Loading vacancy...</p>
-          </div>
+          <Loader />
         </main>
       </div>
     );
@@ -133,38 +131,45 @@ export default function JobDetailPage() {
       <Navbar />
 
       <main className="flex-1 pb-28">
-        {/* Hero: institution brand colour strip */}
-        <div className="bg-xyroots-dark/95 text-white py-8 px-4">
+        {/* Clean header — no dark gradient */}
+        <div className="bg-white border-b border-gray-100 py-6 px-4">
           <div className="max-w-6xl mx-auto">
-            <button onClick={() => router.back()} className="inline-flex items-center gap-1.5 text-xs text-white/60 hover:text-white mb-6 transition-colors group">
-              <FaArrowLeft className="w-3 h-3 group-hover:-translate-x-0.5 transition-transform" /> Back
+            <button onClick={() => router.back()} className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-700 mb-5 transition-colors group">
+              <FaArrowLeft className="w-3 h-3 group-hover:-translate-x-0.5 transition-transform" /> Back to Jobs
             </button>
 
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
-              <div className="flex-1 min-w-0">
-                {/* Chips */}
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {job.board && (
-                    <span className="px-2.5 py-1 text-[11px] font-bold bg-xyroots-teal/20 text-xyroots-teal border border-xyroots-teal/30 uppercase tracking-wider" style={{ borderRadius: "999px" }}>
-                      {job.board}
-                    </span>
-                  )}
-                  <span className="px-2.5 py-1 text-[11px] font-medium bg-white/10 text-white/80" style={{ borderRadius: "999px" }}>{job.employmentType}</span>
-                  {job.level && <span className="px-2.5 py-1 text-[11px] font-medium bg-white/10 text-white/80" style={{ borderRadius: "999px" }}>{job.level}</span>}
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
+              <div className="flex items-start gap-4 flex-1 min-w-0">
+                {/* Institution initial badge */}
+                <div className="w-14 h-14 shrink-0 flex items-center justify-center font-bold text-xl text-white bg-gray-900 border border-gray-100"
+                  style={{ borderRadius: "0.875rem" }}>
+                  {(job.school || 'S').charAt(0)}
                 </div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-white leading-tight mb-3">{job.title}</h1>
-                <div className="flex flex-wrap items-center gap-4 text-sm text-white/70">
-                  <span className="flex items-center gap-1.5">
-                    <FaBuilding className="w-3.5 h-3.5 text-xyroots-teal shrink-0" />
-                    <span className="font-semibold text-white">{job.school}</span>
-                    {job.schoolVerified && <FaShieldHalved className="w-3.5 h-3.5 text-xyroots-teal" />}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <FaLocationDot className="w-3.5 h-3.5 shrink-0" /> {job.location}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <FaCalendarDays className="w-3.5 h-3.5 shrink-0" /> Posted {job.postedDate}
-                  </span>
+                <div className="min-w-0">
+                  {/* Chips */}
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {job.board && (
+                      <span className="px-2 py-0.5 text-[10px] font-bold bg-[#e6f7ed] text-[#00a264] border border-[#00a264]/20 uppercase tracking-wider" style={{ borderRadius: "999px" }}>
+                        {job.board}
+                      </span>
+                    )}
+                    <span className="px-2 py-0.5 text-[10px] font-medium bg-gray-100 text-gray-600" style={{ borderRadius: "999px" }}>{job.employmentType}</span>
+                    {job.level && <span className="px-2 py-0.5 text-[10px] font-medium bg-gray-100 text-gray-600" style={{ borderRadius: "999px" }}>{job.level}</span>}
+                  </div>
+                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight mb-2">{job.title}</h1>
+                  <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">
+                    <span className="flex items-center gap-1.5 font-semibold text-gray-800">
+                      <FaBuilding className="w-3.5 h-3.5 text-[#00a264] shrink-0" />
+                      {job.school}
+                      {job.schoolVerified && <FaShieldHalved className="w-3.5 h-3.5 text-[#00a264]" />}
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <FaLocationDot className="w-3.5 h-3.5 shrink-0" /> {job.location}
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <FaCalendarDays className="w-3.5 h-3.5 shrink-0" /> Posted {job.postedDate}
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -173,7 +178,7 @@ export default function JobDetailPage() {
                 <button
                   onClick={toggleSave}
                   className={`px-4 py-2.5 text-sm font-semibold border transition-all flex items-center gap-2 ${
-                    saved ? "bg-white/10 border-white/20 text-white" : "border-white/20 text-white/70 hover:border-white/50 hover:text-white"
+                    saved ? "bg-[#e6f7ed] border-[#00a264]/30 text-[#00a264]" : "border-gray-200 text-gray-600 hover:border-gray-400"
                   }`}
                   style={{ borderRadius: "0.75rem" }}
                 >
@@ -184,8 +189,8 @@ export default function JobDetailPage() {
                   onClick={handleApply}
                   disabled={applyLoading || applied}
                   className={`px-6 py-2.5 text-sm font-bold flex items-center gap-2 transition-all ${
-                    applied ? "bg-green-500 text-white cursor-default" :
-                    "bg-xyroots-teal text-white hover:bg-[#00875a] active:scale-95"
+                    applied ? "bg-[#e6f7ed] text-[#00a264] cursor-default" :
+                    "bg-[#00a264] text-white hover:bg-[#008f58] active:scale-95"
                   }`}
                   style={{ borderRadius: "0.75rem" }}
                 >
@@ -224,14 +229,13 @@ export default function JobDetailPage() {
               {/* Stats row */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {[
-                  { label: "Monthly Salary", value: job.salaryMin && job.salaryMax ? `₹${(job.salaryMin/1000).toFixed(0)}k–${(job.salaryMax/1000).toFixed(0)}k` : formatSalary(job.salaryMin, job.salaryMax) || "Negotiable", icon: FaIndianRupeeSign, accent: true },
-                  { label: "Experience", value: `${job.experienceMin ?? 0}–${job.experienceMax ?? 5} Yrs`, icon: FaBriefcase },
+                  { label: "Monthly Salary", value: job.salaryMin && job.salaryMax ? `₹${(job.salaryMin/1000).toFixed(0)}k–${(job.salaryMax/1000).toFixed(0)}k` : formatSalary(job.salaryMin, job.salaryMax) || "Negotiable", icon: FaIndianRupeeSign, accent: true },                  { label: "Experience", value: `${job.experienceMin ?? 0}–${job.experienceMax ?? 5} Yrs`, icon: FaBriefcase },
                   { label: "Qualification", value: job.qualification || "B.Ed", icon: FaGraduationCap },
                   { label: "Subject", value: job.subject || "General", icon: FaWandMagicSparkles },
                 ].map(stat => (
-                  <div key={stat.label} className={`p-4 ${stat.accent ? "bg-xyroots-mint border border-xyroots-teal/20" : "bg-white border border-gray-100"}`} style={{ borderRadius: "0.875rem" }}>
+                  <div key={stat.label} className={`p-4 ${stat.accent ? "bg-[#e6f7ed] border border-[#00a264]/20" : "bg-white border border-gray-100"}`} style={{ borderRadius: "0.875rem" }}>
                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wide mb-1">{stat.label}</p>
-                    <p className={`text-sm font-bold leading-tight ${stat.accent ? "text-xyroots-teal" : "text-gray-900"}`}>{stat.value}</p>
+                    <p className={`text-sm font-bold leading-tight ${stat.accent ? "text-[#00a264]" : "text-gray-900"}`}>{stat.value}</p>
                   </div>
                 ))}
               </div>
@@ -240,8 +244,8 @@ export default function JobDetailPage() {
               {job.description && (
                 <div className="bg-white border border-gray-100 p-6" style={{ borderRadius: "1rem" }}>
                   <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
-                    <span className="w-5 h-5 flex items-center justify-center bg-xyroots-mint" style={{ borderRadius: "0.375rem" }}>
-                      <FaBuilding className="w-3 h-3 text-xyroots-teal" />
+                    <span className="w-5 h-5 flex items-center justify-center bg-[#e6f7ed]" style={{ borderRadius: "0.375rem" }}>
+                      <FaBuilding className="w-3 h-3 text-[#00a264]" />
                     </span>
                     About the Role
                   </h2>
@@ -298,8 +302,8 @@ export default function JobDetailPage() {
                   </h2>
                   <div className="grid sm:grid-cols-2 gap-2.5">
                     {job.benefits.map((b: string, i: number) => (
-                      <div key={i} className="flex items-center gap-2.5 p-3 bg-xyroots-mint/40 text-sm text-xyroots-teal font-medium border border-xyroots-teal/10" style={{ borderRadius: "0.75rem" }}>
-                        <FaCircleCheck className="w-3.5 h-3.5 shrink-0" /> {b}
+                      <div key={i} className="flex items-center gap-2.5 p-3 bg-gray-50 text-sm text-gray-700 font-medium border border-gray-100" style={{ borderRadius: "0.75rem" }}>
+                        <FaCircleCheck className="w-3.5 h-3.5 shrink-0 text-gray-500" /> {b}
                       </div>
                     ))}
                   </div>
@@ -313,9 +317,9 @@ export default function JobDetailPage() {
               <div className="bg-white border border-gray-100 p-6 lg:sticky lg:top-24" style={{ borderRadius: "1rem" }}>
                 <div className="mb-5">
                   {job.salaryMin && (
-                    <div className="text-center py-4 mb-4 bg-xyroots-mint/30 border border-xyroots-teal/15" style={{ borderRadius: "0.75rem" }}>
+                    <div className="text-center py-4 mb-4 bg-gray-50 border border-gray-200" style={{ borderRadius: "0.75rem" }}>
                       <p className="text-xs text-gray-500 font-medium mb-1">Monthly Salary</p>
-                      <p className="text-2xl font-bold text-xyroots-teal flex items-center justify-center gap-0.5">
+                      <p className="text-2xl font-bold text-gray-900 flex items-center justify-center gap-0.5">
                         <FaIndianRupeeSign className="w-4 h-4" />
                         {`${(job.salaryMin/1000).toFixed(0)}k`}
                         {job.salaryMax && `–${(job.salaryMax/1000).toFixed(0)}k`}
@@ -373,7 +377,7 @@ export default function JobDetailPage() {
               <div className="bg-white border border-gray-100 p-5" style={{ borderRadius: "1rem" }}>
                 <h3 className="text-sm font-bold text-gray-900 mb-3">About the Institution</h3>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-xyroots-mint flex items-center justify-center font-bold text-xyroots-teal text-base border border-xyroots-teal/10" style={{ borderRadius: "0.75rem" }}>
+                  <div className="w-10 h-10 bg-gray-100 flex items-center justify-center font-bold text-gray-700 text-base border border-gray-200" style={{ borderRadius: "0.75rem" }}>
                     {(job.school || 'S').charAt(0)}
                   </div>
                   <div>
@@ -389,21 +393,21 @@ export default function JobDetailPage() {
         </div>
       </main>
 
-      {/* Mobile sticky bar */}
-      <div className="fixed bottom-0 left-0 right-0 p-3 bg-white/95 backdrop-blur-sm border-t border-gray-100 lg:hidden z-40 flex items-center justify-between gap-3">
+      {/* Mobile sticky bar — bigger */}
+      <div className="fixed bottom-0 left-0 right-0 px-4 py-3 bg-white/98 backdrop-blur-sm border-t border-gray-100 lg:hidden z-40 flex items-center justify-between gap-3">
         <div>
-          {job.salaryMin && <p className="text-xs font-bold text-xyroots-teal">₹{(job.salaryMin/1000).toFixed(0)}k{job.salaryMax && `–${(job.salaryMax/1000).toFixed(0)}k`}/mo</p>}
-          <p className="text-[10px] text-gray-400">{job.location}</p>
+          {job.salaryMin && <p className="text-base font-bold text-gray-900">₹{(job.salaryMin/1000).toFixed(0)}k{job.salaryMax && `–${(job.salaryMax/1000).toFixed(0)}k`}<span className="text-xs font-normal text-gray-400">/mo</span></p>}
+          <p className="text-xs text-gray-500 font-medium">{job.location}</p>
         </div>
         <button
           onClick={handleApply}
           disabled={applyLoading || applied}
-          className={`flex-1 max-w-[200px] py-3 px-4 font-bold text-sm transition-all flex items-center justify-center gap-2 ${
-            applied ? "bg-green-100 text-green-700" : "bg-xyroots-teal text-white"
+          className={`flex-1 max-w-[220px] py-3.5 px-5 font-bold text-base transition-all flex items-center justify-center gap-2 ${
+            applied ? "bg-[#e6f7ed] text-[#00a264]" : "bg-[#00a264] text-white hover:bg-[#008f58]"
           }`}
-          style={{ borderRadius: "0.75rem" }}
+          style={{ borderRadius: "0.875rem" }}
         >
-          {applyLoading ? <FaSpinner className="w-4 h-4 animate-spin" /> : applied ? "Applied ✓" : <>Apply <FaArrowRight className="w-3 h-3" /></>}
+          {applyLoading ? <FaSpinner className="w-4 h-4 animate-spin" /> : applied ? "Applied ✓" : <>Apply Now <FaArrowRight className="w-4 h-4" /></>}
         </button>
       </div>
 

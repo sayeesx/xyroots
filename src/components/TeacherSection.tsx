@@ -141,7 +141,7 @@ export default function TeacherSection() {
                 {/* CTAs */}
                 <div className="flex gap-3">
                   <button className="flex-1 px-4 py-2.5 text-sm font-semibold rounded-xl bg-xyroots-teal text-white hover:bg-xyroots-dark transition-colors">
-                    Message Kavya
+                    View Profile
                   </button>
                   <button className="w-12 h-10 flex items-center justify-center rounded-xl border-2 border-xyroots-border text-black hover:border-xyroots-teal transition-colors">
                     <i className="bi bi-bookmark"></i>

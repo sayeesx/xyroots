@@ -40,6 +40,7 @@ export default function PostJobModal({ isOpen, onClose, onSuccess }: PostJobModa
     salary_min: "",
     salary_max: "",
     school_name: "",
+    institution_type: "",
     application_deadline: "",
     status: "published" as "draft" | "published",
   });
@@ -90,8 +91,8 @@ export default function PostJobModal({ isOpen, onClose, onSuccess }: PostJobModa
           title: "", subject: "", description: "", qualification: "",
           professional_qualification: "", experience_min: "", experience_max: "",
           employment_type: "Full-time", board: "", level: "", location: "",
-          salary_min: "", salary_max: "", school_name: "", application_deadline: "",
-          status: "published",
+          salary_min: "", salary_max: "", school_name: "", institution_type: "",
+          application_deadline: "", status: "published",
         });
       }, 1800);
     } catch {
@@ -275,6 +276,17 @@ export default function PostJobModal({ isOpen, onClose, onSuccess }: PostJobModa
                   className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
                   style={{ borderRadius: "0.75rem" }}
                 />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Institution Type</label>
+                <select
+                  value={form.institution_type} onChange={e => set("institution_type", e.target.value)}
+                  className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
+                  style={{ borderRadius: "0.75rem" }}
+                >
+                  <option value="">Select type</option>
+                  {["School", "International School", "College", "University", "Coaching Centre", "Preschool / Nursery", "Special Needs School", "Vocational Institute", "Other"].map(t => <option key={t}>{t}</option>)}
+                </select>
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Location</label>

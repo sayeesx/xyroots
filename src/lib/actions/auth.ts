@@ -71,8 +71,9 @@ export async function signUpTeacher(formData: {
   fullName: string
   phone: string
   email: string
-  subject: string
+  subject?: string | null
   password: string
+  confirmPassword: string
 }): Promise<ServiceResponse> {
   const validation = teacherSignupSchema.safeParse(formData)
   if (!validation.success) {
@@ -126,7 +127,7 @@ export async function signUpTeacher(formData: {
     .from('teacher_profiles')
     .insert({
       profile_id: profileResult.data.id,
-      subject,
+      subject: subject || null,
       specializations: [],
       skills: [],
       languages: [],
@@ -149,7 +150,7 @@ export async function signUpTeacher(formData: {
     action: 'signup',
     entity_type: 'profile',
     entity_id: profileResult.data.id,
-    details: { role: 'teacher', subject },
+    details: { role: 'teacher', subject: subject || null },
   } as any)
 
   return { success: true }

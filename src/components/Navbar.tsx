@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { FaBars, FaXmark, FaArrowRightFromBracket, FaBriefcase, FaGear } from "react-icons/fa6";
+import { FaBars, FaXmark, FaArrowRightFromBracket, FaBriefcase, FaGear, FaPlus } from "react-icons/fa6";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { getNavVisibility } from "@/lib/auth/permissions";
 

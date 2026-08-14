@@ -1,30 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Loader from "@/components/Loader";
 import {
   FaShieldHalved, FaStar, FaLocationDot, FaBriefcase, FaGraduationCap, FaAward,
   FaVideo, FaFileLines, FaCalendarDays, FaCircleCheck, FaArrowLeft, FaEnvelope,
   FaPhone, FaBookmark, FaRegBookmark, FaPlay
 } from "react-icons/fa6";
 import { createClient } from "@/lib/supabase/client";
-import { teachers } from "@/data/teachers";
 import { formatSalary } from "@/lib/utils";
-
-
-const verificationOptions = [
-  { value: "all", label: "All Teachers" },
-  { value: "verified", label: "Verified Only" },
-];
-const qualificationOptions = [
-  { value: "", label: "Any Qualification" },
-  { value: "bed", label: "B.Ed" },
-  { value: "med", label: "M.Ed" },
-  { value: "msc", label: "Master's" },
-  { value: "phd", label: "Ph.D" },
-];
 
 export default function TeacherProfilePage() {
   const params = useParams();
@@ -32,53 +19,102 @@ export default function TeacherProfilePage() {
   const slug = params?.slug as string;
 
   const [dbTeacher, setDbTeacher] = useState<any>(null);
+  const [pageLoading, setPageLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
   const supabase = createClient();
 
-  const actualId = slug.includes('-') && slug.length > 36 ? slug.split('-').pop() : slug;
-  const fallbackTeacher = teachers.find((t) => t.id === actualId || t.slug === slug) || teachers[0];
+  // UUID format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+  const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const actualId = UUID_REGEX.test(slug) ? slug : slug?.split('-').pop();
 
-  import("react").then((React) => {
-    React.useEffect(() => {
-      if (actualId) {
-        supabase.from('teacher_profiles').select('*, profiles(full_name, location, avatar_url)').eq('id', actualId).single().then(({ data }: any) => {
-          if (data) {
-            setDbTeacher({
-              ...data,
-              id: data.id,
-              slug: slug,
-              name: data.profiles?.full_name || "Anonymous",
-              title: data.title || "Educator",
-              location: data.location || data.profiles?.location || "India",
-              avatar: data.profiles?.avatar_url || data.profile_image_url || null,
-              subjects: data.specializations || [data.subject],
-              experience: data.experience_years || 0,
-              verified: data.profile_completion > 80,
-              about: data.bio || "No description provided.",
-              education: data.education || [],
-              professionalQualifications: [data.qualification],
-              teachingExperience: data.experience_details || [],
-              boards: data.boards || [],
-              languages: data.languages || ["English"],
-              skills: data.skills || [],
-              availability: data.availability || "Immediate",
-              expectedSalaryMin: data.expected_salary_min || 0,
-              expectedSalaryMax: data.expected_salary_max || 0,
-              preferredLocations: data.preferred_locations || [],
-              workPreferences: data.work_preferences || [],
-              hasDemo: data.has_demo_video || false,
-              hasCV: !!data.resume_url,
-            });
-          }
-        });
-      }
-    }, [actualId, slug, supabase]);
-  });
-  
-  const teacher = dbTeacher || fallbackTeacher;
+  useEffect(() => {
+    if (!actualId) {
+      setNotFound(true);
+      setPageLoading(false);
+      return;
+    }
+    supabase
+      .from('teacher_profiles')
+      .select('*, profiles(full_name, email, phone, avatar_url)')
+      .eq('id', actualId)
+      .eq('is_visible', true)
+      .single()
+      .then(({ data }: any) => {
+        if (data) {
+          setDbTeacher({
+            id: data.id,
+            name: data.profiles?.full_name || "Anonymous",
+            title: data.title || "Educator",
+            location: data.location || "India",
+            avatar: data.profiles?.avatar_url || null,
+            subjects: data.specializations?.length > 0 ? data.specializations : (data.subject ? [data.subject] : []),
+            experience: data.experience_years || 0,
+            verified: (data.profile_completion || 0) > 80,
+            about: data.bio || "",
+            education: data.education || [],
+            professionalQualifications: [data.professional_qualification, data.qualification].filter(Boolean),
+            teachingExperience: data.experience_details || [],
+            boards: data.boards || [],
+            languages: data.languages || [],
+            skills: data.skills || [],
+            availability: data.availability || "Immediate",
+            expectedSalaryMin: data.expected_salary_min || 0,
+            expectedSalaryMax: data.expected_salary_max || 0,
+            preferredLocations: data.preferred_locations || [],
+            workPreferences: data.work_preferences || [],
+            hasDemo: data.has_demo_video || false,
+            hasCV: !!data.resume_url,
+            rating: null,
+          });
+        } else {
+          setNotFound(true);
+        }
+        setPageLoading(false);
+      })
+      .catch(() => {
+        setNotFound(true);
+        setPageLoading(false);
+      });
+  }, [actualId]); // eslint-disable-line
 
   const [shortlisted, setShortlisted] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [isPlayingDemo, setIsPlayingDemo] = useState(false);
+
+  if (pageLoading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-xyroots-cream/30">
+        <Navbar />
+        <main className="flex-1 flex items-center justify-center">
+          <Loader />
+        </main>
+      </div>
+    );
+  }
+
+  if (notFound || !dbTeacher) {
+    return (
+      <div className="min-h-screen flex flex-col bg-xyroots-cream/30">
+        <Navbar />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="text-center p-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">Teacher Not Found</h2>
+            <p className="text-gray-500 text-sm mb-6">This teacher profile may not exist or the link is invalid.</p>
+            <button
+              onClick={() => router.push('/teachers')}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-xyroots-teal text-white text-sm font-semibold"
+              style={{ borderRadius: "0.75rem" }}
+            >
+              <FaArrowLeft className="w-3.5 h-3.5" /> Browse All Teachers
+            </button>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  const teacher = dbTeacher;
 
   return (
     <div className="min-h-screen flex flex-col bg-xyroots-cream/30">
@@ -99,8 +135,12 @@ export default function TeacherProfilePage() {
           <div className="bg-white rounded-3xl p-6 sm:p-8 border border-xyroots-border shadow-sm mb-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-xyroots-teal text-white font-bold text-2xl sm:text-3xl flex items-center justify-center shrink-0 shadow-lg">
-                  {teacher.avatar}
+                {/* Initial circle — no real avatar */}
+                <div
+                  className="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center text-white font-bold text-2xl sm:text-3xl shrink-0 shadow-lg"
+                  style={{ borderRadius: "1.5rem", backgroundColor: "#00a264" }}
+                >
+                  {teacher.name.charAt(0).toUpperCase()}
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
@@ -122,11 +162,15 @@ export default function TeacherProfilePage() {
                       <FaBriefcase className="w-3.5 h-3.5 text-xyroots-teal" />
                       {teacher.experience} Years Experience
                     </span>
-                    <span>•</span>
-                    <span className="flex items-center gap-1 bg-yellow-50 px-2.5 py-0.5 rounded-lg border border-yellow-200 text-yellow-700 font-bold">
-                      <FaStar className="w-3 h-3 text-yellow-500" />
-                      {teacher.rating}
-                    </span>
+                    {teacher.rating && (
+                      <>
+                        <span>•</span>
+                        <span className="flex items-center gap-1 bg-yellow-50 px-2.5 py-0.5 rounded-lg border border-yellow-200 text-yellow-700 font-bold">
+                          <FaStar className="w-3 h-3 text-yellow-500" />
+                          {teacher.rating}
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -146,7 +190,7 @@ export default function TeacherProfilePage() {
                 </button>
                 <button
                   onClick={() => setShowScheduleModal(true)}
-                  className="px-6 py-3 rounded-xl font-semibold text-sm bg-xyroots-teal text-white hover:bg-xyroots-dark transition-all btn-hover flex items-center gap-2"
+                  className="px-6 py-3 rounded-xl font-semibold text-sm bg-xyroots-teal text-white hover:bg-xyroots-dark transition-all flex items-center gap-2"
                 >
                   <FaCalendarDays className="w-4 h-4" />
                   Schedule Interview
@@ -162,7 +206,7 @@ export default function TeacherProfilePage() {
               <div className="bg-white rounded-3xl p-6 sm:p-8 border border-xyroots-border shadow-sm">
                 <h2 className="text-lg font-bold text-black mb-4">About Educator</h2>
                 <p className="text-sm sm:text-base text-xyroots-muted leading-relaxed">
-                  {teacher.about}
+                  {teacher.about || "No description provided."}
                 </p>
               </div>
 
@@ -184,8 +228,7 @@ export default function TeacherProfilePage() {
                     {isPlayingDemo ? (
                       <div className="w-full h-full flex flex-col items-center justify-center text-white bg-xyroots-teal/90 p-6 text-center">
                         <FaPlay className="w-12 h-12 mb-3 animate-pulse text-xyroots-yellow" />
-                        <p className="font-bold text-lg">Playing Mathematics Demo Lecture</p>
-                        <p className="text-xs text-white/80 mt-1">Topic: Quadratic Equations & Real-world Applications</p>
+                        <p className="font-bold text-lg">Playing Demo Lecture</p>
                       </div>
                     ) : (
                       <>
@@ -195,7 +238,6 @@ export default function TeacherProfilePage() {
                         </div>
                         <div className="absolute bottom-4 left-4 z-10 text-white">
                           <p className="font-bold text-sm">Classroom Teaching Methodology Sample</p>
-                          <p className="text-xs text-gray-300">Recorded for Grade 10 CBSE Algebra</p>
                         </div>
                       </>
                     )}
@@ -204,26 +246,28 @@ export default function TeacherProfilePage() {
               )}
 
               {/* Teaching Experience */}
-              <div className="bg-white rounded-3xl p-6 sm:p-8 border border-xyroots-border shadow-sm">
-                <h2 className="text-lg font-bold text-black mb-6 flex items-center gap-2">
-                  <FaBriefcase className="w-5 h-5 text-xyroots-teal" />
-                  Teaching Experience
-                </h2>
-                <div className="space-y-6">
-                  {teacher.teachingExperience.map((exp: any, idx: any) => (
-                    <div key={idx} className="relative pl-6 border-l-2 border-xyroots-teal/30">
-                      <div className="absolute -left-[7px] top-1 w-3 h-3 rounded-full bg-xyroots-teal" />
-                      <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
-                        <h3 className="text-base font-bold text-black">{exp.role}</h3>
-                        <span className="text-xs font-semibold px-2.5 py-0.5 rounded bg-xyroots-cream text-xyroots-muted">
-                          {exp.duration}
-                        </span>
+              {teacher.teachingExperience?.length > 0 && (
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-xyroots-border shadow-sm">
+                  <h2 className="text-lg font-bold text-black mb-6 flex items-center gap-2">
+                    <FaBriefcase className="w-5 h-5 text-xyroots-teal" />
+                    Teaching Experience
+                  </h2>
+                  <div className="space-y-6">
+                    {teacher.teachingExperience.map((exp: any, idx: number) => (
+                      <div key={idx} className="relative pl-6 border-l-2 border-xyroots-teal/30">
+                        <div className="absolute -left-[7px] top-1 w-3 h-3 rounded-full bg-xyroots-teal" />
+                        <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
+                          <h3 className="text-base font-bold text-black">{exp.role || exp.jobTitle || "Teacher"}</h3>
+                          <span className="text-xs font-semibold px-2.5 py-0.5 rounded bg-xyroots-cream text-xyroots-muted">
+                            {exp.duration || `${exp.startDate || ""}${exp.endDate ? ` – ${exp.endDate}` : ""}`}
+                          </span>
+                        </div>
+                        <p className="text-sm font-medium text-xyroots-teal mb-2">{exp.school || exp.organization || ""}</p>
                       </div>
-                      <p className="text-sm font-medium text-xyroots-teal mb-2">{exp.school}</p>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Education & Qualifications */}
               <div className="bg-white rounded-3xl p-6 sm:p-8 border border-xyroots-border shadow-sm">
@@ -232,29 +276,39 @@ export default function TeacherProfilePage() {
                   Education & Certifications
                 </h2>
                 <div className="grid sm:grid-cols-2 gap-6">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-xyroots-muted mb-3">Degrees</p>
-                    <div className="space-y-3">
-                      {teacher.education.map((edu: any, i: any) => (
-                        <div key={i} className="p-3 bg-xyroots-cream rounded-xl">
-                          <p className="text-sm font-bold text-black">{edu.degree}</p>
-                          <p className="text-xs text-xyroots-muted">{edu.institution} • {edu.year}</p>
-                        </div>
-                      ))}
+                  {teacher.education?.length > 0 && (
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wider text-xyroots-muted mb-3">Degrees</p>
+                      <div className="space-y-3">
+                        {teacher.education.map((edu: any, i: number) => (
+                          <div key={i} className="p-3 bg-xyroots-cream rounded-xl">
+                            <p className="text-sm font-bold text-black">
+                              {edu.degree || ""}
+                              {edu.fieldOfStudy ? ` in ${edu.fieldOfStudy}` : ""}
+                            </p>
+                            <p className="text-xs text-xyroots-muted">
+                              {edu.institution || ""}
+                              {edu.endDate ? ` • ${edu.endDate}` : ""}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-xyroots-muted mb-3">Professional Qualifications</p>
-                    <div className="flex flex-wrap gap-2">
-                      {teacher.professionalQualifications.map((q: any, i: any) => (
-                        <span key={i} className="text-xs font-semibold px-3 py-1.5 bg-xyroots-mint text-xyroots-teal rounded-xl flex items-center gap-1.5">
-                          <FaAward className="w-3.5 h-3.5" />
-                          {q}
-                        </span>
-                      ))}
+                  {teacher.professionalQualifications?.length > 0 && (
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wider text-xyroots-muted mb-3">Professional Qualifications</p>
+                      <div className="flex flex-wrap gap-2">
+                        {teacher.professionalQualifications.map((q: any, i: number) => (
+                          <span key={i} className="text-xs font-semibold px-3 py-1.5 bg-xyroots-mint text-xyroots-teal rounded-xl flex items-center gap-1.5">
+                            <FaAward className="w-3.5 h-3.5" />
+                            {q}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
 
@@ -262,38 +316,44 @@ export default function TeacherProfilePage() {
               <div className="bg-white rounded-3xl p-6 sm:p-8 border border-xyroots-border shadow-sm">
                 <h2 className="text-lg font-bold text-black mb-4">Subjects & Pedagogical Skills</h2>
                 <div className="space-y-4">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-xyroots-muted mb-2">Subjects Taught</p>
-                    <div className="flex flex-wrap gap-2">
-                      {teacher.subjects.map((sub: any) => (
-                        <span key={sub} className="text-xs font-bold px-3 py-1 bg-xyroots-dark text-white rounded-lg">
-                          {sub}
-                        </span>
-                      ))}
+                  {teacher.subjects?.length > 0 && (
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wider text-xyroots-muted mb-2">Subjects Taught</p>
+                      <div className="flex flex-wrap gap-2">
+                        {teacher.subjects.map((sub: any) => (
+                          <span key={sub} className="text-xs font-bold px-3 py-1 bg-xyroots-dark text-white rounded-lg">
+                            {sub}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-xyroots-muted mb-2">Education Boards</p>
-                    <div className="flex flex-wrap gap-2">
-                      {teacher.boards.map((b: any) => (
-                        <span key={b} className="text-xs font-semibold px-3 py-1 bg-xyroots-cream text-black rounded-lg">
-                          {b}
-                        </span>
-                      ))}
+                  {teacher.boards?.length > 0 && (
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wider text-xyroots-muted mb-2">Education Boards</p>
+                      <div className="flex flex-wrap gap-2">
+                        {teacher.boards.map((b: any) => (
+                          <span key={b} className="text-xs font-semibold px-3 py-1 bg-xyroots-cream text-black rounded-lg">
+                            {b}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-xyroots-muted mb-2">Skills & Specializations</p>
-                    <div className="flex flex-wrap gap-2">
-                      {teacher.skills.map((skill: any) => (
-                        <span key={skill} className="text-xs font-medium px-3 py-1 bg-gray-100 text-xyroots-text rounded-lg">
-                          {skill}
-                        </span>
-                      ))}
+                  {teacher.skills?.length > 0 && (
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wider text-xyroots-muted mb-2">Skills & Specializations</p>
+                      <div className="flex flex-wrap gap-2">
+                        {teacher.skills.map((skill: any) => (
+                          <span key={skill} className="text-xs font-medium px-3 py-1 bg-gray-100 text-xyroots-text rounded-lg">
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -317,14 +377,18 @@ export default function TeacherProfilePage() {
                       {formatSalary(teacher.expectedSalaryMin, teacher.expectedSalaryMax)}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-xyroots-muted">Preferred Cities:</span>
-                    <span className="font-semibold text-black">{teacher.preferredLocations.join(", ")}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-xyroots-muted">Languages:</span>
-                    <span className="font-semibold text-black">{teacher.languages.join(", ")}</span>
-                  </div>
+                  {teacher.preferredLocations?.length > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-xyroots-muted">Preferred Cities:</span>
+                      <span className="font-semibold text-black">{teacher.preferredLocations.join(", ")}</span>
+                    </div>
+                  )}
+                  {teacher.languages?.length > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-xyroots-muted">Languages:</span>
+                      <span className="font-semibold text-black">{teacher.languages.join(", ")}</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Resume Download Box */}

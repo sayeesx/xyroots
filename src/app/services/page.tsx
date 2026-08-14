@@ -83,7 +83,7 @@ export default function ServicesPage() {
                   </div>
                   <h2 className="text-xl font-bold text-gray-900 mb-2">{s.title}</h2>
                   <p className="text-sm text-gray-600 leading-relaxed mb-5">{s.desc}</p>
-                  <ul className="space-y-2 mb-6">
+                  <ul className="space-y-2">
                     {s.features.map(f => (
                       <li key={f} className="flex items-center gap-2.5 text-sm text-gray-700">
                         <FaCircleCheck className="w-4 h-4 text-xyroots-teal shrink-0" />
@@ -91,11 +91,6 @@ export default function ServicesPage() {
                       </li>
                     ))}
                   </ul>
-                </div>
-                <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50">
-                  <Link href={s.href} className="inline-flex items-center gap-2 text-sm font-bold text-xyroots-teal hover:text-xyroots-teal transition-colors">
-                    {s.cta} <FaArrowRight className="w-3.5 h-3.5" />
-                  </Link>
                 </div>
               </div>
             ))}

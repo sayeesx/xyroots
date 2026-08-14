@@ -9,7 +9,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import getCroppedImg from "@/lib/utils/cropImage";
 import Cropper from "react-easy-crop";
-import { FaSpinner, FaUpload, FaXmark, FaAsterisk } from "react-icons/fa6";
+import { FaSpinner, FaUpload, FaXmark, FaAsterisk, FaArrowLeft } from "react-icons/fa6";
 
 export default function ProfileSettingsPage() {
   const { user, profile, loading, isAuthenticated, refreshProfile } = useAuth();
@@ -118,6 +118,12 @@ export default function ProfileSettingsPage() {
       <Navbar />
 
       <main className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
+        <button
+          onClick={() => router.back()}
+          className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-xyroots-teal mb-6 transition-colors"
+        >
+          <FaArrowLeft className="w-3.5 h-3.5" /> Back
+        </button>
         <h1 className="text-3xl font-bold font-editorial text-black mb-8">Account Settings</h1>
 
         <div className="bg-white rounded-2xl shadow-sm border border-xyroots-border p-6 sm:p-8">

@@ -23,11 +23,39 @@ export const teacherSignupSchema = z.object({
   fullName: nameSchema,
   phone: phoneSchema,
   email: emailSchema,
-  subject: z.string().min(1, 'Please select a subject'),
+  subject: z.string().min(1, 'Please select a subject').optional().nullable(),
   password: passwordSchema,
+  confirmPassword: z.string().min(1, 'Please confirm your password'),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'Passwords do not match',
+  path: ['confirmPassword'],
 })
 
 export type TeacherSignupInput = z.infer<typeof teacherSignupSchema>
+
+// ─── Resume Upload ──────────────────────────────────────────────────────────────
+
+export const resumeUploadSchema = z.object({
+  file: z.any(), // File validation happens separately
+})
+
+export const MAX_RESUME_SIZE = 10 * 1024 * 1024; // 10MB
+export const ALLOWED_RESUME_TYPES = [
+  'application/pdf',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+];
+
+export function validateResumeFile(file: File): string | null {
+  if (file.size > MAX_RESUME_SIZE) {
+    return 'File size must be less than 10 MB';
+  }
+
+  if (!ALLOWED_RESUME_TYPES.includes(file.type)) {
+    return 'Only PDF and DOCX files are supported';
+  }
+
+  return null;
+}
 
 // ─── Management Signup ──────────────────────────────────────────────────────────
 

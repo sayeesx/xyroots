@@ -15,6 +15,7 @@ import {
 } from '@/lib/actions/auth'
 import type { ServiceResponse } from '@/lib/types'
 import AuthModal from '@/components/AuthModal'
+import OnboardingModal from '@/components/OnboardingModal'
 import { useRouter } from 'next/navigation'
 
 type AuthMode = "signin" | "signup_select" | "signup_teacher" | "signup_employer" | "signup_agency";
@@ -48,6 +49,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [modalOpen, setModalOpen] = useState(false)
   const [modalMode, setModalMode] = useState<AuthMode>("signin")
   const [onAuthSuccess, setOnAuthSuccess] = useState<(() => void) | null>(null)
+  
+  // Onboarding Modal
+  const [onboardingOpen, setOnboardingOpen] = useState(false)
 
   const supabase = createClient()
   const router = useRouter()
@@ -139,6 +143,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session.user)
         const prf = await fetchProfile(session.user)
         handleAuthCallback(session.user, prf)
+        
+        // Trigger Onboarding for newly registered users
+        if (typeof window !== 'undefined') {
+          if (localStorage.getItem('justRegistered') === 'true') {
+            localStorage.removeItem('justRegistered')
+            setOnboardingOpen(true)
+          }
+        }
       }
     }
     return result
@@ -246,6 +258,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isOpen={modalOpen} 
         onClose={() => setModalOpen(false)} // We don't nullify onAuthSuccess on manual close, just close modal
         initialMode={modalMode} 
+      />
+      <OnboardingModal 
+        isOpen={onboardingOpen} 
+        onClose={() => setOnboardingOpen(false)} 
+        role={profile?.role as UserRole | null ?? null}
       />
     </AuthContext.Provider>
   )

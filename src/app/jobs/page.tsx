@@ -1,17 +1,24 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { formatSalary } from "@/lib/utils";
 import {
   FaMagnifyingGlass, FaLocationDot, FaBookmark, FaRegBookmark, FaCircleCheck,
-  FaChevronDown, FaBars, FaTableCellsLarge, FaBriefcase, FaFilter, FaXmark, FaIndianRupeeSign
+  FaBars, FaTableCellsLarge, FaBriefcase, FaFilter, FaXmark, FaIndianRupeeSign
 } from "react-icons/fa6";
 import { useAuth } from "@/lib/auth/AuthProvider";
 
-// ─── Filter Panel (shared) ───────────────────────────────────────────────────
+const SUBJECTS = [
+  "All", "Mathematics", "Physics", "Chemistry", "Biology", "English", "Hindi",
+  "Social Science", "Computer Science", "Commerce", "Economics", "History",
+  "Geography", "Sanskrit", "Physical Education"
+];
+
+// ─── Filter Panel ─────────────────────────────────────────────────────────────
 function FilterPanel({
   selectedJobTypes, setSelectedJobTypes,
   openToRemote, setOpenToRemote,
@@ -56,8 +63,8 @@ function FilterPanel({
         <span className="font-semibold text-gray-800">Open to remote</span>
         <button
           onClick={() => setOpenToRemote(!openToRemote)}
-          className={`w-10 h-5.5 rounded-full relative transition-colors shrink-0 ${openToRemote ? 'bg-xyroots-teal' : 'bg-gray-300'}`}
-          style={{ width: 40, height: 22 }}
+          className={`relative transition-colors shrink-0 ${openToRemote ? 'bg-xyroots-teal' : 'bg-gray-300'}`}
+          style={{ width: 40, height: 22, borderRadius: 999 }}
         >
           <div className={`absolute top-[3px] w-4 h-4 rounded-full bg-white shadow transition-all ${openToRemote ? 'left-[20px]' : 'left-[3px]'}`} />
         </button>
@@ -121,8 +128,34 @@ function FilterPanel({
   );
 }
 
-// ─── Main Page ───────────────────────────────────────────────────────────────
-export default function JobsPage() {
+// ─── Skeleton Card ────────────────────────────────────────────────────────────
+function SkeletonCard() {
+  return (
+    <div className="bg-white border border-gray-100 animate-pulse" style={{ borderRadius: "1rem" }}>
+      <div className="p-4">
+        <div className="flex gap-3 mb-3">
+          <div className="w-9 h-9 bg-gray-200" style={{ borderRadius: "0.75rem" }} />
+          <div className="flex-1 space-y-2">
+            <div className="h-4 bg-gray-200 rounded w-3/4" />
+            <div className="h-3 bg-gray-100 rounded w-1/2" />
+          </div>
+        </div>
+        <div className="flex gap-2 mb-2">
+          <div className="h-5 bg-gray-100 rounded-full w-16" />
+          <div className="h-5 bg-gray-100 rounded-full w-12" />
+        </div>
+      </div>
+      <div className="px-4 py-3 border-t border-gray-100 flex justify-between">
+        <div className="h-4 bg-gray-100 rounded w-20" />
+        <div className="h-7 bg-gray-100 rounded-lg w-20" />
+      </div>
+    </div>
+  );
+}
+
+// ─── Inner page (uses useSearchParams) ───────────────────────────────────────
+function JobsPageInner() {
+  const searchParams = useSearchParams();
   const { requireTeacher, user, loading } = useAuth();
 
   useEffect(() => {
@@ -131,36 +164,42 @@ export default function JobsPage() {
     }
   }, [loading, user]);
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [citySearch, setCitySearch] = useState("");
+  const [searchTerm, setSearchTerm] = useState(searchParams.get("q") || "");
+  const [citySearch, setCitySearch] = useState(searchParams.get("location") || "");
+  const [activeSubject, setActiveSubject] = useState(searchParams.get("subject") || "All");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
   const [dbJobs, setDbJobs] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const supabase = createClient();
 
   useEffect(() => {
-    supabase.from('jobs').select('*, institutions(verified)').then(({ data }) => {
-      if (data) {
-        const mappedJobs = (data as any[]).map((j: any) => ({
-          ...j,
-          slug: `${j.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${j.id}`,
-          school: j.school_name || "Unknown School",
-          schoolVerified: j.institutions?.verified || false,
-          location: j.location || "Remote",
-          district: "",
-          salaryMin: j.salary_min,
-          salaryMax: j.salary_max,
-          experienceMin: j.experience_min,
-          experienceMax: j.experience_max,
-          subject: j.subject,
-          employmentType: j.employment_type || "Full-time",
-          postedDate: new Date(j.created_at).toLocaleDateString(),
-        }));
-        setDbJobs(mappedJobs);
-      }
-    });
-  }, []);
+    setIsLoading(true);
+    supabase
+      .from('jobs')
+      .select('*, institutions(verified)')
+      .eq('status', 'published')
+      .then(({ data }) => {
+        if (data) {
+          const mappedJobs = (data as any[]).map((j: any) => ({
+            ...j,
+            school: j.school_name || "Unknown School",
+            schoolVerified: j.institutions?.verified || false,
+            location: j.location || "Remote",
+            salaryMin: j.salary_min,
+            salaryMax: j.salary_max,
+            experienceMin: j.experience_min,
+            experienceMax: j.experience_max,
+            subject: j.subject,
+            employmentType: j.employment_type || "Full-time",
+            postedDate: new Date(j.created_at).toLocaleDateString(),
+          }));
+          setDbJobs(mappedJobs);
+        }
+        setIsLoading(false);
+      });
+  }, []); // eslint-disable-line
 
   // Filters
   const [selectedJobTypes, setSelectedJobTypes] = useState<string[]>([]);
@@ -171,17 +210,17 @@ export default function JobsPage() {
   const [customSalaryMax, setCustomSalaryMax] = useState(100000);
   const [selectedExperiences, setSelectedExperiences] = useState<string[]>([]);
 
-  // Watchlist
+  // Watchlist — stores actual job UUIDs
   const [watchlist, setWatchlist] = useState<string[]>([]);
   useEffect(() => {
     const savedIds = localStorage.getItem('xyroots_watchlist');
     if (savedIds) { try { setWatchlist(JSON.parse(savedIds)); } catch (e) {} }
   }, []);
 
-  const toggleWatchlist = (slug: string) => {
+  const toggleWatchlist = (jobId: string) => {
     requireTeacher(() => {
       setWatchlist(prev => {
-        const next = prev.includes(slug) ? prev.filter(s => s !== slug) : [...prev, slug];
+        const next = prev.includes(jobId) ? prev.filter(s => s !== jobId) : [...prev, jobId];
         localStorage.setItem('xyroots_watchlist', JSON.stringify(next));
         return next;
       });
@@ -200,6 +239,12 @@ export default function JobsPage() {
 
   const filteredJobs = useMemo(() => {
     return dbJobs.filter(job => {
+      // Subject bubble filter
+      if (activeSubject && activeSubject !== "All") {
+        const jobSubject = (job.subject || "").toLowerCase();
+        if (!jobSubject.includes(activeSubject.toLowerCase())) return false;
+      }
+
       if (searchTerm) {
         const term = searchTerm.toLowerCase();
         if (!job.title?.toLowerCase().includes(term) &&
@@ -210,21 +255,31 @@ export default function JobsPage() {
       }
       if (citySearch) {
         const city = citySearch.toLowerCase();
-        if (!(job.location ?? '').toLowerCase().includes(city) && !(job.district ?? '').toLowerCase().includes(city)) {
+        if (!(job.location ?? '').toLowerCase().includes(city)) {
           return false;
         }
       }
       if (selectedJobTypes.length > 0 && !selectedJobTypes.includes(job.employmentType)) return false;
       if (selectedExperiences.length > 0) {
-        const exp = job.experience ?? '';
-        const hasMatch = selectedExperiences.some(e => exp.includes(e) || (e.includes('years') && exp !== 'Fresher'));
+        const expMin = job.experienceMin ?? 0;
+        const hasMatch = selectedExperiences.some(e => {
+          if (e === "Less than a year") return expMin === 0;
+          if (e === "1-3 years") return expMin >= 1 && expMin <= 3;
+          if (e === "3-5 years") return expMin >= 3 && expMin <= 5;
+          if (e === "5-10 years") return expMin >= 5 && expMin <= 10;
+          if (e === "More than 10 years") return expMin > 10;
+          return false;
+        });
         if (!hasMatch) return false;
       }
       return true;
     });
-  }, [searchTerm, citySearch, dbJobs, selectedJobTypes, selectedExperiences]);
+  }, [searchTerm, citySearch, activeSubject, dbJobs, selectedJobTypes, selectedExperiences]);
 
   const filterProps = { selectedJobTypes, setSelectedJobTypes, openToRemote, setOpenToRemote, selectedSalaryRanges, setSelectedSalaryRanges, useCustomSalary, setUseCustomSalary, customSalaryMin, setCustomSalaryMin, customSalaryMax, setCustomSalaryMax, selectedExperiences, setSelectedExperiences, clearAll };
+
+  const INITIAL_COLORS = ['#E6F4EA', '#E3F2FD', '#FDE7E9', '#FFF3E0'];
+  const INITIAL_TEXT_COLORS = ['#1e8e3e', '#1976d2', '#d32f2f', '#f57c00'];
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f7f8fa]">
@@ -253,7 +308,7 @@ export default function JobsPage() {
         </div>
       )}
 
-      <main className="flex-1 pt-6 lg:pt-8 pb-10">
+      <main className="flex-1 pt-4 pb-10">
         <div className="max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8">
 
           {/* Search Bar */}
@@ -285,11 +340,29 @@ export default function JobsPage() {
             </div>
           </div>
 
+          {/* Subject Bubble Filters */}
+          <div className="flex gap-2 overflow-x-auto pb-2 mb-2 scrollbar-hide" style={{ scrollbarWidth: "none" }}>
+            {SUBJECTS.map(subject => (
+              <button
+                key={subject}
+                onClick={() => setActiveSubject(subject)}
+                className={`px-4 py-1.5 text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
+                  activeSubject === subject
+                    ? "bg-xyroots-teal text-white"
+                    : "bg-white border border-gray-200 text-gray-700 hover:border-xyroots-teal"
+                }`}
+                style={{ borderRadius: "999px" }}
+              >
+                {subject}
+              </button>
+            ))}
+          </div>
+
           {/* Layout */}
           <div className="flex gap-6 lg:gap-8">
 
             {/* Desktop Sidebar */}
-            <aside className="hidden lg:block w-60 shrink-0 sticky top-20 self-start overflow-y-auto max-h-[calc(100vh-5rem)] custom-scrollbar pb-10">
+            <aside className="hidden lg:block w-60 shrink-0 sticky top-20 self-start overflow-y-auto max-h-[calc(100vh-5rem)] pb-10">
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
                 <FilterPanel {...filterProps} />
               </div>
@@ -311,7 +384,7 @@ export default function JobsPage() {
                     )}
                   </button>
                   <p className="text-[13px] text-gray-500">
-                    <span className="font-bold text-gray-900">{filteredJobs.length}</span> jobs found
+                    <span className="font-bold text-gray-900">{isLoading ? "..." : filteredJobs.length}</span> jobs found
                   </p>
                 </div>
                 <div className="flex items-center bg-white rounded-lg p-0.5 border border-gray-200 shadow-sm">
@@ -324,22 +397,33 @@ export default function JobsPage() {
                 </div>
               </div>
 
-              {/* Job Cards */}
-              {filteredJobs.length === 0 ? (
+              {/* Skeleton or Job Cards */}
+              {isLoading ? (
+                <div className={`grid gap-3 lg:gap-4 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
+                  {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
+                </div>
+              ) : filteredJobs.length === 0 ? (
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
                   <p className="text-gray-500 text-sm">No jobs match your search yet. Check back soon!</p>
                 </div>
               ) : (
                 <div className={`grid gap-3 lg:gap-4 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
                   {filteredJobs.map((job, i) => {
-                    const isSaved = watchlist.includes(job.slug);
+                    const isSaved = watchlist.includes(job.id);
                     return (
-                      <div key={job.id} className="bg-white border rounded-2xl border-gray-100 overflow-hidden hover:shadow-[0_4px_20px_rgb(0,0,0,0.06)] hover:border-xyroots-teal/30 transition-all group flex flex-col">
+                      <div key={job.id} className="bg-white border border-gray-100 overflow-hidden hover:shadow-[0_4px_20px_rgb(0,0,0,0.06)] hover:border-xyroots-teal/30 transition-all group flex flex-col" style={{ borderRadius: "1rem" }}>
                         <div className="p-4 flex-1">
                           <div className="flex items-start justify-between mb-3">
                             <div className="flex items-start gap-2.5 min-w-0">
-                              <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border border-gray-100 shadow-sm" style={{ backgroundColor: ['#E6F4EA', '#E3F2FD', '#FDE7E9', '#FFF3E0'][i % 4] }}>
-                                <span className="font-bold text-xs" style={{ color: ['#1e8e3e', '#1976d2', '#d32f2f', '#f57c00'][i % 4] }}>
+                              {/* School initial box — no avatar */}
+                              <div
+                                className="w-9 h-9 flex items-center justify-center shrink-0 border border-gray-100 shadow-sm"
+                                style={{
+                                  borderRadius: "0.75rem",
+                                  backgroundColor: INITIAL_COLORS[i % 4],
+                                }}
+                              >
+                                <span className="font-bold text-xs" style={{ color: INITIAL_TEXT_COLORS[i % 4] }}>
                                   {(job.school || 'S').charAt(0)}
                                 </span>
                               </div>
@@ -349,7 +433,7 @@ export default function JobsPage() {
                               </div>
                             </div>
                             <button
-                              onClick={() => toggleWatchlist(job.slug)}
+                              onClick={() => toggleWatchlist(job.id)}
                               className={`transition-colors shrink-0 ml-1 ${isSaved ? 'text-xyroots-teal' : 'text-gray-300 hover:text-xyroots-teal'}`}
                             >
                               {isSaved ? <FaBookmark className="w-3.5 h-3.5" /> : <FaRegBookmark className="w-3.5 h-3.5" />}
@@ -371,7 +455,12 @@ export default function JobsPage() {
                               : 'Negotiable'}
                             {job.salaryMin && <span className="text-[10px] font-medium text-xyroots-teal/70">/mo</span>}
                           </div>
-                          <Link href={`/jobs/${job.slug}`} className="px-3 py-1.5 bg-xyroots-mint/40 text-black hover:bg-xyroots-teal hover:text-white rounded-lg text-[11px] font-bold transition-all border border-xyroots-teal/20 hover:border-xyroots-teal">
+                          {/* Apply Now links to /jobs/{uuid} */}
+                          <Link
+                            href={`/jobs/${job.id}`}
+                            className="px-3 py-1.5 bg-xyroots-mint/40 text-black hover:bg-xyroots-teal hover:text-white text-[11px] font-bold transition-all border border-xyroots-teal/20 hover:border-xyroots-teal"
+                            style={{ borderRadius: "0.5rem" }}
+                          >
                             Apply Now
                           </Link>
                         </div>
@@ -385,5 +474,21 @@ export default function JobsPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+// ─── Default export wraps inner in Suspense (required for useSearchParams) ───
+export default function JobsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex flex-col bg-[#f7f8fa]">
+        <Navbar />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="text-center text-gray-400 text-sm">Loading...</div>
+        </main>
+      </div>
+    }>
+      <JobsPageInner />
+    </Suspense>
   );
 }

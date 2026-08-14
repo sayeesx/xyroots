@@ -3,6 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import CustomSelect from "@/components/ui/CustomSelect";
+import PasswordInput from "@/components/ui/PasswordInput";
+import ResumeUpload from "@/components/ResumeUpload";
+import type { ResumeData } from "@/lib/resume/schema";
 
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
@@ -38,6 +41,7 @@ export default function TeacherRegisterPage() {
     email: "",
     phone: "",
     password: "",
+    confirmPassword: "",
     city: "",
     title: "",
     subject: "",
@@ -49,14 +53,37 @@ export default function TeacherRegisterPage() {
     preferredLocation: "",
   });
 
+  const handleResumeExtracted = (data: ResumeData) => {
+    // Only fill empty fields - preserve any manually entered data
+    setFormData(prev => ({
+      ...prev,
+      fullName: prev.fullName || data.fullName || "",
+      email: prev.email || data.email || "",
+      phone: prev.phone || data.phone || "",
+      city: prev.city || data.location || data.city || "",
+      title: prev.title || data.title || "",
+      subject: prev.subject || data.subject || "",
+      qualification: prev.qualification || data.qualification || "",
+      profQualification: prev.profQualification || data.professionalQualification || "",
+      experienceYears: prev.experienceYears || (data.experienceYears ? String(data.experienceYears) : ""),
+    }));
+
+    // Show success message
+    setError(null);
+  };
+
   const validateStep = (currentStep: number) => {
     if (currentStep === 1) {
-      if (!formData.fullName || !formData.email || !formData.phone || !formData.password || !formData.city) {
+      if (!formData.fullName || !formData.email || !formData.phone || !formData.password || !formData.confirmPassword || !formData.city) {
         setError("Please fill in all personal details.");
         return false;
       }
       if (formData.password.length < 8) {
         setError("Password must be at least 8 characters.");
+        return false;
+      }
+      if (formData.password !== formData.confirmPassword) {
+        setError("Passwords do not match.");
         return false;
       }
     } else if (currentStep === 2) {
@@ -94,6 +121,7 @@ export default function TeacherRegisterPage() {
         phone: formData.phone,
         subject: formData.subject,
         password: formData.password,
+        confirmPassword: formData.confirmPassword,
       });
 
       if (!result.success) {
@@ -160,6 +188,19 @@ export default function TeacherRegisterPage() {
             {step === 1 && (
               <div className="space-y-4 animate-modal-in">
                 <h2 className="text-lg font-bold text-black mb-4">1. Personal Details</h2>
+                
+                {/* Resume Upload Section */}
+                <ResumeUpload onExtracted={handleResumeExtracted} className="mb-6" />
+
+                <div className="relative my-6">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-xyroots-border"></div>
+                  </div>
+                  <div className="relative flex justify-center text-xs">
+                    <span className="bg-white px-2 text-xyroots-muted uppercase font-bold">Or enter manually</span>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-bold text-black block mb-1">Full Name *</label>
@@ -192,16 +233,24 @@ export default function TeacherRegisterPage() {
                     className="w-full p-3 text-sm bg-xyroots-cream/60 rounded-xl border border-xyroots-border focus:border-xyroots-teal outline-none"
                   />
                 </div>
-                <div>
-                  <label className="text-xs font-bold text-black block mb-1">Password *</label>
-                  <input
-                    type="password"
-                    placeholder="Minimum 8 characters"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full p-3 text-sm bg-xyroots-cream/60 rounded-xl border border-xyroots-border focus:border-xyroots-teal outline-none"
-                  />
-                </div>
+                <PasswordInput
+                  label="Password"
+                  value={formData.password}
+                  onChange={(val) => setFormData({ ...formData, password: val })}
+                  placeholder="Minimum 8 characters"
+                  showIcon={false}
+                  required
+                  className="mt-0"
+                />
+                <PasswordInput
+                  label="Confirm Password"
+                  value={formData.confirmPassword}
+                  onChange={(val) => setFormData({ ...formData, confirmPassword: val })}
+                  placeholder="Re-enter your password"
+                  showIcon={false}
+                  required
+                  className="mt-0"
+                />
                 <div>
                   <label className="text-xs font-bold text-black block mb-1">Current City / Location *</label>
                   <input

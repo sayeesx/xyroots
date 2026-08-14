@@ -56,10 +56,10 @@ export default function Footer() {
             </h3>
             <ul className="space-y-3">
               <FooterLink href="/jobs">Find Jobs</FooterLink>
-              <li><AuthGuardedLink href="/dashboard/teacher" type="teacher" className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors">Create Profile</AuthGuardedLink></li>
-              <li><AuthGuardedLink href="/dashboard/teacher" type="teacher" className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors">Saved Jobs</AuthGuardedLink></li>
-              <li><AuthGuardedLink href="/dashboard/teacher" type="teacher" className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors">Applications</AuthGuardedLink></li>
-              <li><AuthGuardedLink href="/dashboard/teacher" type="teacher" className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors">Interview Schedule</AuthGuardedLink></li>
+              <li><span className="text-xs sm:text-sm text-gray-400">Create Profile</span></li>
+              <li><span className="text-xs sm:text-sm text-gray-400">Saved Jobs</span></li>
+              <li><span className="text-xs sm:text-sm text-gray-400">Applications</span></li>
+              <li><span className="text-xs sm:text-sm text-gray-400">Interview Schedule</span></li>
             </ul>
           </div>
 
@@ -69,11 +69,11 @@ export default function Footer() {
               Find Institution
             </h3>
             <ul className="space-y-3">
-              <li><AuthGuardedLink href="/dashboard/employer" type="institution" className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors">Post a Job</AuthGuardedLink></li>
-              <li><AuthGuardedLink href="/dashboard/employer" type="institution" className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors">Find Teachers</AuthGuardedLink></li>
-              <li><AuthGuardedLink href="/dashboard/employer" type="institution" className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors">Candidate Search</AuthGuardedLink></li>
-              <li><AuthGuardedLink href="/dashboard/employer" type="institution" className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors">Hiring Dashboard</AuthGuardedLink></li>
-              <FooterLink href="/pricing">Pricing</FooterLink>
+              <li><span className="text-xs sm:text-sm text-gray-400">Post a Job</span></li>
+              <li><span className="text-xs sm:text-sm text-gray-400">Find Teachers</span></li>
+              <li><span className="text-xs sm:text-sm text-gray-400">Candidate Search</span></li>
+              <li><span className="text-xs sm:text-sm text-gray-400">Hiring Dashboard</span></li>
+              <li><span className="text-xs sm:text-sm text-gray-400">Pricing</span></li>
             </ul>
           </div>
 

@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { FaXmark, FaBuilding, FaUser, FaUsers, FaBriefcase, FaEnvelope, FaLock, FaPhone, FaArrowRight, FaSpinner, FaCircleCheck } from "react-icons/fa6";
+import { FaXmark, FaBuilding, FaUser, FaUsers, FaBriefcase, FaEnvelope, FaPhone, FaArrowRight, FaSpinner, FaCircleCheck } from "react-icons/fa6";
 import { useAuth } from "@/lib/auth/AuthProvider";
+import PasswordInput from "@/components/ui/PasswordInput";
 
 type AuthMode = "signin" | "signup_select" | "signup_teacher" | "signup_employer" | "signup_agency";
 
@@ -22,6 +23,18 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
   
   const { signIn, signUpTeacher, signUpManagement, signUpAgency } = useAuth();
   
+  // Block body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+  
   // Track initialMode changes
   useEffect(() => {
     if (isOpen) {
@@ -35,6 +48,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
   // Form States
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [orgName, setOrgName] = useState(""); // School or Agency name
@@ -45,6 +59,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
     setMode(initialMode);
     setEmail("");
     setPassword("");
+    setConfirmPassword("");
     setFullName("");
     setPhone("");
     setOrgName("");
@@ -59,6 +74,10 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
     if (!email) errs.email = ["Email is required."];
     if (!password) errs.password = ["Password is required."];
     if (mode !== "signin" && password.length > 0 && password.length < 8) errs.password = ["Password must be at least 8 characters."];
+    if (mode !== "signin" && !confirmPassword) errs.confirmPassword = ["Please confirm your password."];
+    if (mode !== "signin" && password && confirmPassword && password !== confirmPassword) {
+      errs.confirmPassword = ["Passwords do not match."];
+    }
     if (mode === "signup_teacher" && !fullName) errs.fullName = ["Full name is required."];
     if (mode === "signup_teacher" && !phone) errs.phone = ["Phone number is required."];
     if ((mode === "signup_employer" || mode === "signup_agency") && !fullName) errs.contactName = ["Contact name is required."];
@@ -92,14 +111,16 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
           handleClose();
         }
       } else if (mode === "signup_teacher") {
-        const res = await signUpTeacher({ email, password, fullName, phone, subject: "General" });
+        const res = await signUpTeacher({ email, password, confirmPassword, fullName, phone, subject: "General" });
         if (!res.success) {
           if (res.errors) setFieldErrors(res.errors);
           if (res.error) setError(res.error);
         } else {
+          localStorage.setItem('justRegistered', 'true');
           setMode("signin");
           setSuccessMsg("Registration successful! Please sign in.");
           setPassword("");
+          setConfirmPassword("");
         }
       } else if (mode === "signup_employer") {
         const res = await signUpManagement({ email, password, contactName: fullName, phone, institutionName: orgName });
@@ -107,6 +128,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
           if (res.errors) setFieldErrors(res.errors);
           if (res.error) setError(res.error);
         } else {
+          localStorage.setItem('justRegistered', 'true');
           setMode("signin");
           setSuccessMsg("Registration successful! Please sign in.");
           setPassword("");
@@ -117,6 +139,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
           if (res.errors) setFieldErrors(res.errors);
           if (res.error) setError(res.error);
         } else {
+          localStorage.setItem('justRegistered', 'true');
           setMode("signin");
           setSuccessMsg("Registration successful! Please sign in.");
           setPassword("");
@@ -137,9 +160,9 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in overflow-y-auto modal-scrollbar">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in overflow-hidden">
       <div 
-        className="bg-white rounded-2xl w-full max-w-3xl shadow-2xl relative overflow-hidden animate-modal-in flex flex-col md:flex-row my-auto"
+        className="bg-white rounded-2xl w-full max-w-3xl shadow-2xl relative animate-modal-in flex flex-col md:flex-row my-auto max-h-[90vh] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         <button 
@@ -292,10 +315,15 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
                     <div className="relative">
                       <FaPhone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                       <input 
-                        type="tel" 
+                        type="tel"
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        placeholder="+91 98765 43210"
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/\D/g, '').slice(0, 10);
+                          setPhone(val);
+                        }}
+                        placeholder="10-digit mobile number"
+                        maxLength={10}
+                        pattern="[0-9]{10}"
                         className={`w-full pl-10 pr-4 py-2.5 text-sm bg-gray-50 border ${fieldErrors.phone ? 'border-red-400' : 'border-gray-200'} rounded-lg outline-none focus:border-xyroots-teal`}
                       />
                     </div>
@@ -320,19 +348,30 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
               </div>
 
               <div>
-                <label className="text-xs font-bold text-black uppercase tracking-wider block mb-1">Password</label>
-                <div className="relative">
-                  <FaLock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input 
-                    type="password" 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder={mode === "signin" ? "Enter your password" : "Min. 8 characters"}
-                    className={`w-full pl-10 pr-4 py-2.5 text-sm bg-gray-50 border ${fieldErrors.password ? 'border-red-400' : 'border-gray-200'} rounded-lg outline-none focus:border-xyroots-teal`}
-                  />
-                </div>
+                <PasswordInput
+                  label="Password"
+                  value={password}
+                  onChange={setPassword}
+                  placeholder={mode === "signin" ? "Enter your password" : "Min. 8 characters"}
+                  error={!!fieldErrors.password}
+                  required
+                />
                 {fieldErrors.password && <p className="text-red-500 text-xs mt-1 font-medium">{fieldErrors.password[0]}</p>}
               </div>
+
+              {mode !== "signin" && (
+                <div>
+                  <PasswordInput
+                    label="Confirm Password"
+                    value={confirmPassword}
+                    onChange={setConfirmPassword}
+                    placeholder="Re-enter your password"
+                    error={!!fieldErrors.confirmPassword}
+                    required
+                  />
+                  {fieldErrors.confirmPassword && <p className="text-red-500 text-xs mt-1 font-medium">{fieldErrors.confirmPassword[0]}</p>}
+                </div>
+              )}
 
               {mode === "signin" && (
                 <div className="text-right">

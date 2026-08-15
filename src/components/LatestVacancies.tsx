@@ -7,17 +7,17 @@ import AuthGuardedLink from "@/components/AuthGuardedLink";
 
 function JobCard({ job, isAuthenticated }: { job: any, isAuthenticated: boolean }) {
   return (
-    <div className="flex flex-col h-full border border-gray-200 bg-white hover:border-gray-400 transition-all group shadow-sm" style={{ borderRadius: "0.75rem", background: "linear-gradient(135deg, #fff 80%, #f0fdf4 100%)" }}>
+    <div className="flex flex-col h-full border border-indigo-100 bg-white hover:border-indigo-300 transition-all group shadow-sm hover:shadow-md" style={{ borderRadius: "0.75rem", background: "linear-gradient(135deg, #ffffff 75%, #eef2ff 100%)" }}>
       <div className="flex flex-1 flex-col">
         {/* Top header */}
-        <div className="border-b border-gray-100 px-4 py-3" style={{ borderRadius: "0.75rem 0.75rem 0 0", background: "linear-gradient(to right, #f9fafb, #f0fdf4)" }}>
+        <div className="border-b border-indigo-100/60 px-4 py-3" style={{ borderRadius: "0.75rem 0.75rem 0 0", background: "linear-gradient(to right, #f8fafc, #eef2ff)" }}>
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
               {/* Institution type chip */}
-              <span className="inline-block text-[11px] font-semibold uppercase tracking-wider bg-gray-100 text-gray-600 px-2 py-0.5 mb-1.5" style={{ borderRadius: "0.25rem" }}>
+              <span className="inline-block text-[11px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200/60 px-2 py-0.5 mb-1.5" style={{ borderRadius: "0.25rem" }}>
                 {job.type}
               </span>
-              <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="block text-gray-900 font-semibold text-[13px] leading-snug hover:text-black transition-colors line-clamp-2 text-left">
+              <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="block text-gray-900 font-bold text-[13px] leading-snug hover:text-indigo-600 transition-colors line-clamp-2 text-left">
                 {job.title}
               </AuthGuardedLink>
             </div>
@@ -25,10 +25,10 @@ function JobCard({ job, isAuthenticated }: { job: any, isAuthenticated: boolean 
         </div>
 
         {/* Action buttons row */}
-        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-100">
-          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-medium py-1.5 border border-[#00a264]/40 text-[#00a264] hover:bg-[#00a264] hover:text-white flex items-center justify-center gap-1 transition-all duration-200" style={{ borderRadius: "0.5rem" }}><FaBookmark className="inline w-2.5 h-2.5" /> Save</AuthGuardedLink>
-          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-semibold py-1.5 bg-[#00a264] text-white hover:bg-[#007a4d] hover:scale-[1.03] flex items-center justify-center gap-1 transition-all duration-200" style={{ borderRadius: "0.5rem" }}>Apply Now <FaArrowRight className="inline w-2.5 h-2.5" /></AuthGuardedLink>
-          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-medium py-1.5 border border-[#00a264]/40 text-[#00a264] hover:bg-[#00a264] hover:text-white transition-all duration-200 flex items-center justify-center" style={{ borderRadius: "0.5rem" }}>Quick Apply</AuthGuardedLink>
+        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-indigo-100/60">
+          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-medium py-1.5 border border-indigo-200 text-indigo-700 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 flex items-center justify-center gap-1 transition-all duration-200" style={{ borderRadius: "0.5rem" }}><FaBookmark className="inline w-2.5 h-2.5" /> Save</AuthGuardedLink>
+          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-bold py-1.5 bg-indigo-600 text-white hover:bg-indigo-700 hover:scale-[1.03] flex items-center justify-center gap-1 transition-all duration-200 shadow-sm" style={{ borderRadius: "0.5rem" }}>Apply Now <FaArrowRight className="inline w-2.5 h-2.5" /></AuthGuardedLink>
+          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-medium py-1.5 border border-indigo-200 text-indigo-700 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all duration-200 flex items-center justify-center" style={{ borderRadius: "0.5rem" }}>Quick Apply</AuthGuardedLink>
         </div>
 
         {/* Meta + Details */}
@@ -38,7 +38,7 @@ function JobCard({ job, isAuthenticated }: { job: any, isAuthenticated: boolean 
               Posted: <span className="text-gray-700 font-medium">{job.postedDate}</span>
             </span>
             <span className="flex items-center gap-1">
-              <FaPeopleGroup className="inline w-2.5 h-2.5 text-gray-400" />
+              <FaPeopleGroup className="inline w-2.5 h-2.5 text-indigo-400" />
               Openings: <span className="text-gray-700 font-medium ml-0.5">{job.openings}</span>
             </span>
           </div>
@@ -53,19 +53,19 @@ function JobCard({ job, isAuthenticated }: { job: any, isAuthenticated: boolean 
               <p className="text-gray-700 text-sm">{job.experience}</p>
             </div>
             <div>
-              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Salary</p>
-              <p className="text-gray-700">{job.salary}</p>
+              <p className="text-[11px] font-semibold text-indigo-600 uppercase tracking-wide mb-0.5">Salary</p>
+              <p className="text-gray-900 font-bold">{job.salary}</p>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="px-4 py-2.5 border-t border-gray-100 flex items-center justify-between" style={{ borderRadius: "0 0 0.75rem 0.75rem", background: "linear-gradient(to right, #f9fafb, #f0fdf4)" }}>
+        <div className="px-4 py-2.5 border-t border-indigo-100/60 flex items-center justify-between" style={{ borderRadius: "0 0 0.75rem 0.75rem", background: "linear-gradient(to right, #f8fafc, #eef2ff)" }}>
           <span className="flex items-center gap-1 text-xs text-gray-500">
-            <FaLocationDot className="inline w-2.5 h-2.5 text-gray-400" />
+            <FaLocationDot className="inline w-2.5 h-2.5 text-indigo-500" />
             {job.location}
           </span>
-          <span className="text-[11px] font-mono text-gray-400">{job.id}</span>
+          <span className="text-[11px] font-mono text-indigo-400">{job.id}</span>
         </div>
       </div>
     </div>
@@ -153,8 +153,6 @@ function TeacherCard({ teacher, isAuthenticated }: { teacher: any, isAuthenticat
 
 // ─── Section ───────────────────────────────────────────────────────────────────
 
-import { teachers as mockTeachers } from "@/data/teachers";
-
 export default async function LatestVacancies() {
   const supabase = await createClient();
 
@@ -167,14 +165,13 @@ export default async function LatestVacancies() {
     if (profile) role = (profile as any).role;
   }
   
-  const limit = role ? 4 : 3;
+  const jobLimit = 3;
 
   // Fetch jobs and teachers in parallel
+  // Only show "verified" teachers = profile_completion >= 80, max 3
   const [{ data: rawJobs }, { data: rawTeachers }] = await Promise.all([
-    supabase.from("jobs").select("id, title, level, created_at, qualification, experience_min, experience_max, salary_min, salary_max, location").eq("status", "published").limit(limit).order("created_at", { ascending: false }),
-    role
-      ? supabase.from("teacher_profiles").select("id, subject, title, location, experience_years, professional_qualification, languages, availability, profiles(full_name, avatar_url)").eq("is_visible", true).limit(limit).order("created_at", { ascending: false })
-      : Promise.resolve({ data: null }),
+    supabase.from("jobs").select("id, title, level, created_at, qualification, experience_min, experience_max, salary_min, salary_max, location").eq("status", "published").limit(jobLimit).order("created_at", { ascending: false }),
+    supabase.from("teacher_profiles").select("id, subject, title, location, experience_years, professional_qualification, languages, availability, profile_completion, profiles(full_name, avatar_url, status)").eq("is_visible", true).gte("profile_completion", 80).limit(3).order("profile_completion", { ascending: false }),
   ]);
 
   const jobCards = ((rawJobs as any[]) || []).map((j: any) => ({
@@ -190,36 +187,27 @@ export default async function LatestVacancies() {
     slug: `${(j.title || "Untitled Job").toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${j.id}`,
   }));
 
-  let teacherCards: any[] = [];
-  if (!role) {
-    teacherCards = mockTeachers.slice(0, 3).map((t) => ({
-      id: t.id,
-      name: t.name,
-      designation: t.title,
-      subject: t.subjects[0],
-      experience: `${t.experience} Years`,
-      qualification: t.professionalQualifications[0] || "B.Ed",
-      location: t.location,
-      languages: t.languages,
-      availability: t.availability,
-      slug: t.slug,
-    }));
-  } else {
-    teacherCards = ((rawTeachers as any[]) || []).map((t: any) => ({
-      id: t.id.substring(0,8).toUpperCase(),
-      fullId: t.id,
-      name: t.profiles?.full_name || "Anonymous Educator",
-      avatar_url: t.profiles?.avatar_url || null,
+  // Map all teachers - slug is just the UUID so the detail page finds it correctly
+  const teacherCards = ((rawTeachers as any[]) || []).map((t: any) => {
+    // profiles join can return an object or array - handle both
+    const profile = Array.isArray(t.profiles) ? t.profiles[0] : t.profiles;
+    const teacherName = profile?.full_name || "Educator";
+    const avatarUrl = profile?.avatar_url || null;
+
+    return {
+      id: t.id.substring(0, 8).toUpperCase(),
+      name: teacherName,
+      avatar_url: avatarUrl,
       designation: t.title || "Subject Teacher",
       subject: t.subject || "General",
       experience: t.experience_years ? `${t.experience_years} Years` : 'Fresher',
       qualification: t.professional_qualification || "B.Ed",
       location: t.location || "India",
-      languages: t.languages || ["English"],
+      languages: t.languages?.length > 0 ? t.languages : ["English"],
       availability: t.availability || "Immediate",
-      slug: `${(t.profiles?.full_name || "Anonymous").toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${t.id}`,
-    }));
-  }
+      slug: t.id, // Use raw UUID — detail page expects this
+    };
+  });
 
   return (
     <section className="py-12 lg:py-16 bg-[#f5f7f6]" aria-label="Latest Vacancies and Teacher Profiles">
@@ -229,9 +217,11 @@ export default async function LatestVacancies() {
         <div className="flex items-end justify-between mb-8">
           <div>
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-              {role === 'management' ? 'Top Profiles' : 'Latest Vacancies'}
+              {role === 'management' ? 'Top Profiles' : (!role || role === 'agency') ? 'Latest Vacancies and Top Teacher Profiles' : 'Latest Vacancies'}
             </h2>
-            <p className="text-sm text-gray-500 mt-1">Open positions from verified institutions across India</p>
+            <p className="text-sm text-gray-500 mt-1">
+              {role === 'management' ? 'Verified educators ready to join your institution' : 'Open positions from verified institutions across India'}
+            </p>
           </div>
         </div>
 
@@ -242,11 +232,11 @@ export default async function LatestVacancies() {
           {role !== 'management' && (
             <div className={`${role === 'teacher' ? 'md:col-span-2' : ''}`}>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                  <FaBuilding className="w-4 h-4 text-gray-500" />
+                <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+                  <FaBuilding className="w-4 h-4 text-indigo-600" />
                   Institutions Hiring
                 </h3>
-                <AuthGuardedLink href="/jobs" type="teacher" className="text-xs text-gray-600 hover:text-black hover:underline font-medium">
+                <AuthGuardedLink href="/jobs" type="teacher" className="text-xs text-indigo-600 hover:text-indigo-800 hover:underline font-semibold">
                   Browse All →
                 </AuthGuardedLink>
               </div>

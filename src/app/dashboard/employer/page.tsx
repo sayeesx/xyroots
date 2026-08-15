@@ -49,9 +49,35 @@ export default function EmployerDashboard() {
   const [watchlistJobs, setWatchlistJobs] = useState<any[]>([]);
   const [watchlistLoading, setWatchlistLoading] = useState(false);
 
+  const [institutionId, setInstitutionId] = useState<string | null>(null);
+  const [institutionVisible, setInstitutionVisible] = useState(true);
+  const [savingVisibility, setSavingVisibility] = useState(false);
+  const [visibilitySaved, setVisibilitySaved] = useState(false);
+
+  // Fetch institution visibility on mount
   useEffect(() => {
-    if (!loading && (!isAuthenticated || role !== "management")) router.push("/");
-  }, [loading, isAuthenticated, role, router]);
+    if (!profile) return;
+    supabase
+      .from("institutions")
+      .select("id, is_visible")
+      .eq("created_by_profile_id", profile.id)
+      .single()
+      .then(({ data }) => {
+        if (data) {
+          setInstitutionId(data.id);
+          setInstitutionVisible((data as any).is_visible ?? true);
+        }
+      });
+  }, [profile]); // eslint-disable-line
+
+  const saveVisibility = async () => {
+    if (!institutionId) return;
+    setSavingVisibility(true);
+    await supabase.from("institutions").update({ is_visible: institutionVisible } as any).eq("id", institutionId);
+    setSavingVisibility(false);
+    setVisibilitySaved(true);
+    setTimeout(() => setVisibilitySaved(false), 2500);
+  };
 
   // Load watchlist from localStorage
   useEffect(() => {
@@ -462,7 +488,7 @@ export default function EmployerDashboard() {
           {tab === "settings" && (
             <div className="bg-white border border-gray-100 p-6" style={{ borderRadius: "1rem" }}>
               <h2 className="text-lg font-bold text-gray-900 mb-5">Institution Settings</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mb-6">
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase">Contact Name</label>
                   <input defaultValue={profile?.full_name || ""} className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-gray-500" style={{ borderRadius: "0.75rem" }} />
@@ -472,9 +498,44 @@ export default function EmployerDashboard() {
                   <input defaultValue={profile?.email || ""} disabled className="w-full px-4 py-2.5 text-sm bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed outline-none" style={{ borderRadius: "0.75rem" }} />
                 </div>
               </div>
-              <div className="mt-5 flex gap-3">
-                <button className="px-5 py-2.5 text-sm font-semibold bg-gray-900 text-white hover:bg-black transition-colors" style={{ borderRadius: "0.75rem" }}>Save Changes</button>
+
+              {/* Visibility Toggle */}
+              <div className="border border-gray-200 rounded-xl p-4 mb-5 max-w-xl">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-bold text-gray-900 mb-0.5">Institution Visibility</p>
+                    <p className="text-xs text-gray-500">
+                      {institutionVisible
+                        ? "Your institution is publicly visible to teachers and job seekers."
+                        : "Your institution is hidden — teachers cannot see your profile or job posts."}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setInstitutionVisible(v => !v)}
+                    className={`relative shrink-0 transition-colors ${institutionVisible ? 'bg-[#00a264]' : 'bg-gray-300'}`}
+                    style={{ width: 44, height: 24, borderRadius: 999 }}
+                  >
+                    <div className={`absolute top-[3px] w-[18px] h-[18px] rounded-full bg-white shadow transition-all ${institutionVisible ? 'left-[23px]' : 'left-[3px]'}`} />
+                  </button>
+                </div>
+                {!institutionVisible && (
+                  <div className="mt-3 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-700 font-medium">
+                    ⚠ While hidden, your institution won't appear in search results and your job posts won't be discoverable.
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-3 items-center">
+                <button
+                  onClick={saveVisibility}
+                  disabled={savingVisibility}
+                  className="px-5 py-2.5 text-sm font-semibold bg-gray-900 text-white hover:bg-black transition-colors flex items-center gap-2 disabled:opacity-60"
+                  style={{ borderRadius: "0.75rem" }}
+                >
+                  {savingVisibility ? <><FaSpinner className="w-3.5 h-3.5 animate-spin" /> Saving...</> : "Save Changes"}
+                </button>
                 <Link href="/profile" className="px-5 py-2.5 text-sm font-semibold border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors" style={{ borderRadius: "0.75rem" }}>Account Settings</Link>
+                {visibilitySaved && <span className="text-sm text-[#00a264] font-semibold">✓ Saved!</span>}
               </div>
             </div>
           )}

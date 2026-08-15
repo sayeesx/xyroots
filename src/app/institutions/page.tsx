@@ -9,7 +9,7 @@ import {
   FaMagnifyingGlass, FaLocationDot, FaShieldHalved, FaUsers, FaChevronRight,
   FaBuilding, FaGraduationCap, FaStar, FaBriefcase, FaCheck, FaArrowRight,
   FaBookOpen, FaChartSimple, FaBell, FaWandMagicSparkles, FaCircleCheck,
-  FaSchool, FaRegBuilding
+  FaSchool, FaRegBuilding, FaLock
 } from "react-icons/fa6";
 import { schools, testimonials, pricingPlans } from "@/data/schools";
 import { useAuth } from "@/lib/auth/AuthProvider";
@@ -63,7 +63,8 @@ function InstitutionCard({ school }: { school: typeof schools[0] }) {
   const idx = parseInt(school.id) % bgColors.length;
 
   return (
-    <div
+    <Link
+      href={`/institutions/${school.id}`}
       className="bg-white border border-gray-200 hover:border-[#00a264]/50 hover:shadow-[0_4px_24px_rgba(0,162,100,0.10)] transition-all duration-300 flex flex-col group"
       style={{ borderRadius: "1.25rem" }}
     >
@@ -141,14 +142,14 @@ function InstitutionCard({ school }: { school: typeof schools[0] }) {
           {school.openPositions} open {school.openPositions === 1 ? "vacancy" : "vacancies"}
         </span>
         <Link
-          href={`/jobs?school=${encodeURIComponent(school.name)}`}
+          href={`/institutions/${school.id}`}
           className="inline-flex items-center gap-1.5 text-[11px] font-bold text-white bg-[#00a264] hover:bg-[#007a4d] transition-all px-3 py-1.5 group-hover:scale-[1.03]"
           style={{ borderRadius: "0.5rem" }}
         >
-          View Jobs <FaChevronRight className="w-2.5 h-2.5" />
+          View Details <FaChevronRight className="w-2.5 h-2.5" />
         </Link>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -232,7 +233,7 @@ function PricingCard({ plan }: { plan: typeof pricingPlans[0] }) {
 
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 export default function InstitutionsPage() {
-  const { openInstitutionRegistration } = useAuth();
+  const { openInstitutionRegistration, openSignIn, user, loading } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("All");
   const [selectedLocation, setSelectedLocation] = useState("All");
@@ -323,7 +324,29 @@ export default function InstitutionsPage() {
         <section className="py-12 lg:py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-            {/* Section heading */}
+            {!loading && !user ? (
+              /* Auth Gate for non-logged-in users */
+              <div className="flex items-center justify-center py-16">
+                <div className="text-center max-w-md">
+                  <div className="w-16 h-16 rounded-2xl bg-[#e6f7ed] flex items-center justify-center mx-auto mb-6">
+                    <FaLock className="w-7 h-7 text-[#00a264]" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-3">Sign in to view institutions</h2>
+                  <p className="text-gray-500 text-base mb-8 leading-relaxed">
+                    Access our full directory of verified educational institutions hiring across India.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button onClick={() => openSignIn()} className="px-8 py-3 bg-[#00a264] text-white font-semibold rounded-xl hover:bg-[#007a4d] transition-colors text-base">
+                      Sign In
+                    </button>
+                    <button onClick={() => openInstitutionRegistration()} className="px-8 py-3 bg-white border-2 border-gray-200 text-gray-700 font-semibold rounded-xl hover:border-gray-400 transition-colors text-base">
+                      Register Free
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <>
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
               <div>
                 <span className="text-xs font-bold uppercase tracking-widest text-[#00a264] mb-2 inline-block">Directory</span>
@@ -375,97 +398,12 @@ export default function InstitutionsPage() {
                 ))}
               </div>
             )}
+            </>
+            )}
           </div>
         </section>
 
-        {/* ─── Why Xyroots for Institutions ─────────────────────────── */}
-        <section className="py-12 lg:py-16 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-2xl mx-auto mb-10">
-              <span className="text-xs font-bold uppercase tracking-widest text-[#00a264] mb-2 inline-block">Why Xyroots</span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">Everything you need to hire great teachers</h2>
-              <p className="text-sm text-gray-500">Purpose-built tools for the education sector — no generic HR software.</p>
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {features.map((f) => (
-                <div
-                  key={f.title}
-                  className="p-5 border border-gray-100 bg-[#f7f9f8] hover:border-[#00a264]/30 hover:bg-[#f0fdf4] transition-all group"
-                  style={{ borderRadius: "1rem" }}
-                >
-                  <div
-                    className="w-10 h-10 flex items-center justify-center bg-[#e6f7ed] mb-3 group-hover:bg-[#00a264] transition-colors"
-                    style={{ borderRadius: "0.75rem" }}
-                  >
-                    <f.icon className="w-4.5 h-4.5 text-[#00a264] group-hover:text-white transition-colors" />
-                  </div>
-                  <h3 className="text-[15px] font-bold text-gray-900 mb-1">{f.title}</h3>
-                  <p className="text-xs text-gray-500 leading-relaxed">{f.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
 
-        {/* ─── Testimonials ──────────────────────────────────────────── */}
-        <section className="py-12 lg:py-16 bg-[#f7f9f8]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-xl mx-auto mb-10">
-              <span className="text-xs font-bold uppercase tracking-widest text-[#00a264] mb-2 inline-block">Testimonials</span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Trusted by schools and teachers</h2>
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {testimonials.map((t) => (
-                <TestimonialCard key={t.id} t={t} />
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ─── Pricing ───────────────────────────────────────────────── */}
-        <section className="py-12 lg:py-16 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-xl mx-auto mb-10">
-              <span className="text-xs font-bold uppercase tracking-widest text-[#00a264] mb-2 inline-block">Pricing</span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">Simple, transparent plans</h2>
-              <p className="text-sm text-gray-500">Start free. Upgrade when you need more.</p>
-            </div>
-            <div className="grid md:grid-cols-3 gap-5 max-w-4xl mx-auto">
-              {pricingPlans.map((plan) => (
-                <PricingCard key={plan.id} plan={plan} />
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ─── CTA Banner ────────────────────────────────────────────── */}
-        <section
-          className="py-14"
-          style={{ background: "linear-gradient(135deg, #074526 0%, #00a264 100%)" }}
-        >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">Ready to find your next great teacher?</h2>
-              <p className="text-white/70 text-sm">Join 1,200+ institutions already hiring on Xyroots.</p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-3 shrink-0">
-              <button
-                onClick={() => openInstitutionRegistration()}
-                className="px-6 py-3 text-sm font-bold bg-white text-[#074526] hover:bg-[#e6f7ed] transition-all inline-flex items-center gap-2"
-                style={{ borderRadius: "0.75rem" }}
-              >
-                Get Started Free <FaArrowRight className="w-3.5 h-3.5" />
-              </button>
-              <Link
-                href="/teachers"
-                className="px-6 py-3 text-sm font-bold bg-white/10 text-white border border-white/20 hover:bg-white/20 transition-all inline-flex items-center gap-2"
-                style={{ borderRadius: "0.75rem" }}
-              >
-                Browse Teachers
-              </Link>
-            </div>
-          </div>
-        </section>
 
       </main>
 

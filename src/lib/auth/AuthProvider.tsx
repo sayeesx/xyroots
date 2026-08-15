@@ -56,6 +56,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const supabase = createClient()
   const router = useRouter()
 
+  // Auto-open sign-in modal when redirected from registration (?signin=1)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const url = new URL(window.location.href)
+    if (url.searchParams.get('signin') === '1') {
+      setModalMode('signin')
+      setModalOpen(true)
+      url.searchParams.delete('signin')
+      window.history.replaceState({}, '', url.toString())
+    }
+  }, [])
+
   const handleAuthCallback = useCallback((currentUser: User | null, currentProfile: Profile | null) => {
     if (currentUser && currentProfile && onAuthSuccess) {
       const callback = onAuthSuccess

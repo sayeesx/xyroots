@@ -27,7 +27,16 @@ export default function AuthGuardedLink({ href, type, className, style, children
       }
     } else {
       // Agencies can access both teacher profiles and job pages
-      router.push(href);
+      // Teachers and Management can also access opposite type if they're an agency
+      if (role === 'agency' || role === 'management' || role === 'teacher') {
+        router.push(href);
+      } else if (type === "teacher" && role !== 'teacher') {
+        requireTeacher(() => router.push(href));
+      } else if (type === "institution" && role !== 'management') {
+        requireInstitution(() => router.push(href));
+      } else {
+        router.push(href);
+      }
     }
   };
 

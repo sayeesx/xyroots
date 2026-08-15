@@ -70,7 +70,7 @@ export default function Footer() {
             </h3>
             <ul className="space-y-3">
               <li><span className="text-xs sm:text-sm text-gray-400">Post a Job</span></li>
-              <li><span className="text-xs sm:text-sm text-gray-400">Find Teachers</span></li>
+              <li><Link href="/jobs" className="text-xs sm:text-sm text-gray-400 hover:text-xyroots-teal transition-colors">Find Jobs</Link></li>
               <li><span className="text-xs sm:text-sm text-gray-400">Candidate Search</span></li>
               <li><span className="text-xs sm:text-sm text-gray-400">Hiring Dashboard</span></li>
               <li><span className="text-xs sm:text-sm text-gray-400">Pricing</span></li>

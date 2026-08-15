@@ -34,7 +34,7 @@ export default function TeacherRegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const { signUpTeacher, signIn } = useAuth();
+  const { signUpTeacher } = useAuth();
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -130,14 +130,10 @@ export default function TeacherRegisterPage() {
         return;
       }
 
-      // 2. Sign them in immediately
-      await signIn(formData.email, formData.password);
-
-      // Note: Ideally, here we would also call an update action to save the rest 
-      // of formData (city, title, board, experience, salary) to the teacher_profiles table.
-      // For phase 1, creating the base account is the primary goal.
-
-      setStep(8); // Show success step
+      // Registration done — redirect to home and open sign-in modal
+      localStorage.setItem('justRegistered', 'true');
+      router.push('/?signin=1');
+      setStep(8); // Show success step briefly
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
     } finally {

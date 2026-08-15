@@ -5,6 +5,7 @@ import Link from "next/link";
 import CustomSelect from "@/components/ui/CustomSelect";
 import Image from "next/image";
 import { useAuth } from "@/lib/auth/AuthProvider";
+import { useRouter } from "next/navigation";
 
 // ─── Data Maps ─────────────────────────────────────────────────────────────
 
@@ -223,6 +224,7 @@ export default function Hero() {
   const [expFrom, setExpFrom] = useState("");
   const [expTo, setExpTo] = useState("");
   const { openTeacherRegistration, openInstitutionRegistration, isAuthenticated, role } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -284,7 +286,7 @@ export default function Hero() {
         </div>
 
         {/* Search Component */}
-        <div className="w-full bg-white border border-xyroots-border shadow-xl px-4 sm:px-6 lg:px-7 pt-4 pb-8 mt-auto rounded-xl relative z-20 -mb-20 lg:-mb-24">
+        <div className="w-full bg-white border border-xyroots-border shadow-xl px-4 sm:px-6 lg:px-7 pt-4 pb-8 mt-auto relative z-20 -mb-20 lg:-mb-24" style={{ borderRadius: "1.5rem" }}>
 
           {/* Tabs Row + CTA on ONE line */}
           <div className="flex items-center justify-between border-b border-xyroots-border pb-3 mb-4 gap-4">
@@ -350,7 +352,7 @@ export default function Hero() {
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-xyroots-text mb-1.5">State</label>
-                    <CustomSelect value={stateVal} onChange={handleStateChange} options={stateOptions} placeholder="State" icon={<i className="bi bi-geo-alt text-sm" />} searchable />
+                    <CustomSelect value={stateVal} onChange={handleStateChange} options={stateOptions} placeholder="State" searchable />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-xyroots-text mb-1.5">Designation</label>
@@ -377,9 +379,15 @@ export default function Hero() {
                     <div className="w-full sm:w-36"><CustomSelect value={expFrom} onChange={setExpFrom} options={expFromOptions} placeholder="Exp From" /></div>
                   </div>
                   <div className="w-full sm:w-auto mt-1 sm:mt-0">
-                    <button className="w-full sm:w-auto px-3 py-1.5 bg-white border border-xyroots-border text-xyroots-text font-semibold inline-flex items-center justify-center gap-1 hover:bg-xyroots-surface">
-                      <i className="bi bi-sliders text-xs" /> All Filter
-                    </button>
+                    {isAuthenticated ? (
+                      <button onClick={() => router.push('/jobs')} className="w-full sm:w-auto px-3 py-1.5 bg-white border border-xyroots-border text-xyroots-text font-semibold inline-flex items-center justify-center gap-1 hover:bg-xyroots-surface cursor-pointer">
+                        <i className="bi bi-sliders text-xs" /> All Filter
+                      </button>
+                    ) : (
+                      <button onClick={() => openTeacherRegistration()} className="w-full sm:w-auto px-3 py-1.5 bg-white border border-xyroots-border text-xyroots-text font-semibold inline-flex items-center justify-center gap-1 hover:bg-xyroots-surface">
+                        <i className="bi bi-sliders text-xs" /> All Filter
+                      </button>
+                    )}
                   </div>
                 </div>
              </>
@@ -393,7 +401,7 @@ export default function Hero() {
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-xyroots-text mb-1.5">State</label>
-                    <CustomSelect value={stateVal} onChange={handleStateChange} options={stateOptions} placeholder="State" icon={<i className="bi bi-geo-alt text-sm" />} searchable />
+                    <CustomSelect value={stateVal} onChange={handleStateChange} options={stateOptions} placeholder="State" searchable />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-xyroots-text mb-1.5">Qualification</label>

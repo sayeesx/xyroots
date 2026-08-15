@@ -110,6 +110,9 @@ export async function signUpTeacher(formData: {
     return { success: false, error: 'Failed to create account. Please try again.' }
   }
 
+  // Sign out immediately — browser must sign in manually via modal
+  await supabase.auth.signOut()
+
   // Create profile
   const profileResult = await createProfileForUser(authData.user.id, 'teacher', {
     fullName,
@@ -198,6 +201,9 @@ export async function signUpManagement(formData: {
   if (!authData.user) {
     return { success: false, error: 'Failed to create account. Please try again.' }
   }
+
+  // Sign out immediately — browser must sign in manually via modal
+  await supabase.auth.signOut()
 
   const profileResult = await createProfileForUser(authData.user.id, 'management', {
     fullName: contactName,
@@ -292,6 +298,9 @@ export async function signUpAgency(formData: {
   if (!authData.user) {
     return { success: false, error: 'Failed to create account. Please try again.' }
   }
+
+  // Sign out immediately — browser must sign in manually via modal
+  await supabase.auth.signOut()
 
   const profileResult = await createProfileForUser(authData.user.id, 'agency', {
     fullName: contactName,

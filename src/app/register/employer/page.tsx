@@ -24,7 +24,7 @@ export default function EmployerRegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const { signUpManagement, signIn } = useAuth();
+  const { signUpManagement } = useAuth();
 
   const [formData, setFormData] = useState({
     institutionName: "",
@@ -89,10 +89,10 @@ export default function EmployerRegisterPage() {
         return;
       }
 
-      // 2. Sign them in immediately
-      await signIn(formData.email, formData.password);
-
-      setStep(4); // Show success step
+      // Registration done — redirect to home and open sign-in modal
+      localStorage.setItem('justRegistered', 'true');
+      router.push('/?signin=1');
+      setStep(4); // Show success step briefly
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
     } finally {

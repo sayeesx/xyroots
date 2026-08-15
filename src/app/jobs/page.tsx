@@ -353,78 +353,79 @@ function JobsPageInner() {
       <main className="flex-1 pt-4 pb-10">
         <div className="max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8">
 
-          {/* Search Bar */}
-          <div className="pt-3 pb-2">
-            <div className="bg-white border border-gray-200 flex flex-col sm:flex-row items-stretch sm:items-center gap-0" style={{ borderRadius: "0.625rem" }}>
-              <div className="flex-1 flex items-center px-3 py-2.5 border-b sm:border-b-0 sm:border-r border-gray-200 min-w-0">
-                <FaMagnifyingGlass className="w-3.5 h-3.5 text-gray-400 mr-2 shrink-0" />
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Job Title, Subject, School..."
-                  className="w-full text-sm outline-none bg-transparent placeholder-gray-400 text-gray-900 font-medium min-w-0 search-input"
-                />
-              </div>
-              <div className="flex-1 flex items-center px-3 py-2.5 border-b sm:border-b-0 sm:border-r border-gray-200 min-w-0">
-                <FaLocationDot className="w-3.5 h-3.5 text-gray-400 mr-2 shrink-0" />
-                <input
-                  type="text"
-                  value={citySearch}
-                  onChange={(e) => setCitySearch(e.target.value)}
-                  placeholder="Any City"
-                  className="w-full text-sm outline-none bg-transparent placeholder-gray-400 text-gray-900 font-medium min-w-0 search-input"
-                />
-              </div>
-              {/* State Dropdown */}
-              <div className="flex items-center px-2 py-2 border-b sm:border-b-0 sm:border-r border-gray-200 min-w-0 w-full sm:w-40">
-                <FaLocationDot className="w-3 h-3 text-gray-400 mr-1.5 shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <CustomSelect
-                    value={selectedState}
-                    onChange={setSelectedState}
-                    options={INDIA_STATES_OPTIONS}
-                    placeholder="All States"
-                    searchable
-                  />
-                </div>
-              </div>
-              <button className="bg-[#00a264] text-white px-5 py-2 text-sm font-semibold hover:bg-[#008f58] transition-colors shrink-0 flex items-center justify-center gap-1.5 m-1" style={{ borderRadius: "0.375rem" }}>
-                <FaMagnifyingGlass className="w-3 h-3" /> Search
-              </button>
-            </div>
-          </div>
-
-          {/* Subject Bubble Filters */}
-          <div className="flex gap-2 overflow-x-auto pb-2 mb-2 scrollbar-hide" style={{ scrollbarWidth: "none" }}>
-            {SUBJECTS.map(subject => (
-              <button
-                key={subject}
-                onClick={() => setActiveSubject(subject)}
-                className={`px-4 py-1.5 text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
-                  activeSubject === subject
-                    ? "bg-[#00a264] text-white"
-                    : "bg-white border border-gray-200 text-gray-700 hover:border-[#00a264]"
-                }`}
-                style={{ borderRadius: "999px" }}
-              >
-                {subject}
-              </button>
-            ))}
-          </div>
-
           {/* Layout */}
-          <div className="flex gap-6 lg:gap-8">
+          <div className="flex gap-6 lg:gap-8 mt-4">
 
             {/* Desktop Sidebar */}
-            <aside className="hidden lg:block w-56 shrink-0 sticky top-20 self-start overflow-y-auto max-h-[calc(100vh-5rem)] pb-10 custom-scrollbar">
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+            <aside className="hidden lg:block w-56 shrink-0 sticky top-20 self-start h-[calc(100vh-6rem)]">
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 h-full overflow-y-auto custom-scrollbar">
                 <FilterPanel {...filterProps} />
               </div>
             </aside>
 
             {/* Main Content */}
             <div className="flex-1 min-w-0">
+
+              {/* Search Bar */}
+              <div className="pb-2">
+                <div className="bg-white border border-gray-200 flex flex-col sm:flex-row items-stretch sm:items-center gap-0" style={{ borderRadius: "0.625rem" }}>
+                  <div className="flex-1 flex items-center px-3 py-1.5 border-b sm:border-b-0 sm:border-r border-gray-200 min-w-0">
+                    <FaMagnifyingGlass className="w-3.5 h-3.5 text-gray-400 mr-2 shrink-0" />
+                    <input
+                      type="text"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      placeholder="Job Title, Subject, School..."
+                      className="w-full text-sm outline-none bg-transparent placeholder-gray-400 text-gray-900 font-medium min-w-0 search-input"
+                    />
+                  </div>
+                  <div className="flex-1 flex items-center px-3 py-1.5 border-b sm:border-b-0 sm:border-r border-gray-200 min-w-0">
+                    <FaLocationDot className="w-3.5 h-3.5 text-gray-400 mr-2 shrink-0" />
+                    <input
+                      type="text"
+                      value={citySearch}
+                      onChange={(e) => setCitySearch(e.target.value)}
+                      placeholder="Any City"
+                      className="w-full text-sm outline-none bg-transparent placeholder-gray-400 text-gray-900 font-medium min-w-0 search-input"
+                    />
+                  </div>
+                  {/* State Dropdown */}
+                  <div className="flex items-center px-2 py-1.5 border-b sm:border-b-0 sm:border-r border-gray-200 min-w-0 w-full sm:w-40">
+                    <FaLocationDot className="w-3 h-3 text-gray-400 mr-1.5 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <CustomSelect
+                        value={selectedState}
+                        onChange={setSelectedState}
+                        options={INDIA_STATES_OPTIONS}
+                        placeholder="All States"
+                        searchable
+                      />
+                    </div>
+                  </div>
+                  <button className="bg-[#00a264] text-white px-4 py-1.5 text-sm font-semibold hover:bg-[#008f58] transition-colors shrink-0 flex items-center justify-center gap-1.5 m-1" style={{ borderRadius: "0.375rem" }}>
+                    <FaMagnifyingGlass className="w-3 h-3" /> Search
+                  </button>
+                </div>
+              </div>
+
+              {/* Subject Bubble Filters */}
+              <div className="flex gap-2 overflow-x-auto pb-2 mb-2 scrollbar-hide" style={{ scrollbarWidth: "none" }}>
+                {SUBJECTS.map(subject => (
+                  <button
+                    key={subject}
+                    onClick={() => setActiveSubject(subject)}
+                    className={`px-4 py-1 flex items-center justify-center text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
+                      activeSubject === subject
+                        ? "bg-[#00a264] text-white"
+                        : "bg-white border border-gray-200 text-gray-700 hover:border-[#00a264]"
+                    }`}
+                    style={{ borderRadius: "999px" }}
+                  >
+                    {subject}
+                  </button>
+                ))}
+              </div>
+
               {/* Toolbar */}
               <div className="flex items-center justify-between mb-4 gap-3">
                 <div className="flex items-center gap-2">

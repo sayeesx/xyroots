@@ -87,25 +87,6 @@ export default function ContactPage() {
                 <p className="text-sm font-bold text-gray-900 mb-1">Support Hours</p>
                 <p className="text-xs text-gray-500 leading-relaxed">Monday – Saturday<br />9:00 AM – 6:00 PM IST</p>
               </div>
-
-              {/* Quick links */}
-              <div className="bg-white border border-gray-200 p-5" style={{ borderRadius: "1rem" }}>
-                <p className="text-sm font-bold text-gray-900 mb-3">Quick Links</p>
-                <div className="space-y-2">
-                  {[
-                    { label: "Browse Teaching Jobs", href: "/jobs" },
-                    { label: "Post a Vacancy", href: "/register/employer" },
-                    { label: "Create Teacher Profile", href: "/register/teacher" },
-                    { label: "Pricing Plans", href: "/pricing" },
-                  ].map(link => (
-                    <a key={link.label} href={link.href}
-                      className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#00a264] transition-colors font-medium">
-                      <FaArrowRight className="w-2.5 h-2.5 shrink-0" />
-                      {link.label}
-                    </a>
-                  ))}
-                </div>
-              </div>
             </div>
 
             {/* Right — form */}

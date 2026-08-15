@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Loader from "@/components/Loader";
+import CustomSelect from "@/components/ui/CustomSelect";
 import {
   FaShieldHalved, FaStar, FaLocationDot, FaBriefcase, FaGraduationCap, FaAward,
   FaVideo, FaFileLines, FaCalendarDays, FaCircleCheck, FaArrowLeft,
@@ -13,6 +14,19 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import { formatSalary } from "@/lib/utils";
 import { scheduleInterview } from "@/lib/actions/interviews";
+
+const timeSlotOptions = [
+  "09:00 AM - 09:45 AM","10:00 AM - 10:45 AM","11:00 AM - 11:45 AM",
+  "12:00 PM - 12:45 PM","02:00 PM - 02:45 PM","03:00 PM - 03:45 PM",
+  "04:00 PM - 04:45 PM","05:00 PM - 05:45 PM"
+].map(t => ({ value: t, label: t }));
+
+const interviewTypeOptions = [
+  { value: "Video Call (Google Meet / Zoom)", label: "Video Call (Google Meet / Zoom)" },
+  { value: "Phone Call", label: "Phone Call" },
+  { value: "In-Person Campus Interview", label: "In-Person Campus Interview" },
+  { value: "Demo Teaching Session", label: "Demo Teaching Session" },
+];
 import { useAuth } from "@/lib/auth/AuthProvider";
 
 export default function TeacherProfilePage() {
@@ -403,20 +417,21 @@ export default function TeacherProfilePage() {
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase">Time Slot</label>
-                    <select value={scheduleTime} onChange={e => setScheduleTime(e.target.value)}
-                      className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-[#00a264]" style={{ borderRadius: "0.75rem" }}>
-                      {["09:00 AM - 09:45 AM","10:00 AM - 10:45 AM","11:00 AM - 11:45 AM","12:00 PM - 12:45 PM","02:00 PM - 02:45 PM","03:00 PM - 03:45 PM","04:00 PM - 04:45 PM","05:00 PM - 05:45 PM"].map(t => <option key={t}>{t}</option>)}
-                    </select>
+                    <CustomSelect
+                      value={scheduleTime}
+                      onChange={setScheduleTime}
+                      options={timeSlotOptions}
+                      placeholder="Select a time slot"
+                    />
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase">Interview Type</label>
-                    <select value={scheduleType} onChange={e => setScheduleType(e.target.value)}
-                      className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-[#00a264]" style={{ borderRadius: "0.75rem" }}>
-                      <option>Video Call (Google Meet / Zoom)</option>
-                      <option>Phone Call</option>
-                      <option>In-Person Campus Interview</option>
-                      <option>Demo Teaching Session</option>
-                    </select>
+                    <CustomSelect
+                      value={scheduleType}
+                      onChange={setScheduleType}
+                      options={interviewTypeOptions}
+                      placeholder="Select interview type"
+                    />
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase">Message (Optional)</label>

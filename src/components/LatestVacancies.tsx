@@ -14,10 +14,10 @@ function JobCard({ job, isAuthenticated }: { job: any, isAuthenticated: boolean 
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
               {/* Institution type chip */}
-              <span className="inline-block text-[10px] font-semibold uppercase tracking-wider bg-gray-100 text-gray-600 px-2 py-0.5 mb-1.5" style={{ borderRadius: "0.25rem" }}>
+              <span className="inline-block text-[11px] font-semibold uppercase tracking-wider bg-gray-100 text-gray-600 px-2 py-0.5 mb-1.5" style={{ borderRadius: "0.25rem" }}>
                 {job.type}
               </span>
-              <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="block text-gray-900 font-semibold text-sm leading-snug hover:text-black transition-colors line-clamp-2 text-left">
+              <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="block text-gray-900 font-semibold text-[13px] leading-snug hover:text-black transition-colors line-clamp-2 text-left">
                 {job.title}
               </AuthGuardedLink>
             </div>
@@ -26,9 +26,9 @@ function JobCard({ job, isAuthenticated }: { job: any, isAuthenticated: boolean 
 
         {/* Action buttons row */}
         <div className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-100">
-          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-medium py-1.5 border border-gray-200 text-gray-600 hover:border-gray-400 hover:text-gray-900 flex items-center justify-center gap-1 transition-colors" style={{ borderRadius: "0.5rem" }}><FaBookmark className="inline w-2.5 h-2.5" /> Save</AuthGuardedLink>
-          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-semibold py-1.5 bg-gray-900 text-white hover:bg-black flex items-center justify-center gap-1 transition-colors" style={{ borderRadius: "0.5rem" }}>Apply Now <FaArrowRight className="inline w-2.5 h-2.5" /></AuthGuardedLink>
-          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-medium py-1.5 border border-gray-200 text-gray-600 hover:border-gray-400 hover:text-gray-900 transition-colors flex items-center justify-center" style={{ borderRadius: "0.5rem" }}>Quick Apply</AuthGuardedLink>
+          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-medium py-1.5 border border-[#00a264]/40 text-[#00a264] hover:bg-[#00a264] hover:text-white flex items-center justify-center gap-1 transition-all duration-200" style={{ borderRadius: "0.5rem" }}><FaBookmark className="inline w-2.5 h-2.5" /> Save</AuthGuardedLink>
+          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-semibold py-1.5 bg-[#00a264] text-white hover:bg-[#007a4d] hover:scale-[1.03] flex items-center justify-center gap-1 transition-all duration-200" style={{ borderRadius: "0.5rem" }}>Apply Now <FaArrowRight className="inline w-2.5 h-2.5" /></AuthGuardedLink>
+          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-medium py-1.5 border border-[#00a264]/40 text-[#00a264] hover:bg-[#00a264] hover:text-white transition-all duration-200 flex items-center justify-center" style={{ borderRadius: "0.5rem" }}>Quick Apply</AuthGuardedLink>
         </div>
 
         {/* Meta + Details */}
@@ -45,15 +45,15 @@ function JobCard({ job, isAuthenticated }: { job: any, isAuthenticated: boolean 
 
           <div className="grid grid-cols-3 gap-x-3 gap-y-1.5 text-xs mt-1">
             <div>
-              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Qualification</p>
+              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Qualification</p>
               <p className="text-gray-700 leading-snug">{job.qualification}</p>
             </div>
             <div>
-              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Experience</p>
+              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Experience</p>
               <p className="text-gray-700 text-sm">{job.experience}</p>
             </div>
             <div>
-              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Salary</p>
+              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Salary</p>
               <p className="text-gray-700">{job.salary}</p>
             </div>
           </div>
@@ -61,11 +61,11 @@ function JobCard({ job, isAuthenticated }: { job: any, isAuthenticated: boolean 
 
         {/* Footer */}
         <div className="px-4 py-2.5 border-t border-gray-100 flex items-center justify-between" style={{ borderRadius: "0 0 0.75rem 0.75rem", background: "linear-gradient(to right, #f9fafb, #f0fdf4)" }}>
-          <span className="flex items-center gap-1 text-sm text-gray-500">
+          <span className="flex items-center gap-1 text-xs text-gray-500">
             <FaLocationDot className="inline w-2.5 h-2.5 text-gray-400" />
             {job.location}
           </span>
-          <span className="text-[10px] font-mono text-gray-400">{job.id}</span>
+          <span className="text-[11px] font-mono text-gray-400">{job.id}</span>
         </div>
       </div>
     </div>
@@ -87,10 +87,10 @@ function TeacherCard({ teacher, isAuthenticated }: { teacher: any, isAuthenticat
               : (teacher.name || "T").charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
-            <span className="inline-block text-[10px] font-semibold uppercase tracking-wider bg-gray-100 text-gray-500 px-2 py-0.5 mb-1 leading-tight" style={{ borderRadius: "0.25rem" }}>
+            <span className="inline-block text-[11px] font-semibold uppercase tracking-wider bg-gray-100 text-gray-500 px-2 py-0.5 mb-1 leading-tight" style={{ borderRadius: "0.25rem" }}>
               {teacher.designation}
             </span>
-            <AuthGuardedLink href={`/teachers/${teacher.slug}`} type="institution" className="block text-gray-900 font-semibold text-sm leading-snug hover:text-black transition-colors text-left">
+            <AuthGuardedLink href={`/teachers/${teacher.slug}`} type="institution" className="block text-gray-900 font-semibold text-[13px] leading-snug hover:text-black transition-colors text-left">
               {teacher.name}
             </AuthGuardedLink>
             <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
@@ -115,20 +115,20 @@ function TeacherCard({ teacher, isAuthenticated }: { teacher: any, isAuthenticat
 
       {/* Action buttons */}
       <div className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-100">
-        <AuthGuardedLink href={`/teachers/${teacher.slug}`} type="institution" className="flex-1 text-center text-xs font-semibold py-1.5 bg-gray-900 text-white hover:bg-black flex items-center justify-center gap-1 transition-colors" style={{ borderRadius: "0.5rem" }}><FaUser className="inline w-2.5 h-2.5" /> View Profile</AuthGuardedLink>
-        <AuthGuardedLink href={`/teachers/${teacher.slug}`} type="institution" className="flex-1 text-center text-xs font-medium py-1.5 border border-gray-200 text-gray-600 hover:border-gray-400 hover:text-gray-900 flex items-center justify-center gap-1 transition-colors" style={{ borderRadius: "0.5rem" }}><FaEnvelope className="inline w-2.5 h-2.5" /> Contact</AuthGuardedLink>
-        <AuthGuardedLink href={`/teachers/${teacher.slug}`} type="institution" className="flex-1 text-center text-xs font-medium py-1.5 border border-gray-200 text-gray-600 hover:border-gray-400 hover:text-gray-900 flex items-center justify-center gap-1 transition-colors" style={{ borderRadius: "0.5rem" }}><FaBookmark className="inline w-2.5 h-2.5" /> Shortlist</AuthGuardedLink>
+        <AuthGuardedLink href={`/teachers/${teacher.slug}`} type="institution" className="flex-1 text-center text-xs font-semibold py-1.5 bg-[#00a264] text-white hover:bg-[#007a4d] hover:scale-[1.03] flex items-center justify-center gap-1 transition-all duration-200" style={{ borderRadius: "0.5rem" }}><FaUser className="inline w-2.5 h-2.5" /> View Profile</AuthGuardedLink>
+        <AuthGuardedLink href={`/teachers/${teacher.slug}`} type="institution" className="flex-1 text-center text-xs font-medium py-1.5 border border-[#00a264]/40 text-[#00a264] hover:bg-[#00a264] hover:text-white flex items-center justify-center gap-1 transition-all duration-200" style={{ borderRadius: "0.5rem" }}><FaEnvelope className="inline w-2.5 h-2.5" /> Contact</AuthGuardedLink>
+        <AuthGuardedLink href={`/teachers/${teacher.slug}`} type="institution" className="flex-1 text-center text-xs font-medium py-1.5 border border-[#00a264]/40 text-[#00a264] hover:bg-[#00a264] hover:text-white flex items-center justify-center gap-1 transition-all duration-200" style={{ borderRadius: "0.5rem" }}><FaBookmark className="inline w-2.5 h-2.5" /> Shortlist</AuthGuardedLink>
       </div>
 
       {/* Details */}
       <div className="px-4 py-3 flex-1 flex flex-col justify-center">
         <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs mt-1">
           <div>
-            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Qualification</p>
+            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Qualification</p>
             <p className="text-gray-700 leading-snug">{teacher.qualification}</p>
           </div>
           <div>
-            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Languages</p>
+            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Languages</p>
             <div className="flex flex-wrap gap-1">
               {teacher.languages?.map((lang: string) => (
                 <span key={lang} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[11px] border border-gray-200" style={{ borderRadius: "0.25rem" }}>
@@ -142,8 +142,8 @@ function TeacherCard({ teacher, isAuthenticated }: { teacher: any, isAuthenticat
 
       {/* Footer */}
       <div className="px-4 py-2.5 border-t border-gray-100 flex items-center justify-between" style={{ borderRadius: "0 0 0.75rem 0.75rem", background: "linear-gradient(to right, #f9fafb, #f0fdf4)" }}>
-        <span className="text-[10px] font-mono text-gray-400">{teacher.id}</span>
-        <span className="text-[11px] text-[#00a264] font-semibold flex items-center gap-1">
+        <span className="text-[11px] font-mono text-gray-400">{teacher.id}</span>
+        <span className="text-xs text-[#00a264] font-semibold flex items-center gap-1">
           <FaCircleCheck className="inline w-3 h-3" /> Verified
         </span>
       </div>

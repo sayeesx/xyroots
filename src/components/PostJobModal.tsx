@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FaXmark, FaSpinner, FaCircleCheck } from "react-icons/fa6";
 import { createJob } from "@/lib/actions/jobs";
+import CustomSelect from "@/components/ui/CustomSelect";
 
 interface PostJobModalProps {
   isOpen: boolean;
@@ -19,6 +20,20 @@ const subjectOptions = [
 const boardOptions = ["CBSE","ICSE","State Board","IB / IGCSE","NIOS","Other"];
 const levelOptions = ["Nursery / KG","Primary (1–5)","Middle (6–8)","Secondary (9–10)","Senior Secondary (11–12)","All Levels"];
 const employmentTypes = ["Full-time","Part-time","Contract","Temporary","Substitute"];
+
+// CustomSelect option arrays
+const subjectSelectOptions = [{ value: "", label: "Select subject" }, ...subjectOptions.map(s => ({ value: s, label: s }))];
+const boardSelectOptions = [{ value: "", label: "Any Board" }, ...boardOptions.map(b => ({ value: b, label: b }))];
+const levelSelectOptions = [{ value: "", label: "Any Level" }, ...levelOptions.map(l => ({ value: l, label: l }))];
+const employmentSelectOptions = employmentTypes.map(t => ({ value: t, label: t }));
+const institutionTypeOptions = [
+  { value: "", label: "Select type" },
+  ...["School","International School","College","University","Coaching Centre","Preschool / Nursery","Special Needs School","Vocational Institute","Other"].map(t => ({ value: t, label: t }))
+];
+const statusSelectOptions = [
+  { value: "published", label: "Published (Live Now)" },
+  { value: "draft", label: "Draft (Save for Later)" },
+];
 
 export default function PostJobModal({ isOpen, onClose, onSuccess }: PostJobModalProps) {
   const [loading, setLoading] = useState(false);
@@ -158,49 +173,22 @@ export default function PostJobModal({ isOpen, onClose, onSuccess }: PostJobModa
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Subject <span className="text-red-500">*</span></label>
-                <select
-                  value={form.subject} onChange={e => set("subject", e.target.value)}
-                  className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
-                  style={{ borderRadius: "0.75rem" }}
-                >
-                  <option value="">Select subject</option>
-                  {subjectOptions.map(s => <option key={s}>{s}</option>)}
-                </select>
+                <CustomSelect value={form.subject} onChange={val => set("subject", val)} options={subjectSelectOptions} placeholder="Select subject" searchable />
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Employment Type</label>
-                <select
-                  value={form.employment_type} onChange={e => set("employment_type", e.target.value)}
-                  className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
-                  style={{ borderRadius: "0.75rem" }}
-                >
-                  {employmentTypes.map(t => <option key={t}>{t}</option>)}
-                </select>
+                <CustomSelect value={form.employment_type} onChange={val => set("employment_type", val)} options={employmentSelectOptions} placeholder="Employment Type" />
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Curriculum Board</label>
-                <select
-                  value={form.board} onChange={e => set("board", e.target.value)}
-                  className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
-                  style={{ borderRadius: "0.75rem" }}
-                >
-                  <option value="">Any Board</option>
-                  {boardOptions.map(b => <option key={b}>{b}</option>)}
-                </select>
+                <CustomSelect value={form.board} onChange={val => set("board", val)} options={boardSelectOptions} placeholder="Any Board" />
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Teaching Level</label>
-                <select
-                  value={form.level} onChange={e => set("level", e.target.value)}
-                  className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
-                  style={{ borderRadius: "0.75rem" }}
-                >
-                  <option value="">Any Level</option>
-                  {levelOptions.map(l => <option key={l}>{l}</option>)}
-                </select>
+                <CustomSelect value={form.level} onChange={val => set("level", val)} options={levelSelectOptions} placeholder="Any Level" />
               </div>
             </div>
 
@@ -279,14 +267,7 @@ export default function PostJobModal({ isOpen, onClose, onSuccess }: PostJobModa
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Institution Type</label>
-                <select
-                  value={form.institution_type} onChange={e => set("institution_type", e.target.value)}
-                  className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
-                  style={{ borderRadius: "0.75rem" }}
-                >
-                  <option value="">Select type</option>
-                  {["School", "International School", "College", "University", "Coaching Centre", "Preschool / Nursery", "Special Needs School", "Vocational Institute", "Other"].map(t => <option key={t}>{t}</option>)}
-                </select>
+                <CustomSelect value={form.institution_type} onChange={val => set("institution_type", val)} options={institutionTypeOptions} placeholder="Select type" />
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Location</label>
@@ -323,14 +304,7 @@ export default function PostJobModal({ isOpen, onClose, onSuccess }: PostJobModa
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Post As</label>
-                <select
-                  value={form.status} onChange={e => set("status", e.target.value as "draft" | "published")}
-                  className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
-                  style={{ borderRadius: "0.75rem" }}
-                >
-                  <option value="published">Published (Live Now)</option>
-                  <option value="draft">Draft (Save for Later)</option>
-                </select>
+                <CustomSelect value={form.status} onChange={val => set("status", val as "draft" | "published")} options={statusSelectOptions} placeholder="Post As" />
               </div>
             </div>
 

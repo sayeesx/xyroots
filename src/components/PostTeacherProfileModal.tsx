@@ -4,6 +4,7 @@ import { useState } from "react";
 import { FaXmark, FaSpinner, FaCircleCheck } from "react-icons/fa6";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth/AuthProvider";
+import CustomSelect from "@/components/ui/CustomSelect";
 
 interface PostTeacherProfileModalProps {
   isOpen: boolean;
@@ -15,6 +16,11 @@ const subjectOptions = [
   "Mathematics","Physics","Chemistry","Biology","English","Hindi","Social Science",
   "Computer Science","Commerce","Economics","History","Geography","Sanskrit",
   "Physical Education","Art & Craft","Music","EVS","General Science",
+];
+
+const subjectSelectOptions = [
+  { value: "", label: "Select subject" },
+  ...subjectOptions.map(s => ({ value: s, label: s })),
 ];
 
 export default function PostTeacherProfileModal({ isOpen, onClose, onSuccess }: PostTeacherProfileModalProps) {
@@ -198,12 +204,13 @@ export default function PostTeacherProfileModal({ isOpen, onClose, onSuccess }: 
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1.5">Primary Subject <span className="text-red-500">*</span></label>
-                  <select value={form.subject} onChange={e => set("subject", e.target.value)}
-                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-[#00a264] focus:bg-white transition-all"
-                    style={{ borderRadius: "0.75rem" }}>
-                    <option value="">Select subject</option>
-                    {subjectOptions.map(s => <option key={s}>{s}</option>)}
-                  </select>
+                  <CustomSelect
+                    value={form.subject}
+                    onChange={(val) => set("subject", val)}
+                    options={subjectSelectOptions}
+                    placeholder="Select subject"
+                    searchable
+                  />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1.5">Academic Qualification</label>

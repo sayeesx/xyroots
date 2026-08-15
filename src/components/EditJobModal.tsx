@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { FaXmark, FaSpinner, FaCircleCheck } from "react-icons/fa6";
 import { updateJob, updateJobStatus } from "@/lib/actions/jobs";
+import CustomSelect from "@/components/ui/CustomSelect";
 
 interface EditJobModalProps {
   isOpen: boolean;
@@ -10,6 +11,19 @@ interface EditJobModalProps {
   job: any;
   onSuccess?: () => void;
 }
+
+const employmentTypeOptions = [
+  { value: "Full-time", label: "Full-time" },
+  { value: "Part-time", label: "Part-time" },
+  { value: "Contract", label: "Contract" },
+  { value: "Temporary", label: "Temporary" },
+];
+
+const statusOptions = [
+  { value: "published", label: "Published (Live)" },
+  { value: "draft", label: "Draft" },
+  { value: "closed", label: "Closed" },
+];
 
 export default function EditJobModal({ isOpen, onClose, job, onSuccess }: EditJobModalProps) {
   const [loading, setLoading] = useState(false);
@@ -228,28 +242,11 @@ export default function EditJobModal({ isOpen, onClose, job, onSuccess }: EditJo
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Employment Type</label>
-              <select
-                value={form.employment_type} onChange={e => set("employment_type", e.target.value)}
-                className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
-                style={{ borderRadius: "0.75rem" }}
-              >
-                <option>Full-time</option>
-                <option>Part-time</option>
-                <option>Contract</option>
-                <option>Temporary</option>
-              </select>
+              <CustomSelect value={form.employment_type} onChange={val => set("employment_type", val)} options={employmentTypeOptions} placeholder="Employment Type" />
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Status</label>
-              <select
-                value={form.status} onChange={e => set("status", e.target.value)}
-                className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
-                style={{ borderRadius: "0.75rem" }}
-              >
-                <option value="published">Published (Live)</option>
-                <option value="draft">Draft</option>
-                <option value="closed">Closed</option>
-              </select>
+              <CustomSelect value={form.status} onChange={val => set("status", val)} options={statusOptions} placeholder="Status" />
             </div>
           </div>
         </div>

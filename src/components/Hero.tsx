@@ -268,16 +268,16 @@ export default function Hero() {
       {/* ─── Foreground Content Container ─── */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col flex-1 pt-8 sm:pt-12 md:pt-[6%] pb-0">
 
-        <div className="max-w-4xl text-left mb-3 sm:mb-4">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-xyroots-text leading-[1.25] tracking-tight">
+        <div className="max-w-4xl text-left mb-4 sm:mb-5">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-xyroots-text leading-[1.15] tracking-tight">
             Finding the right<br />
-            <span className="text-xyroots-teal font-serif font-normal text-3xl sm:text-4xl lg:text-5xl tracking-normal">teaching job</span> is just a click away
+            <span className="text-xyroots-teal font-serif font-normal text-3xl sm:text-4xl lg:text-5xl xl:text-6xl tracking-normal">teaching job</span> is just a click away
           </h1>
         </div>
 
         {/* Subtitle */}
-        <div className="max-w-3xl mb-4">
-          <p className="text-xs sm:text-sm md:text-base text-xyroots-muted leading-relaxed">
+        <div className="max-w-3xl mb-5">
+          <p className="text-sm sm:text-base md:text-lg text-xyroots-muted leading-relaxed">
             Xyroots connects talented teachers with schools looking for<br className="hidden sm:block" />
             educators who make a real difference in classrooms.
           </p>

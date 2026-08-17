@@ -1,17 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CustomSelect from "@/components/ui/CustomSelect";
 import {
   FaMagnifyingGlass, FaLocationDot, FaShieldHalved, FaUsers, FaChevronRight,
-  FaBuilding, FaGraduationCap, FaStar, FaBriefcase, FaCheck, FaArrowRight,
-  FaBookOpen, FaChartSimple, FaBell, FaWandMagicSparkles, FaCircleCheck,
+  FaBuilding, FaStar, FaBriefcase, FaCheck, FaArrowRight,
   FaSchool, FaRegBuilding, FaLock
 } from "react-icons/fa6";
-import { schools, testimonials, pricingPlans } from "@/data/schools";
+import { schools } from "@/data/schools";
+import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth/AuthProvider";
 
 const TYPE_OPTIONS = [
@@ -47,14 +47,73 @@ const stats = [
   { value: "32", label: "States Covered", icon: FaLocationDot },
 ];
 
-const features = [
-  { icon: FaWandMagicSparkles, title: "AI Matching", desc: "Smart algorithm matches your vacancies with the most qualified teachers automatically." },
-  { icon: FaChartSimple, title: "Hiring Analytics", desc: "Track applications, interviews, and hiring pipeline from a unified dashboard." },
-  { icon: FaShieldHalved, title: "Verified Profiles", desc: "Every teacher profile is verified for qualifications and work history." },
-  { icon: FaBell, title: "Job Alerts", desc: "Instantly notify matching candidates when you post a new vacancy." },
-  { icon: FaBookOpen, title: "Subject Experts", desc: "Filter by subject, board, qualification, and years of experience." },
-  { icon: FaBriefcase, title: "Contract & Fulltime", desc: "Hire for full-time, part-time, contract, or substitute roles seamlessly." },
-];
+// ─── Real Institution Card (from Supabase) ────────────────────────────────────
+function RealInstitutionCard({ inst, openPositions }: { inst: any; openPositions: number }) {
+  const colors = ["#f0fdf4", "#eff6ff", "#fdf4ff", "#fff7ed"];
+  const accents = ["#00a264", "#2563eb", "#9333ea", "#ea580c"];
+  const idx = (inst.name?.charCodeAt(0) || 0) % colors.length;
+
+  return (
+    <Link
+      href={`/institutions/${inst.id}`}
+      className="bg-white border border-gray-200 hover:border-[#00a264]/50 hover:shadow-[0_4px_24px_rgba(0,162,100,0.10)] transition-all duration-300 flex flex-col group"
+      style={{ borderRadius: "1.25rem" }}
+    >
+      <div
+        className="px-5 pt-5 pb-4 flex items-start justify-between"
+        style={{ background: `linear-gradient(135deg, ${colors[idx]} 0%, #fff 100%)`, borderRadius: "1.25rem 1.25rem 0 0" }}
+      >
+        <div className="flex items-center gap-3.5">
+          <div
+            className="w-12 h-12 shrink-0 flex items-center justify-center text-white text-sm font-bold"
+            style={{ borderRadius: "0.875rem", background: `linear-gradient(135deg, ${accents[idx]}, ${accents[idx]}cc)` }}
+          >
+            {(inst.name || "I").charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <h2 className="text-base font-bold text-gray-900 group-hover:text-[#00a264] transition-colors leading-tight">{inst.name}</h2>
+            <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+              <FaLocationDot className="w-3 h-3 text-[#00a264]" />
+              {inst.location || "India"}
+            </p>
+          </div>
+        </div>
+        {inst.verified && (
+          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 bg-[#e6f7ed] text-[#00a264] shrink-0" style={{ borderRadius: "999px" }}>
+            <FaShieldHalved className="w-2.5 h-2.5" /> Verified
+          </span>
+        )}
+      </div>
+
+      <div className="px-5 py-3 flex-1 flex flex-col gap-3">
+        {inst.description && (
+          <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">{inst.description}</p>
+        )}
+        <div className="flex flex-wrap gap-1.5">
+          {inst.type && (
+            <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 font-semibold" style={{ borderRadius: "0.375rem" }}>{inst.type}</span>
+          )}
+          {inst.board && Array.isArray(inst.board) && inst.board.map((b: string) => (
+            <span key={b} className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 font-semibold" style={{ borderRadius: "0.375rem" }}>{b}</span>
+          ))}
+          {inst.established && (
+            <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-500 font-medium" style={{ borderRadius: "0.375rem" }}>Est. {inst.established}</span>
+          )}
+        </div>
+      </div>
+
+      <div className="px-5 py-3 border-t border-gray-100 flex items-center justify-between" style={{ borderRadius: "0 0 1.25rem 1.25rem" }}>
+        <span className="text-xs font-bold text-[#00a264] flex items-center gap-1">
+          <FaBriefcase className="w-3 h-3" />
+          {openPositions} open {openPositions === 1 ? "vacancy" : "vacancies"}
+        </span>
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-white bg-[#00a264] hover:bg-[#007a4d] transition-all px-3 py-1.5 group-hover:scale-[1.03]" style={{ borderRadius: "0.5rem" }}>
+          View Details <FaChevronRight className="w-2.5 h-2.5" />
+        </span>
+      </div>
+    </Link>
+  );
+}
 
 // ─── Institution Card ──────────────────────────────────────────────────────────
 function InstitutionCard({ school }: { school: typeof schools[0] }) {
@@ -153,93 +212,58 @@ function InstitutionCard({ school }: { school: typeof schools[0] }) {
   );
 }
 
-// ─── Testimonial Card ──────────────────────────────────────────────────────────
-function TestimonialCard({ t }: { t: typeof testimonials[0] }) {
-  return (
-    <div
-      className="bg-white border border-gray-100 p-5 flex flex-col gap-3 hover:border-[#00a264]/30 transition-all"
-      style={{ borderRadius: "1rem" }}
-    >
-      <div className="flex gap-1">
-        {[...Array(5)].map((_, i) => (
-          <FaStar key={i} className="w-3 h-3 text-yellow-400" />
-        ))}
-      </div>
-      <p className="text-sm text-gray-600 leading-relaxed flex-1">&ldquo;{t.content}&rdquo;</p>
-      <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
-        <div
-          className="w-9 h-9 shrink-0 flex items-center justify-center text-xs font-bold text-white bg-[#00a264]"
-          style={{ borderRadius: "50%" }}
-        >
-          {t.avatar}
-        </div>
-        <div>
-          <p className="text-sm font-bold text-gray-900">{t.name}</p>
-          <p className="text-[11px] text-gray-500">{t.role}{t.organization ? ` · ${t.organization}` : ""}</p>
-        </div>
-        <span
-          className={`ml-auto text-[10px] font-bold px-2 py-0.5 ${t.type === "school" ? "bg-[#e6f7ed] text-[#00a264]" : "bg-blue-50 text-blue-600"}`}
-          style={{ borderRadius: "999px" }}
-        >
-          {t.type === "school" ? "Institution" : "Teacher"}
-        </span>
-      </div>
-    </div>
-  );
-}
-
-// ─── Pricing Card ──────────────────────────────────────────────────────────────
-function PricingCard({ plan }: { plan: typeof pricingPlans[0] }) {
-  return (
-    <div
-      className={`flex flex-col p-6 transition-all border ${plan.highlighted ? "border-[#00a264] bg-[#f0fdf4]" : "border-gray-200 bg-white hover:border-[#00a264]/40"}`}
-      style={{ borderRadius: "1.25rem" }}
-    >
-      {plan.highlighted && (
-        <span
-          className="self-start text-[10px] font-bold px-3 py-1 bg-[#00a264] text-white mb-3"
-          style={{ borderRadius: "999px" }}
-        >
-          Most Popular
-        </span>
-      )}
-      <h3 className="text-lg font-bold text-gray-900 mb-0.5">{plan.name}</h3>
-      <p className="text-xs text-gray-500 mb-4">{plan.description}</p>
-      <div className="flex items-end gap-1 mb-5">
-        <span className="text-3xl font-bold text-gray-900">{plan.price}</span>
-        {plan.period && <span className="text-sm text-gray-500 mb-1">{plan.period}</span>}
-      </div>
-      <ul className="space-y-2.5 mb-6 flex-1">
-        {plan.features.map((f) => (
-          <li key={f} className="flex items-start gap-2.5 text-sm text-gray-600">
-            <FaCheck className="w-3 h-3 text-[#00a264] mt-0.5 shrink-0" />
-            {f}
-          </li>
-        ))}
-      </ul>
-      <button
-        className={`w-full py-2.5 text-sm font-bold transition-all flex items-center justify-center gap-2 ${
-          plan.highlighted
-            ? "bg-[#00a264] text-white hover:bg-[#007a4d]"
-            : "bg-gray-900 text-white hover:bg-black"
-        }`}
-        style={{ borderRadius: "0.75rem" }}
-      >
-        {plan.cta} <FaArrowRight className="w-3 h-3" />
-      </button>
-    </div>
-  );
-}
-
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 export default function InstitutionsPage() {
   const { openInstitutionRegistration, openSignIn, user, loading } = useAuth();
+  const supabase = createClient();
+
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("All");
   const [selectedLocation, setSelectedLocation] = useState("All");
   const [selectedBoard, setSelectedBoard] = useState("All");
 
-  const filtered = schools.filter((s) => {
+  // Real institutions from Supabase (created by management accounts)
+  const [realInstitutions, setRealInstitutions] = useState<{ inst: any; openPositions: number }[]>([]);
+  const [realLoading, setRealLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) { setRealLoading(false); return; }
+    const fetchReal = async () => {
+      setRealLoading(true);
+      // Fetch visible institutions + open job count
+      const { data: instData } = await supabase
+        .from("institutions")
+        .select("id, name, location, type, board, established, verified, description, is_visible")
+        .eq("is_visible", true)
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (!instData || instData.length === 0) { setRealLoading(false); return; }
+
+      // Count open jobs per institution
+      const ids = instData.map((i: any) => i.id);
+      const { data: jobCounts } = await supabase
+        .from("jobs")
+        .select("institution_id")
+        .in("institution_id", ids)
+        .eq("status", "published");
+
+      const countMap: Record<string, number> = {};
+      (jobCounts || []).forEach((j: any) => {
+        if (j.institution_id) countMap[j.institution_id] = (countMap[j.institution_id] || 0) + 1;
+      });
+
+      setRealInstitutions(instData.map((inst: any) => ({
+        inst,
+        openPositions: countMap[inst.id] || 0,
+      })));
+      setRealLoading(false);
+    };
+    fetchReal();
+  }, [user]); // eslint-disable-line
+
+  // Filter static schools
+  const filteredStatic = schools.filter((s) => {
     const matchSearch =
       s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       s.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -249,6 +273,20 @@ export default function InstitutionsPage() {
     const matchBoard = selectedBoard === "All" || s.board.includes(selectedBoard);
     return matchSearch && matchType && matchLoc && matchBoard;
   });
+
+  // Filter real institutions
+  const filteredReal = realInstitutions.filter(({ inst }) => {
+    const matchSearch =
+      (inst.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (inst.location || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (inst.type || "").toLowerCase().includes(searchTerm.toLowerCase());
+    const matchType = selectedType === "All" || (inst.type || "") === selectedType;
+    const matchLoc = selectedLocation === "All" || (inst.location || "").includes(selectedLocation);
+    const matchBoard = selectedBoard === "All" || (Array.isArray(inst.board) && inst.board.includes(selectedBoard));
+    return matchSearch && matchType && matchLoc && matchBoard;
+  });
+
+  const totalCount = filteredReal.length + filteredStatic.length;
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f7f9f8]">
@@ -284,20 +322,6 @@ export default function InstitutionsPage() {
                 Xyroots connects your institution with verified, experienced educators across India. Post a vacancy, browse profiles, and hire with confidence.
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
-                <button
-                  onClick={() => openInstitutionRegistration()}
-                  className="px-6 py-3 text-sm font-bold bg-white text-[#074526] hover:bg-[#e6f7ed] transition-all inline-flex items-center gap-2"
-                  style={{ borderRadius: "0.75rem" }}
-                >
-                  Register Your Institution <FaArrowRight className="w-3.5 h-3.5" />
-                </button>
-                <Link
-                  href="/teachers"
-                  className="px-6 py-3 text-sm font-bold bg-white/10 text-white border border-white/20 hover:bg-white/20 transition-all inline-flex items-center gap-2"
-                  style={{ borderRadius: "0.75rem" }}
-                >
-                  Browse Teachers
-                </Link>
               </div>
             </div>
           </div>
@@ -354,13 +378,12 @@ export default function InstitutionsPage() {
                 <p className="text-sm text-gray-500 mt-1">Connect directly with verified institutions across India</p>
               </div>
               <p className="text-sm text-gray-500 shrink-0">
-                <span className="font-bold text-gray-900">{filtered.length}</span> institutions found
+                <span className="font-bold text-gray-900">{totalCount}</span> institutions found
               </p>
             </div>
 
             {/* Search + Filters */}
             <div className="bg-white border border-gray-200 p-3 mb-8 flex flex-col sm:flex-row gap-2" style={{ borderRadius: "0.875rem" }}>
-              {/* Search */}
               <div className="flex-1 flex items-center px-3 py-2 border border-gray-200 gap-2" style={{ borderRadius: "0.625rem" }}>
                 <FaMagnifyingGlass className="w-3.5 h-3.5 text-gray-400 shrink-0" />
                 <input
@@ -371,29 +394,37 @@ export default function InstitutionsPage() {
                   className="flex-1 text-sm outline-none bg-transparent placeholder-gray-400 text-gray-900"
                 />
               </div>
-              {/* Type */}
               <div className="sm:w-40">
                 <CustomSelect value={selectedType} onChange={setSelectedType} options={TYPE_OPTIONS} placeholder="Type" />
               </div>
-              {/* Location */}
               <div className="sm:w-44">
                 <CustomSelect value={selectedLocation} onChange={setSelectedLocation} options={LOCATION_OPTIONS} placeholder="Location" searchable />
               </div>
-              {/* Board */}
               <div className="sm:w-36">
                 <CustomSelect value={selectedBoard} onChange={setSelectedBoard} options={BOARD_OPTIONS} placeholder="Board" />
               </div>
             </div>
 
             {/* Cards grid */}
-            {filtered.length === 0 ? (
+            {realLoading ? (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
+                {[1,2,3].map(i => (
+                  <div key={i} className="h-64 bg-white border border-gray-100 animate-pulse" style={{ borderRadius: "1.25rem" }} />
+                ))}
+              </div>
+            ) : totalCount === 0 ? (
               <div className="bg-white border border-gray-100 p-12 text-center" style={{ borderRadius: "1rem" }}>
                 <FaRegBuilding className="w-8 h-8 text-gray-300 mx-auto mb-3" />
                 <p className="text-gray-500 text-sm">No institutions match your search.</p>
               </div>
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
-                {filtered.map((school) => (
+                {/* Real institutions from Supabase first (newest, most relevant) */}
+                {filteredReal.map(({ inst, openPositions }) => (
+                  <RealInstitutionCard key={inst.id} inst={inst} openPositions={openPositions} />
+                ))}
+                {/* Static demo institutions */}
+                {filteredStatic.map((school) => (
                   <InstitutionCard key={school.id} school={school} />
                 ))}
               </div>

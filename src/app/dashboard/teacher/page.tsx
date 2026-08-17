@@ -1,33 +1,29 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import Image from "next/image";
 import OnboardingModal from "@/components/OnboardingModal";
 import GetVerifiedModal from "@/components/GetVerifiedModal";
 import {
   FaBriefcase, FaBookmark, FaLocationDot, FaGraduationCap,
   FaCircleCheck, FaArrowRight, FaUser, FaSpinner, FaEnvelope,
   FaPhone, FaPencil, FaStar, FaBuilding, FaClock, FaCalendarDays,
-  FaShieldHalved, FaCheckDouble, FaCalendar, FaBell, FaTriangleExclamation
+  FaShieldHalved, FaCheck, FaCalendar, FaTriangleExclamation,
+  FaGear, FaArrowRightFromBracket, FaHouse, FaMagnifyingGlass,
+  FaBell, FaXmark, FaBars
 } from "react-icons/fa6";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { getMyApplications } from "@/lib/actions/jobs";
-import { getMyInterviews } from "@/lib/actions/interviews";
-import { getWatchlist, removeFromWatchlist } from "@/lib/actions/watchlist";
-import Loader from "@/components/Loader";
-import NotificationBell from "@/components/NotificationBell";
 
-type Tab = "applications" | "saved" | "interviews" | "profile";
+type Tab = "overview" | "applications" | "saved" | "interviews" | "profile" | "settings";
 
 const STATUS_STYLE: Record<string, string> = {
   pending: "bg-blue-50 text-blue-700",
   reviewed: "bg-purple-50 text-purple-700",
   shortlisted: "bg-amber-50 text-amber-700",
-  interview: "bg-gray-100 text-gray-700",
+  interview: "bg-[#e6f7ed] text-[#00a264]",
   offered: "bg-emerald-50 text-emerald-700",
   rejected: "bg-red-50 text-red-700",
   withdrawn: "bg-gray-100 text-gray-500",
@@ -39,114 +35,88 @@ const STATUS_LABEL: Record<string, string> = {
 };
 const INTERVIEW_STATUS_STYLE: Record<string, string> = {
   scheduled: "bg-blue-50 text-blue-700",
-  confirmed: "bg-gray-100 text-gray-700",
+  confirmed: "bg-[#e6f7ed] text-[#00a264]",
   cancelled: "bg-red-50 text-red-700",
   completed: "bg-gray-100 text-gray-600",
 };
 
-// ─── Modern profile completion bar ───────────────────────────────────────────
-function ProfileCompletionBanner({ pct, onEdit }: { pct: number; onEdit: () => void }) {
-  if (pct >= 100) return null;
-  const segments = [
-    { label: "Basic Info", done: pct >= 25 },
-    { label: "Professional", done: pct >= 50 },
-    { label: "Experience", done: pct >= 75 },
-    { label: "Complete", done: pct >= 100 },
-  ];
-  return (
-    <div className="bg-white border border-gray-100 p-5 mb-6" style={{ borderRadius: "1rem" }}>
-      <div className="flex items-center justify-between mb-3">
-        <div>
-          <p className="text-sm font-bold text-gray-900">Profile Strength</p>
-          <p className="text-xs text-gray-500 mt-0.5">Complete your profile to get more interview calls</p>
-        </div>
-        <div className="text-right">
-          <span className="text-2xl font-bold text-gray-900">{pct}%</span>
-        </div>
-      </div>
-      {/* Segmented bar */}
-      <div className="flex gap-1 mb-3">
-        {[25, 50, 75, 100].map(threshold => (
-          <div key={threshold} className="flex-1 h-1.5 transition-all" style={{
-            borderRadius: "999px",
-            backgroundColor: pct >= threshold ? "#111827" : "#e5e7eb"
-          }} />
-        ))}
-      </div>
-      <div className="flex items-center justify-between">
-        <div className="flex gap-3">
-          {segments.map(s => (
-            <div key={s.label} className="flex items-center gap-1">
-              {s.done
-                ? <FaCheckDouble className="w-3 h-3 text-gray-700" />
-                : <div className="w-3 h-3 border border-gray-300" style={{ borderRadius: "50%" }} />}
-              <span className={`text-[10px] font-medium ${s.done ? "text-gray-800" : "text-gray-400"}`}>{s.label}</span>
-            </div>
-          ))}
-        </div>
-        <button
-          onClick={onEdit}
-          className="text-xs font-semibold text-gray-700 hover:underline flex items-center gap-1"
-        >
-          Complete now <FaArrowRight className="w-3 h-3" />
-        </button>
-      </div>
-    </div>
-  );
-}
-
 export default function TeacherDashboard() {
-  const { profile, loading, isAuthenticated, role } = useAuth();
+  const { profile, loading, isAuthenticated, role, signOut } = useAuth();
   const router = useRouter();
-  const [tab, setTab] = useState<Tab>("applications");
+  const [tab, setTab] = useState<Tab>("overview");
   const [teacherProfile, setTeacherProfile] = useState<any>(null);
   const [applications, setApplications] = useState<any[]>([]);
   const [interviews, setInterviews] = useState<any[]>([]);
   const [savedJobs, setSavedJobs] = useState<any[]>([]);
-  const [savedIds, setSavedIds] = useState<string[]>([]);  const [isLoadingData, setIsLoadingData] = useState(true);
+  const [savedIds, setSavedIds] = useState<string[]>([]);
+  const [isLoadingData, setIsLoadingData] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showVerifiedModal, setShowVerifiedModal] = useState(false);
   const [isProfileVisible, setIsProfileVisible] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const supabase = createClient();
+  const cacheRef = useRef<{ ts: number; data: any } | null>(null);
+  const CACHE_TTL = 5 * 60 * 1000;
 
   useEffect(() => {
     if (!loading && (!isAuthenticated || role !== "teacher")) router.push("/");
   }, [loading, isAuthenticated, role, router]);
 
-  // Load saved job IDs from DB
-  useEffect(() => {
-    if (!isAuthenticated) return;
-    getWatchlist().then(res => {
-      if (res.success && res.data) setSavedIds(res.data.jobs);
-    });
-  }, [isAuthenticated]);
-
   useEffect(() => {
     if (!isAuthenticated || !profile) return;
     const load = async () => {
+      if (cacheRef.current && Date.now() - cacheRef.current.ts < CACHE_TTL) {
+        const c = cacheRef.current.data;
+        setTeacherProfile(c.tp);
+        setIsProfileVisible(c.tp?.is_visible ?? true);
+        setApplications(c.apps);
+        setInterviews(c.interviews);
+        setSavedIds(c.savedIds);
+        setIsLoadingData(false);
+        return;
+      }
       setIsLoadingData(true);
-
-      // Fetch teacher profile, applications and interviews in parallel
-      const [tpResult, appsResult, intResult] = await Promise.all([
-        supabase.from("teacher_profiles").select("*").eq("profile_id", profile.id).single() as unknown as Promise<{ data: any; error: any }>,
-        getMyApplications(),
-        getMyInterviews(),
+      const [tpRes, appsRes, intRes, watchRes] = await Promise.all([
+        supabase.from("teacher_profiles").select("*").eq("profile_id", profile.id).single(),
+        supabase.from("applications")
+          .select("id, status, created_at, job_id, jobs(id, title, school_name, location, salary_min, salary_max)")
+          .eq("applicant_profile_id", profile.id)
+          .order("created_at", { ascending: false })
+          .limit(50),
+        supabase.from("teacher_profiles").select("id").eq("profile_id", profile.id).single()
+          .then(async ({ data: tp }) => {
+            if (!tp) return { data: [] };
+            return supabase.from("interviews").select("*")
+              .eq("teacher_profile_id", (tp as any).id)
+              .order("interview_date", { ascending: true });
+          }),
+        supabase.from("watchlist_items")
+          .select("item_id, item_type")
+          .eq("profile_id", profile.id)
+          .limit(100)
+          .then(r => r)
+          .catch(() => ({ data: [] })),
       ]);
-
-      const tp = (tpResult as any).data;
-      if (tp) { setTeacherProfile(tp); setIsProfileVisible(tp.is_visible ?? true); }
-      if (appsResult.success && appsResult.data) setApplications(appsResult.data as any[]);
-      if (intResult.success && intResult.data) setInterviews(intResult.data);
-
+      const tp = (tpRes as any).data;
+      const apps = (appsRes as any).data || [];
+      const ivs = (intRes as any).data || [];
+      const watchItems = ((watchRes as any).data || []) as any[];
+      const jobIds = watchItems.filter((w: any) => w.item_type === "job").map((w: any) => w.item_id);
+      if (tp) { setTeacherProfile(tp); setIsProfileVisible((tp as any).is_visible ?? true); }
+      setApplications(apps);
+      setInterviews(ivs);
+      setSavedIds(jobIds);
+      cacheRef.current = { ts: Date.now(), data: { tp, apps, interviews: ivs, savedIds: jobIds } };
       setIsLoadingData(false);
     };
     load();
   }, [isAuthenticated, profile]); // eslint-disable-line
 
-  // Load saved jobs when tab switches to saved
   useEffect(() => {
     if (tab !== "saved" || savedIds.length === 0) return;
-    supabase.from("jobs").select("*").in("id", savedIds.slice(0, 30))
+    supabase.from("jobs")
+      .select("id, title, school_name, board, location, employment_type, salary_min, salary_max")
+      .in("id", savedIds.slice(0, 30))
       .then(({ data }) => { if (data) setSavedJobs(data); });
   }, [tab, savedIds]); // eslint-disable-line
 
@@ -154,331 +124,225 @@ export default function TeacherDashboard() {
     || `https://api.dicebear.com/7.x/initials/svg?seed=${(profile?.full_name || "X").replace(/\s+/g, "")}&chars=2`;
   const completionPct = teacherProfile?.profile_completion ?? 0;
   const activeCount = applications.filter(a => a.status === "interview" || a.status === "offered").length;
+  const hasNewInterviews = interviews.some((iv: any) => iv.status === "scheduled" || iv.status === "confirmed");
+  const joinedDate = profile?.created_at
+    ? new Date(profile.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
+    : null;
 
+  // Profile strength — compute missing fields for hint text
+  const missingFields: string[] = [];
+  if (!teacherProfile?.subject) missingFields.push("subject");
+  if (!teacherProfile?.qualification) missingFields.push("qualification");
+  if (!teacherProfile?.professional_qualification) missingFields.push("teaching qualification");
+  if (teacherProfile?.experience_years == null) missingFields.push("experience years");
+  if (!teacherProfile?.location) missingFields.push("location");
+  if (!teacherProfile?.bio) missingFields.push("bio");
+
+  const completionSegments = [
+    { label: "Basic Info", done: completionPct >= 25 },
+    { label: "Professional", done: completionPct >= 50 },
+    { label: "Experience", done: completionPct >= 75 },
+    { label: "Complete", done: completionPct >= 100 },
+  ];
+
+  // Sidebar nav items — Interviews before Saved Jobs
+  const navItems: { id: Tab; label: string; icon: React.ElementType; badge?: number; dot?: boolean }[] = [
+    { id: "overview", label: "Overview", icon: FaHouse },
+    { id: "applications", label: "Applications", icon: FaBriefcase, badge: applications.length },
+    { id: "interviews", label: "Interviews", icon: FaCalendar, badge: interviews.length },
+    { id: "saved", label: "Saved Jobs", icon: FaBookmark, badge: savedIds.length },
+    { id: "profile", label: "My Profile", icon: FaUser },
+    { id: "settings", label: "Settings", icon: FaGear },
+  ];
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push("/");
+  };
+
+  // ── Skeleton ──
   if (loading || isLoadingData) {
     return (
-      <div className="min-h-screen flex flex-col bg-[#f7f8fa]">
-        <Navbar />
-        <div className="flex-1 flex items-center justify-center">
-          <Loader />
+      <div className="min-h-screen flex bg-[#f4f5f7]">
+        {/* Sidebar skeleton */}
+        <div className="hidden md:flex flex-col w-56 lg:w-64 bg-white border-r border-gray-100 shrink-0 h-screen sticky top-0 animate-pulse">
+          <div className="p-5 border-b border-gray-100">
+            <div className="h-8 bg-gray-100 rounded w-24" />
+          </div>
+          <div className="p-4 space-y-2 flex-1">
+            {[1,2,3,4,5,6].map(i => <div key={i} className="h-10 bg-gray-50 rounded-xl" />)}
+          </div>
+        </div>
+        {/* Content skeleton */}
+        <div className="flex-1 p-5 sm:p-8 animate-pulse">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
+            <div className="h-48 bg-white rounded-2xl border border-gray-100" />
+            <div className="h-48 bg-white rounded-2xl border border-gray-100" />
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[1,2,3,4].map(i => <div key={i} className="h-24 bg-white rounded-2xl border border-gray-100" />)}
+          </div>
         </div>
       </div>
     );
   }
 
-  const tabs = [
-    { id: "applications", label: "Applied", count: applications.length, icon: FaBriefcase },
-    { id: "saved", label: "Saved", count: savedIds.length, icon: FaBookmark },
-    { id: "interviews", label: "Interviews", count: interviews.length, icon: FaCalendar, hasNew: interviews.some((iv: any) => iv.status === "scheduled" || iv.status === "confirmed") },
-    { id: "profile", label: "Profile", count: null, icon: FaUser },
-  ] as const;
+  // ── Sidebar component (shared desktop + mobile) ──
+  const SidebarContent = () => (
+    <>
+      {/* Logo */}
+      <div className="px-5 py-4 border-b border-gray-100 shrink-0">
+        <Link href="/" className="flex items-center gap-2">
+          <Image src="/logo1.webp" alt="Xyroots" width={120} height={36} className="h-8 w-auto object-contain" />
+        </Link>
+      </div>
+
+      {/* Avatar mini */}
+      <div className="px-4 py-4 border-b border-gray-100 shrink-0">
+        <div className="flex items-center gap-3">
+          <img src={avatar} alt={profile?.full_name || "T"} className="w-10 h-10 rounded-full border-2 border-[#00a264]/20 object-cover shrink-0" />
+          <div className="min-w-0">
+            <p className="text-sm font-bold text-gray-900 truncate">{profile?.full_name}</p>
+            <p className="text-[11px] text-gray-500 truncate">{teacherProfile?.title || "Teacher"}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Nav items */}
+      <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5">
+        {navItems.map(item => (
+          <button
+            key={item.id}
+            onClick={() => { setTab(item.id); setMobileMenuOpen(false); }}
+            className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 text-sm font-medium transition-all group`}
+            style={{
+              borderRadius: "0.625rem",
+              backgroundColor: tab === item.id ? "#e6f7ed" : "transparent",
+              color: tab === item.id ? "#00a264" : "#4b5563",
+            }}
+          >
+            <span className="flex items-center gap-3">
+              <item.icon
+                className="w-4 h-4 shrink-0"
+                style={{ color: tab === item.id ? "#00a264" : "#9ca3af" }}
+              />
+              {item.label}
+            </span>
+            <span className="flex items-center gap-1.5 shrink-0">
+              {item.badge !== undefined && item.badge > 0 && (
+                <span
+                  className="text-[10px] font-bold px-1.5 py-0.5 min-w-[18px] text-center"
+                  style={{
+                    borderRadius: "999px",
+                    backgroundColor: tab === item.id ? "#00a264" : "#f3f4f6",
+                    color: tab === item.id ? "#fff" : "#6b7280",
+                  }}
+                >
+                  {item.badge}
+                </span>
+              )}
+              {item.dot && <span className="w-2 h-2 rounded-full bg-red-500" />}
+            </span>
+          </button>
+        ))}
+      </nav>
+
+      {/* Bottom: sign out */}
+      <div className="px-3 py-3 border-t border-gray-100 shrink-0">
+        <button
+          onClick={handleSignOut}
+          className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 transition-colors"
+          style={{ borderRadius: "0.625rem" }}
+        >
+          <FaArrowRightFromBracket className="w-4 h-4" />
+          Log Out
+        </button>
+      </div>
+    </>
+  );
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f7f8fa]">
-      <Navbar />
+    <div className="flex bg-[#f4f5f7]" style={{ minHeight: "100vh" }}>
 
-      <main className="flex-1 pb-20">
-        {/* Clean header */}
-        <div className="bg-white border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
-              {/* Avatar */}
-              <div className="relative shrink-0">
-                <img src={avatar} alt={profile?.full_name || "Teacher"}
-                  className="w-16 h-16 sm:w-20 sm:h-20 object-cover border-2 border-gray-200"
-                  style={{ borderRadius: "50%" }} />
-                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-gray-800 flex items-center justify-center" style={{ borderRadius: "50%" }}>
-                  <FaCircleCheck className="w-2.5 h-2.5 text-white" />
-                </div>
-              </div>
+      {/* ── Desktop Sidebar — fixed height, never scrolls with content ── */}
+      <aside className="hidden md:flex flex-col w-56 lg:w-64 bg-white border-r border-gray-100 shrink-0 sticky top-0 self-start" style={{ height: "100vh" }}>
+        <SidebarContent />
+      </aside>
 
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-2 mb-1">
-                  <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{profile?.full_name}</h1>
-                  {/* Not verified by default — show Get Verified */}
-                  <button
-                    onClick={() => setShowVerifiedModal(true)}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-bold border border-dashed border-gray-300 text-gray-500 hover:border-gray-500 hover:text-gray-700 transition-colors"
-                    style={{ borderRadius: "0.5rem" }}
-                  >
-                    <FaShieldHalved className="w-3 h-3" /> Get Verified
-                  </button>
-                </div>
-                <p className="text-gray-500 text-sm mb-2">
-                  {teacherProfile?.title || teacherProfile?.subject || "Teacher"}
-                  {teacherProfile?.location ? ` · ${teacherProfile.location}` : ""}
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {teacherProfile?.qualification && (
-                    <span className="flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-600 text-xs font-medium" style={{ borderRadius: "0.375rem" }}>
-                      <FaGraduationCap className="w-2.5 h-2.5" /> {teacherProfile.qualification}
-                    </span>
-                  )}
-                  {teacherProfile?.experience_years != null && (
-                    <span className="flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-600 text-xs font-medium" style={{ borderRadius: "0.375rem" }}>
-                      <FaBriefcase className="w-2.5 h-2.5" /> {teacherProfile.experience_years} yrs
-                    </span>
-                  )}
-                </div>
-              </div>
+      {/* ── Mobile: top bar + slide-in drawer ── */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-100 flex items-center justify-between px-4 py-3">
+        <Link href="/"><Image src="/logo1.webp" alt="Xyroots" width={100} height={30} className="h-7 w-auto" /></Link>
+        <button onClick={() => setMobileMenuOpen(true)} className="p-2 hover:bg-gray-100 rounded-lg">
+          <FaBars className="w-5 h-5 text-gray-700" />
+        </button>
+      </div>
 
-              {/* Right side: notification bell + stats */}
-              <div className="flex items-start gap-3 shrink-0">
-                {/* Notification bell — desktop dashboard */}
-                <div className="hidden sm:block">
-                  <NotificationBell />
-                </div>
-
-                {/* Stats */}
-                <div className="flex gap-2 sm:gap-3">
-                  {[
-                    { label: "Applied", value: applications.length, accent: false },
-                    { label: "Active", value: activeCount, accent: true },
-                    { label: "Saved", value: savedIds.length, accent: false },
-                  ].map(s => (
-                    <div key={s.label} className={`text-center px-2.5 sm:px-4 py-1.5 sm:py-2 border ${s.accent ? "bg-gray-100 border-gray-200" : "bg-gray-50 border-gray-200"}`} style={{ borderRadius: "0.75rem" }}>
-                      <p className={`text-lg sm:text-2xl font-bold ${s.accent ? "text-gray-900" : "text-gray-900"}`}>{s.value}</p>
-                      <p className={`text-[10px] sm:text-xs font-medium ${s.accent ? "text-gray-600" : "text-gray-500"}`}>{s.label}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
+      {/* Mobile drawer */}
+      {mobileMenuOpen && (
+        <div className="md:hidden fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setMobileMenuOpen(false)} />
+          <div className="absolute left-0 top-0 bottom-0 w-72 bg-white flex flex-col shadow-2xl overflow-y-auto">
+            {/* Close button row — no logo (SidebarContent already has one) */}
+            <div className="flex items-center justify-end px-4 py-3 border-b border-gray-100 shrink-0">
+              <button onClick={() => setMobileMenuOpen(false)} className="p-1.5 hover:bg-gray-100 rounded-full" aria-label="Close menu">
+                <FaXmark className="w-4 h-4 text-gray-600" />
+              </button>
+            </div>
+            <div className="flex-1 flex flex-col">
+              <SidebarContent />
             </div>
           </div>
         </div>
+      )}
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-8">
-          {/* Profile completion */}
-          <ProfileCompletionBanner pct={completionPct} onEdit={() => setShowEditModal(true)} />
+      {/* ── Main Content — scrolls independently of sidebar ── */}
+      <div className="flex-1 min-w-0 overflow-y-auto pt-16 md:pt-0">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
 
-          {/* Tabs — scrollable on mobile, smaller text */}
-          <div className="flex gap-0.5 sm:gap-1 mb-6 border-b border-gray-200 overflow-x-auto">
-            {tabs.map(t => (
-              <button key={t.id} onClick={() => setTab(t.id as Tab)}
-                className={`flex items-center gap-1 sm:gap-2 px-2.5 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold transition-all -mb-px whitespace-nowrap shrink-0 ${
-                  tab === t.id
-                    ? "text-gray-900 border-b-2 border-gray-900"
-                    : "text-gray-400 hover:text-gray-700"
-                }`}
-              >
-                <t.icon className="w-3 h-3 sm:w-4 sm:h-4" />
-                {t.label}
-                {t.count !== null && t.count > 0 && (
-                  <span className={`text-[10px] px-1.5 py-0.5 font-bold ${
-                    tab === t.id ? "bg-gray-100 text-gray-800" : "bg-gray-100 text-gray-500"
-                  }`} style={{ borderRadius: "999px" }}>{t.count}</span>
-                )}
-                {'hasNew' in t && t.hasNew && (
-                  <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
-                )}
-              </button>
-            ))}
-          </div>
+          {/* ── Overview ── */}
+          {tab === "overview" && (
+            <div className="space-y-5">
+              {/* Top 2-col row: Profile card + Stats card */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
-          {/* ── Applications ── */}
-          {tab === "applications" && (
-            <div className="space-y-3">
-              {applications.length === 0 ? (
-                <div className="bg-white border border-gray-100 p-10 text-center" style={{ borderRadius: "1rem" }}>
-                  <FaBriefcase className="w-9 h-9 text-gray-200 mx-auto mb-3" />
-                  <h3 className="text-base font-bold text-gray-900 mb-1">No Applications Yet</h3>
-                  <p className="text-gray-500 text-sm mb-5">Start applying to teaching vacancies to see your status here.</p>
-                  <Link href="/jobs" className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold" style={{ borderRadius: "0.75rem" }}>
-                    Browse Jobs <FaArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-              ) : applications.map((app: any) => {
-                const job = app.jobs || {};
-                return (
-                  <div key={app.id} className="bg-white border border-gray-100 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3" style={{ borderRadius: "1rem" }}>
-                    <div className="flex items-start gap-3 sm:gap-4 min-w-0">
-                      <div className="w-10 h-10 shrink-0 flex items-center justify-center text-sm font-bold" style={{ borderRadius: "0.75rem", backgroundColor: "#f3f4f6", color: "#374151" }}>
-                        {(job.school_name || job.title || "?").charAt(0).toUpperCase()}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <h3 className="text-sm font-bold text-gray-900 truncate">{job.title || "Untitled Position"}</h3>
-                        <p className="text-xs text-gray-500 flex items-center gap-2 flex-wrap mt-0.5">
-                          {job.school_name && <span className="flex items-center gap-1"><FaBuilding className="w-2.5 h-2.5" />{job.school_name}</span>}
-                          {job.location && <span className="flex items-center gap-1"><FaLocationDot className="w-2.5 h-2.5" />{job.location}</span>}
-                        </p>
-                        <div className="mt-2 flex items-center gap-2 flex-wrap">
-                          <span className={`text-xs font-bold px-2 py-0.5 ${STATUS_STYLE[app.status] || STATUS_STYLE.pending}`} style={{ borderRadius: "0.375rem" }}>
-                            {STATUS_LABEL[app.status] || app.status}
-                          </span>
-                          <span className="text-xs text-gray-400 flex items-center gap-1">
-                            <FaClock className="w-2.5 h-2.5" />
-                            {new Date(app.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    {(job.salary_min || job.salary_max) && (
-                      <p className="text-sm font-bold text-gray-900 shrink-0 text-right">
-                        ₹{job.salary_min ? `${(job.salary_min/1000).toFixed(0)}k` : ""}
-                        {job.salary_min && job.salary_max ? "–" : ""}
-                        {job.salary_max ? `${(job.salary_max/1000).toFixed(0)}k` : ""}
-                        <span className="text-gray-400 text-xs font-normal">/mo</span>
-                      </p>
-                    )}
+                {/* Your Profile card */}
+                <div className="bg-white border border-gray-200 p-6" style={{ borderRadius: "1rem" }}>
+                  <div className="flex items-start justify-between mb-4">
+                    <h2 className="text-base font-bold text-gray-900">Your profile</h2>
+                    {joinedDate && <span className="text-xs text-gray-400">Joined {joinedDate}</span>}
                   </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* ── Saved Jobs ── */}
-          {tab === "saved" && (
-            <div className="space-y-3">
-              {savedIds.length === 0 ? (
-                <div className="bg-white border border-gray-100 p-10 text-center" style={{ borderRadius: "1rem" }}>
-                  <FaBookmark className="w-9 h-9 text-gray-200 mx-auto mb-3" />
-                  <h3 className="text-base font-bold text-gray-900 mb-1">No Saved Jobs</h3>
-                  <p className="text-gray-500 text-sm mb-5">Bookmark jobs while browsing to revisit them here.</p>
-                  <Link href="/jobs" className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold" style={{ borderRadius: "0.75rem" }}>
-                    Find Jobs <FaArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-              ) : savedJobs.length === 0 ? (
-                <div className="bg-white border border-gray-100 p-8 text-center" style={{ borderRadius: "1rem" }}>
-                  <FaSpinner className="w-6 h-6 text-gray-400 animate-spin mx-auto" />
-                </div>
-              ) : savedJobs.map((job: any) => (
-                <div key={job.id} className="bg-white border border-gray-100 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3" style={{ borderRadius: "1rem" }}>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-bold text-gray-900 truncate">{job.title}</h3>
-                    <p className="text-xs text-gray-500 mt-0.5 truncate">
-                      {[job.school_name, job.board, job.location || "India"].filter(Boolean).join(" · ")}
-                    </p>
-                    <div className="flex flex-wrap gap-1.5 mt-2">
-                      {job.employment_type && <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 font-medium" style={{ borderRadius: "0.375rem" }}>{job.employment_type}</span>}
-                      {(job.salary_min || job.salary_max) && (
-                        <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 font-medium" style={{ borderRadius: "0.375rem" }}>
-                          ₹{job.salary_min ? `${(job.salary_min/1000).toFixed(0)}k` : "?"}–{job.salary_max ? `${(job.salary_max/1000).toFixed(0)}k` : "?"}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <Link href={`/jobs/${job.id}`} className="px-4 py-2 text-sm font-semibold bg-gray-900 text-white hover:bg-black transition-colors shrink-0" style={{ borderRadius: "0.75rem" }}>
-                    Apply
-                  </Link>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* ── Interviews ── */}
-          {tab === "interviews" && (
-            <div className="space-y-3">
-              {interviews.length === 0 ? (
-                <div className="bg-white border border-gray-100 p-10 text-center" style={{ borderRadius: "1rem" }}>
-                  <FaCalendarDays className="w-9 h-9 text-gray-200 mx-auto mb-3" />
-                  <h3 className="text-base font-bold text-gray-900 mb-1">No Interviews Scheduled</h3>
-                  <p className="text-gray-500 text-sm">When a recruiter schedules an interview with you, it will appear here.</p>
-                </div>
-              ) : interviews.map((iv: any) => {
-                const isNew = (Date.now() - new Date(iv.created_at).getTime()) < 48 * 60 * 60 * 1000;
-                const isUpcoming = iv.status === "scheduled" || iv.status === "confirmed";
-                return (
-                  <div key={iv.id} className={`bg-white border p-4 sm:p-5 ${isUpcoming ? "border-blue-200 shadow-sm shadow-blue-50" : "border-gray-100"}`} style={{ borderRadius: "1rem" }}>
-                    <div className="flex items-start justify-between gap-3 flex-wrap">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <h3 className="text-sm font-bold text-gray-900">{iv.institution_name || iv.recruiter_name}</h3>
-                          <span className={`text-xs font-bold px-2 py-0.5 ${INTERVIEW_STATUS_STYLE[iv.status] || "bg-gray-100 text-gray-500"}`} style={{ borderRadius: "0.375rem" }}>
-                            {iv.status.charAt(0).toUpperCase() + iv.status.slice(1)}
-                          </span>
-                          {/* Important badge for new/upcoming interviews */}
-                          {(isNew || isUpcoming) && (
-                            <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 bg-red-500 text-white animate-pulse" style={{ borderRadius: "0.375rem" }}>
-                              <FaTriangleExclamation className="w-2.5 h-2.5" /> Important
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-xs text-gray-500 mb-2">{iv.interview_type}</p>
-                        <div className="flex flex-wrap gap-3 text-xs text-gray-600">
-                          <span className="flex items-center gap-1">
-                            <FaCalendarDays className="w-3 h-3 text-gray-500" />
-                            {new Date(iv.interview_date).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" })}
-                          </span>
-                          <span className="flex items-center gap-1"><FaClock className="w-3 h-3 text-gray-500" />{iv.time_slot}</span>
-                        </div>
-                        {iv.recruiter_email && (
-                          <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1">
-                            <FaEnvelope className="w-2.5 h-2.5" /> {iv.recruiter_email}
-                          </p>
-                        )}
-                        {iv.message && <p className="text-xs text-gray-500 mt-2 italic">&ldquo;{iv.message}&rdquo;</p>}
-                      </div>
-                      {isUpcoming && (
-                        <div className="shrink-0">
-                          <span className="flex items-center gap-1 text-xs font-bold text-blue-700 bg-blue-50 px-3 py-1.5" style={{ borderRadius: "0.5rem" }}>
-                            <FaCalendarDays className="w-3 h-3" /> Upcoming
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* ── Profile ── */}
-          {tab === "profile" && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-1 space-y-4">
-                <div className="bg-white border border-gray-100 p-6" style={{ borderRadius: "1rem" }}>
-                  <div className="text-center mb-5">
-                    <div className="relative inline-block mb-4">
-                      <img
-                        src={avatar}
-                        alt={profile?.full_name || "Teacher"}
-                        className="w-28 h-28 sm:w-32 sm:h-32 mx-auto object-cover border-4 border-gray-100 shadow-md"
-                        style={{ borderRadius: "50%" }}
-                      />
+                  <div className="flex items-start gap-4">
+                    <div className="relative shrink-0">
+                      <img src={avatar} alt={profile?.full_name || "T"}
+                        className="w-16 h-16 rounded-full object-cover border-2 border-gray-100 shadow-sm" />
                       <button
                         onClick={() => setShowEditModal(true)}
-                        className="absolute bottom-1 right-1 w-8 h-8 bg-gray-800 text-white flex items-center justify-center shadow-lg hover:bg-black transition-colors"
+                        className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#00a264] text-white flex items-center justify-center shadow hover:bg-[#007a4d] transition-colors"
                         style={{ borderRadius: "50%" }}
-                        title="Edit profile"
                       >
-                        <FaPencil className="w-3 h-3" />
+                        <FaPencil className="w-2.5 h-2.5" />
                       </button>
                     </div>
-                    <h2 className="font-bold text-gray-900 text-xl leading-tight">{profile?.full_name}</h2>
-                    <p className="text-sm font-medium text-xyroots-teal mt-0.5">{teacherProfile?.title || "Teacher"}</p>
-                    {teacherProfile?.subject && (
-                      <p className="text-xs text-gray-500 mt-0.5">{teacherProfile.subject}</p>
-                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-base font-bold text-gray-900">{profile?.full_name}</p>
+                      {teacherProfile?.title && <p className="text-sm text-gray-500 mt-0.5">{teacherProfile.title}</p>}
+                      {profile?.phone && <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-1"><FaPhone className="w-3 h-3" />{profile.phone}</p>}
+                      {profile?.email && <p className="text-xs text-gray-400 mt-0.5 flex items-center gap-1 truncate"><FaEnvelope className="w-3 h-3 shrink-0" />{profile.email}</p>}
+                    </div>
+                    <button
+                      onClick={() => setShowEditModal(true)}
+                      className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold border border-gray-200 text-gray-700 hover:border-[#00a264] hover:text-[#00a264] transition-colors"
+                      style={{ borderRadius: "0.5rem" }}
+                    >
+                      <FaPencil className="w-3 h-3" /> Edit
+                    </button>
                   </div>
 
-                  <div className="space-y-2.5 text-sm border-t border-gray-100 pt-4">
-                    {profile?.email && (
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <FaEnvelope className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                        <span className="truncate text-xs">{profile.email}</span>
-                      </div>
-                    )}
-                    {profile?.phone && (
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <FaPhone className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                        <span className="text-xs">{profile.phone}</span>
-                      </div>
-                    )}
-                    {teacherProfile?.location && (
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <FaLocationDot className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                        <span className="text-xs">{teacherProfile.location}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Visibility */}
+                  {/* Visibility toggle */}
                   <div className="mt-4 flex items-center justify-between p-3 bg-gray-50 border border-gray-100" style={{ borderRadius: "0.75rem" }}>
                     <div>
-                      <p className="text-xs font-bold text-gray-900">Visible to Employers</p>
-                      <p className="text-[10px] text-gray-400">Allow schools to find your profile</p>
+                      <p className="text-xs font-bold text-gray-800">Visible to Employers</p>
+                      <p className="text-[10px] text-gray-400">Allow schools to discover your profile</p>
                     </div>
                     <button
                       onClick={async () => {
@@ -488,57 +352,87 @@ export default function TeacherDashboard() {
                           await (supabase.from("teacher_profiles") as any).update({ is_visible: v }).eq("profile_id", profile.id);
                         }
                       }}
-                      className={`relative shrink-0 transition-colors ${isProfileVisible ? "bg-gray-800" : "bg-gray-300"}`}
-                      style={{ width: 38, height: 20, borderRadius: 999 }}
+                      className={`relative shrink-0 transition-colors ${isProfileVisible ? "bg-[#00a264]" : "bg-gray-300"}`}
+                      style={{ width: 38, height: 22, borderRadius: 999 }}
                     >
-                      <div className="absolute top-[2px] w-4 h-4 bg-white shadow transition-all" style={{ borderRadius: "50%", left: isProfileVisible ? 18 : 2 }} />
+                      <div className="absolute top-[3px] w-4 h-4 bg-white shadow transition-all" style={{ borderRadius: "50%", left: isProfileVisible ? 20 : 3 }} />
                     </button>
                   </div>
-
-                  {/* Get Verified */}
-                  <button
-                    onClick={() => setShowVerifiedModal(true)}
-                    className="w-full mt-3 py-2.5 text-sm font-semibold border border-dashed border-gray-300 text-gray-600 hover:border-gray-500 hover:text-gray-700 transition-colors flex items-center justify-center gap-2"
-                    style={{ borderRadius: "0.75rem" }}
-                  >
-                    <FaShieldHalved className="w-3.5 h-3.5" /> Get Verified
-                  </button>
-
-                  <button
-                    onClick={() => setShowEditModal(true)}
-                    className="w-full mt-2 py-2.5 text-sm font-semibold bg-gray-900 text-white hover:bg-black transition-colors flex items-center justify-center gap-2"
-                    style={{ borderRadius: "0.75rem" }}
-                  >
-                    <FaPencil className="w-3.5 h-3.5" /> Edit Profile
-                  </button>
-                  <Link href="/profile" className="block w-full mt-2 py-2.5 text-sm font-semibold border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors text-center" style={{ borderRadius: "0.75rem" }}>
-                    Account Settings
-                  </Link>
                 </div>
 
-                {teacherProfile?.skills?.length > 0 && (
-                  <div className="bg-white border border-gray-100 p-5" style={{ borderRadius: "1rem" }}>
-                    <h3 className="text-sm font-bold text-gray-900 mb-3">Skills</h3>
-                    <div className="flex flex-wrap gap-1.5">
-                      {teacherProfile.skills.map((skill: string) => (
-                        <span key={skill} className="text-xs px-2.5 py-1 bg-gray-100 text-gray-700 font-medium" style={{ borderRadius: "0.5rem" }}>{skill}</span>
-                      ))}
-                    </div>
+                {/* Stats + Profile Strength card */}
+                <div className="bg-white border border-gray-200 p-6 flex flex-col gap-4" style={{ borderRadius: "1rem" }}>
+                  <h2 className="text-base font-bold text-gray-900">Activity</h2>
+                  {/* Stats 2×2 grid */}
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { label: "Applications", value: applications.length, sub: "total submitted", color: "text-gray-900", bg: "bg-gray-50" },
+                      { label: "Active", value: activeCount, sub: "shortlisted / offers", color: "text-[#00a264]", bg: "bg-[#f0fdf4]" },
+                      { label: "Saved Jobs", value: savedIds.length, sub: "bookmarked", color: "text-gray-900", bg: "bg-gray-50" },
+                      { label: "Interviews", value: interviews.length, sub: "scheduled", color: hasNewInterviews ? "text-blue-700" : "text-gray-900", bg: hasNewInterviews ? "bg-blue-50" : "bg-gray-50" },
+                    ].map(s => (
+                      <div key={s.label} className={`${s.bg} p-3.5`} style={{ borderRadius: "0.75rem" }}>
+                        <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+                        <p className="text-xs font-semibold text-gray-700 mt-0.5">{s.label}</p>
+                        <p className="text-[10px] text-gray-400">{s.sub}</p>
+                      </div>
+                    ))}
                   </div>
-                )}
+                </div>
               </div>
 
-              <div className="lg:col-span-2 space-y-4">
-                <div className="bg-white border border-gray-100 p-6" style={{ borderRadius: "1rem" }}>
-                  <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2"><FaStar className="w-4 h-4 text-gray-500" /> Professional Summary</h3>
-                  {teacherProfile?.bio
-                    ? <p className="text-sm text-gray-700 leading-relaxed">{teacherProfile.bio}</p>
-                    : <p className="text-sm text-gray-400 italic">No bio added yet.</p>}
+              {/* Profile Strength card */}
+              {completionPct < 100 && (
+                <div className="bg-white border border-gray-200 p-6" style={{ borderRadius: "1rem" }}>
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <h2 className="text-base font-bold text-gray-900">Profile Strength</h2>
+                      <p className="text-xs text-gray-500 mt-0.5">Complete your profile to get more interview calls</p>
+                    </div>
+                    <span className="text-2xl font-bold text-gray-900">{completionPct}%</span>
+                  </div>
+                  <div className="flex gap-1 mb-3">
+                    {[25, 50, 75, 100].map(t => (
+                      <div key={t} className="flex-1 h-2" style={{ borderRadius: "999px", backgroundColor: completionPct >= t ? "#00a264" : "#e5e7eb" }} />
+                    ))}
+                  </div>
+                  <div className="flex flex-wrap gap-3 mb-3">
+                    {completionSegments.map(s => (
+                      <span key={s.label} className={`text-xs flex items-center gap-1 font-medium ${s.done ? "text-[#00a264]" : "text-gray-400"}`}>
+                        {s.done
+                          ? <FaCheck className="w-3 h-3" />
+                          : <div className="w-3 h-3 border border-gray-300 rounded-full" />}
+                        {s.label}
+                      </span>
+                    ))}
+                  </div>
+                  {missingFields.length > 0 && (
+                    <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 px-3 py-2 mb-4" style={{ borderRadius: "0.5rem" }}>
+                      Add your missing details: <span className="font-semibold">{missingFields.slice(0, 3).join(", ")}{missingFields.length > 3 ? ` and ${missingFields.length - 3} more` : ""}</span>
+                    </p>
+                  )}
+                  <button
+                    onClick={() => setShowEditModal(true)}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#00a264] text-white text-sm font-bold hover:bg-[#007a4d] transition-colors"
+                    style={{ borderRadius: "0.75rem" }}
+                  >
+                    Complete Profile <FaArrowRight className="w-3.5 h-3.5" />
+                  </button>
                 </div>
+              )}
 
-                <div className="bg-white border border-gray-100 p-6" style={{ borderRadius: "1rem" }}>
-                  <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2"><FaGraduationCap className="w-4 h-4 text-gray-500" /> Teaching Information</h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {/* Teaching Info card */}
+              <div className="bg-white border border-gray-200 p-6" style={{ borderRadius: "1rem" }}>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                    <FaGraduationCap className="w-4 h-4 text-[#00a264]" /> Teaching Information
+                  </h2>
+                  <button onClick={() => setShowEditModal(true)} className="text-xs font-semibold text-gray-400 hover:text-[#00a264] flex items-center gap-1 transition-colors">
+                    <FaPencil className="w-3 h-3" /> Edit
+                  </button>
+                </div>
+                {teacherProfile?.subject || teacherProfile?.qualification ? (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                     {[
                       { label: "Subject", value: teacherProfile?.subject },
                       { label: "Qualification", value: teacherProfile?.qualification },
@@ -546,57 +440,394 @@ export default function TeacherDashboard() {
                       { label: "Experience", value: teacherProfile?.experience_years != null ? `${teacherProfile.experience_years} yrs` : null },
                       { label: "Location", value: teacherProfile?.location },
                     ].filter(i => i.value).map(item => (
-                      <div key={item.label}>
-                        <p className="text-[11px] text-gray-400 font-medium mb-0.5">{item.label}</p>
-                        <p className="text-sm font-semibold text-gray-900">{item.value}</p>
+                      <div key={item.label} className="bg-gray-50 p-3" style={{ borderRadius: "0.625rem" }}>
+                        <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wide mb-1">{item.label}</p>
+                        <p className="text-sm font-bold text-gray-900 break-words">{item.value}</p>
                       </div>
                     ))}
                   </div>
-                  {!teacherProfile?.subject && <p className="text-sm text-gray-400 italic">No teaching information yet.</p>}
+                ) : (
+                  <p className="text-sm text-gray-400 italic">No teaching information yet.{" "}
+                    <button onClick={() => setShowEditModal(true)} className="text-[#00a264] underline not-italic">Add now</button>
+                  </p>
+                )}
+              </div>
+
+              {/* Recent Applications preview */}
+              {applications.length > 0 && (
+                <div className="bg-white border border-gray-200 p-6" style={{ borderRadius: "1rem" }}>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-base font-bold text-gray-900">Recent Applications</h2>
+                    <button onClick={() => setTab("applications")} className="text-xs font-semibold text-[#00a264] hover:underline">View all →</button>
+                  </div>
+                  <div className="space-y-3">
+                    {applications.slice(0, 3).map((app: any) => {
+                      const job = app.jobs || {};
+                      return (
+                        <div key={app.id} className="flex items-center justify-between gap-3 p-3 bg-gray-50 hover:bg-[#f0fdf4] transition-colors" style={{ borderRadius: "0.75rem" }}>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-bold text-gray-900 truncate">{job.title || "Untitled"}</p>
+                            <p className="text-xs text-gray-500 truncate">{[job.school_name, job.location].filter(Boolean).join(" · ")}</p>
+                          </div>
+                          <span className={`text-xs font-bold px-2 py-0.5 shrink-0 ${STATUS_STYLE[app.status] || STATUS_STYLE.pending}`} style={{ borderRadius: "0.375rem" }}>
+                            {STATUS_LABEL[app.status] || app.status}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
+              )}
+            </div>
+          )}
 
-                {teacherProfile?.experience_details?.length > 0 && (
-                  <div className="bg-white border border-gray-100 p-6" style={{ borderRadius: "1rem" }}>
-                    <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2"><FaBriefcase className="w-4 h-4 text-gray-500" /> Work Experience</h3>
-                    <div className="space-y-4">
-                      {teacherProfile.experience_details.map((exp: any, i: number) => (
-                        <div key={i} className="flex gap-3">
-                          <div className="w-1 bg-gray-200 shrink-0 mt-1" style={{ borderRadius: "999px" }} />
-                          <div>
-                            <p className="text-sm font-bold text-gray-900">{exp.role || exp.jobTitle || "Teacher"}</p>
-                            <p className="text-xs text-gray-500">{exp.school || exp.organization || ""}</p>
-                            <p className="text-xs text-gray-400">{exp.duration || `${exp.startDate || ""}${exp.endDate ? ` – ${exp.endDate}` : ""}`}</p>
+          {/* ── Applications ── */}
+          {tab === "applications" && (
+            <div>
+              <h1 className="text-xl font-bold text-gray-900 mb-5">My Applications</h1>
+              <div className="space-y-3">
+                {applications.length === 0 ? (
+                  <div className="bg-white border border-gray-100 p-12 text-center" style={{ borderRadius: "1rem" }}>
+                    <FaBriefcase className="w-10 h-10 text-gray-200 mx-auto mb-3" />
+                    <h3 className="text-base font-bold text-gray-900 mb-1">No Applications Yet</h3>
+                    <p className="text-gray-500 text-sm mb-5">Start applying to teaching vacancies to track your status here.</p>
+                    <Link href="/jobs" className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold" style={{ borderRadius: "0.75rem" }}>
+                      Browse Jobs <FaArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                ) : applications.map((app: any) => {
+                  const job = app.jobs || {};
+                  const jobId = job.id || app.job_id;
+                  return (
+                    <Link
+                      key={app.id}
+                      href={jobId ? `/jobs/${jobId}` : "#"}
+                      className="block bg-white border border-gray-100 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-[#00a264]/40 hover:shadow-sm transition-all"
+                      style={{ borderRadius: "1rem" }}
+                    >
+                      <div className="flex items-start gap-3 min-w-0">
+                        <div className="w-10 h-10 shrink-0 flex items-center justify-center text-sm font-bold bg-[#f0fdf4] text-[#00a264] border border-[#00a264]/20" style={{ borderRadius: "0.75rem" }}>
+                          {(job.school_name || job.title || "?").charAt(0).toUpperCase()}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-sm font-bold text-gray-900 truncate">{job.title || "Untitled Position"}</h3>
+                          <p className="text-xs text-gray-500 flex items-center gap-2 flex-wrap mt-0.5">
+                            {job.school_name && <span className="flex items-center gap-1"><FaBuilding className="w-2.5 h-2.5" />{job.school_name}</span>}
+                            {job.location && <span className="flex items-center gap-1"><FaLocationDot className="w-2.5 h-2.5" />{job.location}</span>}
+                          </p>
+                          <div className="mt-2 flex items-center gap-2 flex-wrap">
+                            <span className={`text-xs font-bold px-2 py-0.5 ${STATUS_STYLE[app.status] || STATUS_STYLE.pending}`} style={{ borderRadius: "0.375rem" }}>
+                              {STATUS_LABEL[app.status] || app.status}
+                            </span>
+                            <span className="text-xs text-gray-400 flex items-center gap-1">
+                              <FaClock className="w-2.5 h-2.5" />
+                              {new Date(app.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                            </span>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {teacherProfile?.education?.length > 0 && (
-                  <div className="bg-white border border-gray-100 p-6" style={{ borderRadius: "1rem" }}>
-                    <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2"><FaGraduationCap className="w-4 h-4 text-gray-500" /> Education</h3>
-                    <div className="space-y-3">
-                      {teacherProfile.education.map((edu: any, i: number) => (
-                        <div key={i} className="flex gap-3">
-                          <div className="w-1 bg-gray-200 shrink-0 mt-1" style={{ borderRadius: "999px" }} />
-                          <div>
-                            <p className="text-sm font-bold text-gray-900">{edu.degree || ""}{edu.fieldOfStudy ? ` in ${edu.fieldOfStudy}` : ""}</p>
-                            <p className="text-xs text-gray-500">{edu.institution || ""}</p>
-                            {edu.endDate && <p className="text-xs text-gray-400">{edu.endDate}</p>}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        {(job.salary_min || job.salary_max) && (
+                          <p className="text-sm font-bold text-gray-900 text-right">
+                            ₹{job.salary_min ? `${(job.salary_min / 1000).toFixed(0)}k` : ""}
+                            {job.salary_min && job.salary_max ? "–" : ""}
+                            {job.salary_max ? `${(job.salary_max / 1000).toFixed(0)}k` : ""}
+                            <span className="text-gray-400 text-xs font-normal">/mo</span>
+                          </p>
+                        )}
+                        <FaArrowRight className="w-3.5 h-3.5 text-gray-300" />
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           )}
-        </div>
-      </main>
 
-      <Footer />
+          {/* ── Saved Jobs ── */}
+          {tab === "saved" && (
+            <div>
+              <h1 className="text-xl font-bold text-gray-900 mb-5">Saved Jobs</h1>
+              <div className="space-y-3">
+                {savedIds.length === 0 ? (
+                  <div className="bg-white border border-gray-100 p-12 text-center" style={{ borderRadius: "1rem" }}>
+                    <FaBookmark className="w-10 h-10 text-gray-200 mx-auto mb-3" />
+                    <h3 className="text-base font-bold text-gray-900 mb-1">No Saved Jobs</h3>
+                    <p className="text-gray-500 text-sm mb-5">Bookmark jobs while browsing to revisit them here.</p>
+                    <Link href="/jobs" className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold" style={{ borderRadius: "0.75rem" }}>
+                      Find Jobs <FaArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                ) : savedJobs.length === 0 ? (
+                  <div className="bg-white border border-gray-100 p-8 text-center" style={{ borderRadius: "1rem" }}>
+                    <FaSpinner className="w-6 h-6 text-gray-400 animate-spin mx-auto" />
+                  </div>
+                ) : savedJobs.map((job: any) => (
+                  <div key={job.id} className="bg-white border border-gray-100 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-gray-200 transition-colors" style={{ borderRadius: "1rem" }}>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm font-bold text-gray-900 truncate">{job.title}</h3>
+                      <p className="text-xs text-gray-500 mt-0.5 truncate">{[job.school_name, job.board, job.location || "India"].filter(Boolean).join(" · ")}</p>
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {job.employment_type && <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 font-medium" style={{ borderRadius: "0.375rem" }}>{job.employment_type}</span>}
+                        {(job.salary_min || job.salary_max) && (
+                          <span className="text-xs px-2 py-0.5 bg-[#f0fdf4] text-[#00a264] font-medium" style={{ borderRadius: "0.375rem" }}>
+                            ₹{job.salary_min ? `${(job.salary_min/1000).toFixed(0)}k` : "?"}–{job.salary_max ? `${(job.salary_max/1000).toFixed(0)}k` : "?"}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <Link href={`/jobs/${job.id}`} className="px-4 py-2 text-sm font-semibold bg-[#00a264] text-white hover:bg-[#007a4d] transition-colors shrink-0" style={{ borderRadius: "0.75rem" }}>
+                      Apply Now
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ── Interviews ── */}
+          {tab === "interviews" && (
+            <div>
+              <h1 className="text-xl font-bold text-gray-900 mb-5">Interviews</h1>
+              <div className="space-y-3">
+                {interviews.length === 0 ? (
+                  <div className="bg-white border border-gray-100 p-12 text-center" style={{ borderRadius: "1rem" }}>
+                    <FaCalendarDays className="w-10 h-10 text-gray-200 mx-auto mb-3" />
+                    <h3 className="text-base font-bold text-gray-900 mb-1">No Interviews Scheduled</h3>
+                    <p className="text-gray-500 text-sm">When a recruiter schedules an interview, it will appear here.</p>
+                  </div>
+                ) : interviews.map((iv: any) => {
+                  const isNew = (Date.now() - new Date(iv.created_at).getTime()) < 48 * 60 * 60 * 1000;
+                  const isUpcoming = iv.status === "scheduled" || iv.status === "confirmed";
+                  return (
+                    <div key={iv.id} className={`bg-white border p-5 ${isUpcoming ? "border-[#00a264]/30 shadow-sm shadow-[#00a264]/5" : "border-gray-100"}`} style={{ borderRadius: "1rem" }}>
+                      <div className="flex items-start justify-between gap-3 flex-wrap">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <h3 className="text-sm font-bold text-gray-900">{iv.institution_name || iv.recruiter_name}</h3>
+                            <span className={`text-xs font-bold px-2 py-0.5 ${INTERVIEW_STATUS_STYLE[iv.status] || "bg-gray-100 text-gray-500"}`} style={{ borderRadius: "0.375rem" }}>
+                              {iv.status.charAt(0).toUpperCase() + iv.status.slice(1)}
+                            </span>
+                            {(isNew || isUpcoming) && (
+                              <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 bg-red-500 text-white animate-pulse" style={{ borderRadius: "0.375rem" }}>
+                                <FaTriangleExclamation className="w-2.5 h-2.5" /> Important
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-500 mb-2">{iv.interview_type}</p>
+                          <div className="flex flex-wrap gap-3 text-xs text-gray-600">
+                            <span className="flex items-center gap-1"><FaCalendarDays className="w-3 h-3" />{new Date(iv.interview_date).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" })}</span>
+                            <span className="flex items-center gap-1"><FaClock className="w-3 h-3" />{iv.time_slot}</span>
+                          </div>
+                          {iv.recruiter_email && <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1"><FaEnvelope className="w-2.5 h-2.5" />{iv.recruiter_email}</p>}
+                          {iv.message && <p className="text-xs text-gray-500 mt-2 italic">&ldquo;{iv.message}&rdquo;</p>}
+                        </div>
+                        {isUpcoming && (
+                          <span className="flex items-center gap-1 text-xs font-bold text-[#00a264] bg-[#e6f7ed] px-3 py-1.5 shrink-0" style={{ borderRadius: "0.5rem" }}>
+                            <FaCalendarDays className="w-3 h-3" /> Upcoming
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* ── My Profile ── */}
+          {tab === "profile" && (
+            <div>
+              <h1 className="text-xl font-bold text-gray-900 mb-5">My Profile</h1>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+                {/* Left col */}
+                <div className="space-y-5">
+                  {/* Profile card — reference style */}
+                  <div className="bg-white border border-gray-200 p-6" style={{ borderRadius: "1rem" }}>
+                    <div className="flex items-start justify-between mb-4">
+                      <h2 className="text-base font-bold text-gray-900">Your profile</h2>
+                      {joinedDate && <span className="text-xs text-gray-400">Joined {joinedDate}</span>}
+                    </div>
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="relative shrink-0">
+                        <img src={avatar} alt={profile?.full_name || "T"} className="w-16 h-16 rounded-full object-cover border-2 border-gray-100 shadow-sm" />
+                        <button onClick={() => setShowEditModal(true)} className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#00a264] text-white flex items-center justify-center shadow hover:bg-[#007a4d]" style={{ borderRadius: "50%" }}>
+                          <FaPencil className="w-2.5 h-2.5" />
+                        </button>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-base font-bold text-gray-900">{profile?.full_name}</p>
+                        {teacherProfile?.title && <p className="text-sm text-gray-500">{teacherProfile.title}</p>}
+                        {teacherProfile?.subject && <p className="text-xs text-gray-400">{teacherProfile.subject}</p>}
+                      </div>
+                      <button onClick={() => setShowEditModal(true)} className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold border border-gray-200 text-gray-700 hover:border-[#00a264] hover:text-[#00a264] transition-colors" style={{ borderRadius: "0.5rem" }}>
+                        <FaPencil className="w-3 h-3" /> Edit
+                      </button>
+                    </div>
+                    <div className="space-y-2 border-t border-gray-100 pt-4 text-sm">
+                      {profile?.email && <div className="flex items-center gap-2 text-gray-600"><FaEnvelope className="w-3.5 h-3.5 text-gray-400 shrink-0" /><span className="truncate text-xs">{profile.email}</span></div>}
+                      {profile?.phone && <div className="flex items-center gap-2 text-gray-600"><FaPhone className="w-3.5 h-3.5 text-gray-400 shrink-0" /><span className="text-xs">{profile.phone}</span></div>}
+                      {teacherProfile?.location && <div className="flex items-center gap-2 text-gray-600"><FaLocationDot className="w-3.5 h-3.5 text-gray-400 shrink-0" /><span className="text-xs">{teacherProfile.location}</span></div>}
+                    </div>
+                  </div>
+
+                  {/* Get Verified */}
+                  <div className="bg-white border border-gray-200 p-5" style={{ borderRadius: "1rem" }}>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-sm font-bold text-gray-900">Verification Status</h3>
+                        <p className="text-xs text-gray-500 mt-0.5">Get verified to stand out to employers</p>
+                      </div>
+                      <button onClick={() => setShowVerifiedModal(true)} className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold border border-dashed border-[#00a264] text-[#00a264] hover:bg-[#f0fdf4] transition-colors" style={{ borderRadius: "0.5rem" }}>
+                        <FaShieldHalved className="w-3.5 h-3.5" /> Get Verified
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Skills */}
+                  {teacherProfile?.skills?.length > 0 && (
+                    <div className="bg-white border border-gray-200 p-5" style={{ borderRadius: "1rem" }}>
+                      <h3 className="text-sm font-bold text-gray-900 mb-3">Skills</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {teacherProfile.skills.map((skill: string) => (
+                          <span key={skill} className="text-xs px-2.5 py-1 bg-[#f0fdf4] text-[#00a264] font-medium border border-[#00a264]/20" style={{ borderRadius: "0.5rem" }}>{skill}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Right col */}
+                <div className="space-y-5">
+                  {/* Professional Summary */}
+                  <div className="bg-white border border-gray-200 p-5" style={{ borderRadius: "1rem" }}>
+                    <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2"><FaStar className="w-4 h-4 text-[#00a264]" /> Professional Summary</h3>
+                    {teacherProfile?.bio
+                      ? <p className="text-sm text-gray-700 leading-relaxed">{teacherProfile.bio}</p>
+                      : <p className="text-sm text-gray-400 italic">No bio added. <button onClick={() => setShowEditModal(true)} className="text-[#00a264] underline not-italic">Add one</button></p>}
+                  </div>
+
+                  {/* Teaching Info */}
+                  <div className="bg-white border border-gray-200 p-5" style={{ borderRadius: "1rem" }}>
+                    <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2"><FaGraduationCap className="w-4 h-4 text-[#00a264]" /> Teaching Details</h3>
+                    <div className="grid grid-cols-2 gap-3">
+                      {[
+                        { label: "Subject", value: teacherProfile?.subject },
+                        { label: "Qualification", value: teacherProfile?.qualification },
+                        { label: "Teaching Qual.", value: teacherProfile?.professional_qualification },
+                        { label: "Experience", value: teacherProfile?.experience_years != null ? `${teacherProfile.experience_years} yrs` : null },
+                      ].filter(i => i.value).map(item => (
+                        <div key={item.label} className="bg-gray-50 p-3" style={{ borderRadius: "0.625rem" }}>
+                          <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wide mb-1">{item.label}</p>
+                          <p className="text-sm font-bold text-gray-900">{item.value}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Work Experience */}
+                  {teacherProfile?.experience_details?.length > 0 && (
+                    <div className="bg-white border border-gray-200 p-5" style={{ borderRadius: "1rem" }}>
+                      <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2"><FaBriefcase className="w-4 h-4 text-[#00a264]" /> Work Experience</h3>
+                      <div className="space-y-3">
+                        {teacherProfile.experience_details.map((exp: any, i: number) => (
+                          <div key={i} className="flex gap-3">
+                            <div className="w-1 bg-[#00a264]/30 shrink-0 mt-1" style={{ borderRadius: "999px" }} />
+                            <div>
+                              <p className="text-sm font-bold text-gray-900">{exp.role || exp.jobTitle || "Teacher"}</p>
+                              <p className="text-xs text-gray-500">{exp.school || exp.organization || ""}</p>
+                              <p className="text-xs text-gray-400">{exp.duration || `${exp.startDate || ""}${exp.endDate ? ` – ${exp.endDate}` : ""}`}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Education */}
+                  {teacherProfile?.education?.length > 0 && (
+                    <div className="bg-white border border-gray-200 p-5" style={{ borderRadius: "1rem" }}>
+                      <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2"><FaGraduationCap className="w-4 h-4 text-[#00a264]" /> Education</h3>
+                      <div className="space-y-3">
+                        {teacherProfile.education.map((edu: any, i: number) => (
+                          <div key={i} className="flex gap-3">
+                            <div className="w-1 bg-[#00a264]/30 shrink-0 mt-1" style={{ borderRadius: "999px" }} />
+                            <div>
+                              <p className="text-sm font-bold text-gray-900">{edu.degree || ""}{edu.fieldOfStudy ? ` in ${edu.fieldOfStudy}` : ""}</p>
+                              <p className="text-xs text-gray-500">{edu.institution || ""}</p>
+                              {edu.endDate && <p className="text-xs text-gray-400">{edu.endDate}</p>}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Settings ── */}
+          {tab === "settings" && (
+            <div>
+              <h1 className="text-xl font-bold text-gray-900 mb-5">Settings</h1>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+                {/* Account Options */}
+                <div className="bg-white border border-gray-200 p-6" style={{ borderRadius: "1rem" }}>
+                  <h2 className="text-base font-bold text-gray-900 mb-4">Account Options</h2>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between py-3 border-b border-gray-100">
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">Visible to Employers</p>
+                        <p className="text-xs text-gray-500 mt-0.5">Let schools and institutions discover your profile</p>
+                      </div>
+                      <button
+                        onClick={async () => {
+                          const v = !isProfileVisible;
+                          setIsProfileVisible(v);
+                          if (profile?.id) {
+                            await (supabase.from("teacher_profiles") as any).update({ is_visible: v }).eq("profile_id", profile.id);
+                          }
+                        }}
+                        className={`relative shrink-0 transition-colors ${isProfileVisible ? "bg-[#00a264]" : "bg-gray-300"}`}
+                        style={{ width: 40, height: 22, borderRadius: 999 }}
+                      >
+                        <div className="absolute top-[3px] w-4 h-4 bg-white shadow transition-all" style={{ borderRadius: "50%", left: isProfileVisible ? 21 : 3 }} />
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-between py-3 border-b border-gray-100">
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">Email Notifications</p>
+                        <p className="text-xs text-gray-500 mt-0.5">Receive alerts for new job matches and interviews</p>
+                      </div>
+                      <span className="text-xs text-gray-400">Managed in Account Settings</span>
+                    </div>
+                  </div>
+                  <Link href="/profile" className="mt-4 inline-flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm font-semibold hover:bg-black transition-colors" style={{ borderRadius: "0.75rem" }}>
+                    <FaGear className="w-3.5 h-3.5" /> Full Account Settings
+                  </Link>
+                </div>
+
+                {/* Danger Zone */}
+                <div className="bg-white border border-gray-200 p-6" style={{ borderRadius: "1rem" }}>
+                  <h2 className="text-base font-bold text-gray-900 mb-4">Session</h2>
+                  <p className="text-sm text-gray-500 mb-4">Signed in as <span className="font-semibold text-gray-900">{profile?.email}</span></p>
+                  <button
+                    onClick={handleSignOut}
+                    className="flex items-center gap-2 px-4 py-2.5 border border-red-200 text-red-600 text-sm font-semibold hover:bg-red-50 transition-colors"
+                    style={{ borderRadius: "0.75rem" }}
+                  >
+                    <FaArrowRightFromBracket className="w-3.5 h-3.5" /> Sign Out
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+        </div>
+      </div>
 
       {showEditModal && (
         <OnboardingModal
@@ -604,17 +835,10 @@ export default function TeacherDashboard() {
           onClose={() => setShowEditModal(false)}
           role="teacher"
           onSaved={async () => {
-            // Reload teacher profile after saving
             if (profile) {
-              const { data: tp } = await supabase
-                .from("teacher_profiles")
-                .select("*")
-                .eq("profile_id", profile.id)
-                .single();
-              if (tp) {
-                setTeacherProfile(tp);
-                setIsProfileVisible((tp as any).is_visible ?? true);
-              }
+              const { data: tp } = await supabase.from("teacher_profiles").select("*").eq("profile_id", profile.id).single();
+              if (tp) { setTeacherProfile(tp); setIsProfileVisible((tp as any).is_visible ?? true); }
+              cacheRef.current = null;
             }
           }}
         />

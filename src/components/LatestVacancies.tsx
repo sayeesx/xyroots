@@ -1,84 +1,56 @@
 import Link from "next/link";
-import { FaBuilding, FaUsers, FaBookmark, FaArrowRight, FaLocationDot, FaPeopleGroup, FaBook, FaBriefcase, FaUser, FaEnvelope, FaCircleCheck } from "react-icons/fa6";
+import { FaBuilding, FaUsers, FaArrowRight, FaLocationDot, FaBook, FaBriefcase, FaUser, FaEnvelope, FaBookmark, FaCircleCheck } from "react-icons/fa6";
 import { createClient } from "@/lib/supabase/server";
 import AuthGuardedLink from "@/components/AuthGuardedLink";
 
 // ─── Data types mapped to static structures for UI compatibility ───────────────
 
-function JobCard({ job, isAuthenticated }: { job: any, isAuthenticated: boolean }) {
+function JobCard({ job }: { job: any }) {
   return (
-    <div className="flex flex-col h-full border border-gray-200 bg-white hover:border-gray-900 transition-all group shadow-sm hover:shadow-md" style={{ borderRadius: "0.75rem" }}>
+    <div className="flex flex-col h-full border border-gray-200 bg-white hover:border-[#00a264]/50 hover:shadow-[0_2px_12px_rgba(0,162,100,0.08)] transition-all group" style={{ borderRadius: "0.75rem" }}>
       <div className="flex flex-1 flex-col">
-        {/* Top header — matches TeacherCard header style, black dominant */}
-        <div className="border-b border-gray-100 px-4 py-3" style={{ borderRadius: "0.75rem 0.75rem 0 0", background: "linear-gradient(to right, #f9fafb, #f3f4f6)" }}>
-          <div className="flex items-start gap-3">
-            {/* Institution icon */}
-            <div className="w-12 h-12 shrink-0 flex items-center justify-center bg-gray-900 text-white font-bold text-base border border-gray-800 overflow-hidden" style={{ borderRadius: "0.5rem" }}>
-              <FaBuilding className="w-5 h-5 text-gray-300" />
+        {/* Top header — light, clean */}
+        <div className="border-b border-gray-100 px-4 py-3" style={{ borderRadius: "0.75rem 0.75rem 0 0", background: "#f9fafb" }}>
+          <div className="flex-1 min-w-0">
+            <span className="inline-block text-[10px] font-semibold uppercase tracking-wider bg-gray-100 text-gray-500 px-2 py-0.5 mb-1 leading-tight" style={{ borderRadius: "0.25rem" }}>
+              {job.type}
+            </span>
+            <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="block text-gray-900 font-bold text-[13px] leading-snug hover:text-[#00a264] transition-colors line-clamp-2 text-left">
+              {job.title}
+            </AuthGuardedLink>
+            <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+              <FaLocationDot className="inline w-2.5 h-2.5 text-[#00a264]" />
+              {job.location}
+            </p>
+          </div>
+        </div>
+
+        {/* Meta */}
+        <div className="px-4 py-3 flex-1 flex flex-col gap-2">
+          <div className="grid grid-cols-3 gap-x-2 gap-y-1 text-xs">
+            <div>
+              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Exp</p>
+              <p className="text-gray-700 font-medium">{job.experience}</p>
             </div>
-            <div className="flex-1 min-w-0">
-              <span className="inline-block text-[11px] font-bold uppercase tracking-wider bg-gray-100 text-gray-600 px-2 py-0.5 mb-1 leading-tight" style={{ borderRadius: "0.25rem" }}>
-                {job.type}
-              </span>
-              <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="block text-gray-900 font-bold text-[13px] leading-snug hover:text-black transition-colors line-clamp-2 text-left">
-                {job.title}
-              </AuthGuardedLink>
-              <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
-                <FaLocationDot className="inline w-2.5 h-2.5 text-gray-400" />
-                {job.location}
-              </p>
+            <div>
+              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Qual</p>
+              <p className="text-gray-700 font-medium truncate">{job.qualification}</p>
+            </div>
+            <div>
+              <p className="text-[10px] font-semibold text-[#00a264] uppercase tracking-wide mb-0.5">Salary</p>
+              <p className="text-[#00a264] font-bold">{job.salary}</p>
             </div>
           </div>
         </div>
 
-        {/* Action buttons — black primary, green secondary */}
-        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-100">
-          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-bold py-1.5 bg-gray-900 text-white hover:bg-black hover:scale-[1.02] flex items-center justify-center gap-1 transition-all duration-200" style={{ borderRadius: "0.5rem" }}>
+        {/* Footer actions — teal primary */}
+        <div className="px-4 py-2.5 border-t border-gray-100 flex items-center gap-2" style={{ borderRadius: "0 0 0.75rem 0.75rem" }}>
+          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-bold py-1.5 bg-[#00a264] text-white hover:bg-[#007a4d] flex items-center justify-center gap-1 transition-all duration-200" style={{ borderRadius: "0.5rem" }}>
             Apply Now <FaArrowRight className="inline w-2.5 h-2.5" />
           </AuthGuardedLink>
-          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-medium py-1.5 border border-[#00a264]/40 text-[#00a264] hover:bg-[#00a264] hover:text-white flex items-center justify-center gap-1 transition-all duration-200" style={{ borderRadius: "0.5rem" }}>
-            <FaBookmark className="inline w-2.5 h-2.5" /> Save
-          </AuthGuardedLink>
-          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-medium py-1.5 border border-gray-200 text-gray-600 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all duration-200 flex items-center justify-center" style={{ borderRadius: "0.5rem" }}>
+          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-medium py-1.5 border border-gray-200 text-gray-600 hover:border-[#00a264] hover:text-[#00a264] transition-all duration-200 flex items-center justify-center" style={{ borderRadius: "0.5rem" }}>
             Details
           </AuthGuardedLink>
-        </div>
-
-        {/* Meta + Details */}
-        <div className="px-4 py-3 flex-1 flex flex-col gap-2">
-          <div className="flex items-center gap-4 text-xs text-gray-500">
-            <span>
-              Posted: <span className="text-gray-700 font-medium">{job.postedDate}</span>
-            </span>
-            <span className="flex items-center gap-1">
-              <FaPeopleGroup className="inline w-2.5 h-2.5 text-gray-400" />
-              Openings: <span className="text-gray-700 font-medium ml-0.5">{job.openings}</span>
-            </span>
-          </div>
-
-          <div className="grid grid-cols-3 gap-x-3 gap-y-1.5 text-xs mt-1">
-            <div>
-              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Qualification</p>
-              <p className="text-gray-700 leading-snug">{job.qualification}</p>
-            </div>
-            <div>
-              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Experience</p>
-              <p className="text-gray-700 text-sm">{job.experience}</p>
-            </div>
-            <div>
-              <p className="text-[11px] font-semibold text-[#00a264] uppercase tracking-wide mb-0.5">Salary</p>
-              <p className="text-gray-900 font-bold">{job.salary}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="px-4 py-2.5 border-t border-gray-100 flex items-center justify-between" style={{ borderRadius: "0 0 0.75rem 0.75rem", background: "linear-gradient(to right, #f9fafb, #f3f4f6)" }}>
-          <span className="flex items-center gap-1 text-xs text-gray-500">
-            <FaLocationDot className="inline w-2.5 h-2.5 text-gray-400" />
-            {job.location}
-          </span>
-          <span className="text-[11px] font-mono text-gray-400">{job.id}</span>
         </div>
       </div>
     </div>
@@ -178,10 +150,10 @@ export default async function LatestVacancies() {
     if (profile) role = (profile as any).role;
   }
   
-  const jobLimit = 3;
+  // Teachers see 4 job cards in a 2×2 grid; others see 3
+  const jobLimit = role === 'teacher' ? 4 : 3;
 
   // Fetch jobs and teachers in parallel
-  // Only show "verified" teachers = profile_completion >= 80, max 3
   const [{ data: rawJobs }, { data: rawTeachers }] = await Promise.all([
     supabase.from("jobs").select("id, title, level, created_at, qualification, experience_min, experience_max, salary_min, salary_max, location").eq("status", "published").limit(jobLimit).order("created_at", { ascending: false }),
     supabase.from("teacher_profiles").select("id, subject, title, location, experience_years, professional_qualification, languages, availability, profile_completion, profiles(full_name, avatar_url, status)").eq("is_visible", true).gte("profile_completion", 80).limit(3).order("profile_completion", { ascending: false }),
@@ -197,7 +169,7 @@ export default async function LatestVacancies() {
     experience: j.experience_min ? `${j.experience_min}-${j.experience_max} Years` : "Fresher",
     salary: j.salary_min ? `${(j.salary_min/1000).toFixed(0)}k-${(j.salary_max/1000).toFixed(0)}k` : "As per std",
     location: j.location || "Remote",
-    slug: `${(j.title || "Untitled Job").toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${j.id}`,
+    slug: j.id,
   }));
 
   // Map all teachers - slug is just the UUID so the detail page finds it correctly
@@ -253,9 +225,10 @@ export default async function LatestVacancies() {
                   Browse All →
                 </AuthGuardedLink>
               </div>
-              <div className={`grid gap-4 h-full ${role === 'teacher' ? 'grid-cols-1 sm:grid-cols-2' : 'grid-rows-3'}`}>
+              {/* Teacher sees 4 cards in 2×2; others see 3 in column */}
+              <div className={`grid gap-4 ${role === 'teacher' ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
                 {jobCards.map((job) => (
-                  <JobCard key={job.id} job={job} isAuthenticated={!!role} />
+                  <JobCard key={job.id} job={job} />
                 ))}
               </div>
             </div>
@@ -273,7 +246,7 @@ export default async function LatestVacancies() {
                   Browse All →
                 </AuthGuardedLink>
               </div>
-              <div className={`grid gap-4 h-full ${role === 'management' ? 'grid-cols-1 sm:grid-cols-2' : 'grid-rows-3'}`}>
+              <div className={`grid gap-4 ${role === 'management' ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
                 {teacherCards.map((teacher) => (
                   <TeacherCard key={teacher.id} teacher={teacher} isAuthenticated={!!role} />
                 ))}

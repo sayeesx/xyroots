@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth/AuthProvider";
+import { schools } from "@/data/schools";
 import {
   FaLocationDot, FaShieldHalved, FaBuilding, FaBriefcase, FaArrowLeft,
   FaGlobe, FaPhone, FaEnvelope, FaCalendarDays, FaUsers, FaGraduationCap,
@@ -26,6 +27,29 @@ export default function InstitutionDetailPage() {
 
   useEffect(() => {
     if (!id) return;
+
+    // First try the static schools data (numeric IDs from the directory page)
+    const staticSchool = schools.find(s => s.id === id || s.slug === id);
+    if (staticSchool) {
+      setInstitution({
+        id: staticSchool.id,
+        name: staticSchool.name,
+        type: staticSchool.type,
+        location: staticSchool.location,
+        established: staticSchool.established,
+        board: staticSchool.board,
+        verified: staticSchool.verified,
+        description: staticSchool.description,
+        website: null,
+        contact_email: null,
+        contact_phone: null,
+      });
+      setJobs([]);
+      setPageLoading(false);
+      return;
+    }
+
+    // Fall back to Supabase for real institution UUIDs
     Promise.all([
       supabase.from("institutions").select("*").eq("id", id).single(),
       supabase.from("jobs").select("id, title, subject, level, status, created_at, qualification, experience_min, experience_max, salary_min, salary_max, location, employment_type, description").eq("institution_id", id).order("created_at", { ascending: false }),

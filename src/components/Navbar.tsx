@@ -15,9 +15,10 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   
-  // Scroll visibility
+  // Scroll visibility — disabled on dashboard, always show
   const [showNavbar, setShowNavbar] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const isDashboard = typeof window !== "undefined" && window.location.pathname.startsWith("/dashboard");
   
   const { requireTeacher, requireInstitution, isAuthenticated, role, profile, loading, signOut, openSignIn, openTeacherRegistration, openInstitutionRegistration } = useAuth();
   const router = useRouter();
@@ -42,6 +43,11 @@ export default function Navbar() {
   useEffect(() => {
     const handleScroll = () => {
       if (typeof window !== "undefined") {
+        // Never hide on dashboard pages
+        if (window.location.pathname.startsWith("/dashboard")) {
+          setShowNavbar(true);
+          return;
+        }
         if (window.scrollY > lastScrollY && window.scrollY > 150) {
           setShowNavbar(false);
         } else {
@@ -192,92 +198,108 @@ export default function Navbar() {
         <div className="fixed inset-0 z-[60] lg:hidden">
           <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
           <div className="absolute right-0 top-0 bottom-0 w-full max-w-sm bg-white shadow-2xl flex flex-col animate-slide-in-right">
-            <div className="flex items-center justify-between p-4 border-b border-xyroots-border">
+            <div className="flex items-center justify-between p-4 border-b border-xyroots-border shrink-0">
               <Link href="/" onClick={() => setMobileOpen(false)}>
-                <Image src="/logo1.webp" alt="Xyroots Logo" width={160} height={48} className="h-9 lg:h-11 w-auto object-contain" />
+                <Image src="/logo1.webp" alt="Xyroots Logo" width={160} height={48} className="h-9 w-auto object-contain" />
               </Link>
               <button onClick={() => setMobileOpen(false)} className="p-2 hover:bg-gray-100" aria-label="Close menu">
                 <FaXmark className="w-5 h-5" />
               </button>
             </div>
-            
-            {isAuthenticated && profile && (
-              <div className="p-5 border-b border-xyroots-border bg-xyroots-cream flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-xyroots-teal font-bold text-lg border border-xyroots-border overflow-hidden">
-                  {profile.avatar_url ? (
-                    <Image src={profile.avatar_url} alt="Avatar" width={48} height={48} />
-                  ) : (
-                    <Image src={`https://api.dicebear.com/7.x/initials/svg?seed=${profile?.full_name?.replace(/\s+/g, '') || 'x'}&chars=2`} alt="Avatar" width={48} height={48} unoptimized />
-                  )}
-                </div>
-                <div>
-                  <p className="font-bold text-black">{profile.full_name}</p>
-                  <p className="text-xs text-xyroots-muted mt-0.5 capitalize">{role} Account</p>
-                </div>
-              </div>
-            )}
 
-            <div className="flex-1 overflow-y-auto py-4">
-              {visibility.findJobs && (
-                !isAuthenticated ? (
-                  <button onClick={() => requireTeacher(() => { setMobileOpen(false); router.push('/jobs') })} className="block w-full text-left px-6 py-3.5 text-base font-medium text-xyroots-text hover:bg-xyroots-mint hover:text-xyroots-teal transition-colors">Find Teaching Jobs</button>
-                ) : (
-                  <MobileNavLink href="/jobs" onClick={() => setMobileOpen(false)}>Find Teaching Jobs</MobileNavLink>
-                )
-              )}
-              {visibility.findInstitution && (
-                !isAuthenticated ? (
-                  <button onClick={() => requireTeacher(() => { setMobileOpen(false); router.push('/institutions') })} className="block w-full text-left px-6 py-3.5 text-base font-medium text-xyroots-text hover:bg-xyroots-mint hover:text-xyroots-teal transition-colors">Find Institution</button>
-                ) : (
-                  <MobileNavLink href="/institutions" onClick={() => setMobileOpen(false)}>Find Institution</MobileNavLink>
-                )
-              )}
-              {visibility.findTeacher && (
-                !isAuthenticated ? (
-                  <button onClick={() => requireInstitution(() => { setMobileOpen(false); router.push('/teachers') })} className="block w-full text-left px-6 py-3.5 text-base font-medium text-xyroots-text hover:bg-xyroots-mint hover:text-xyroots-teal transition-colors">Find Teachers</button>
-                ) : (
-                  <MobileNavLink href="/teachers" onClick={() => setMobileOpen(false)}>Find Teachers</MobileNavLink>
-                )
-              )}
-              <MobileNavLink href="/about" onClick={() => setMobileOpen(false)}>About Us</MobileNavLink>
-              <MobileNavLink href="/services" onClick={() => setMobileOpen(false)}>Services</MobileNavLink>
-              <MobileNavLink href="/testimonials" onClick={() => setMobileOpen(false)}>Testimonials</MobileNavLink>
-              <MobileNavLink href="/contact" onClick={() => setMobileOpen(false)}>Contact</MobileNavLink>
-              
-              <div className="border-t border-xyroots-border my-4 mx-4" />
-              
-              {!isAuthenticated ? (
-                <button onClick={() => { openSignIn(); setMobileOpen(false); }} className="block w-full text-left px-6 py-3.5 text-base font-medium text-xyroots-text hover:bg-xyroots-mint hover:text-xyroots-teal transition-colors">
-                  Sign In
-                </button>
-              ) : (
-                <>
-                  <MobileNavLink 
-                    href={role === 'teacher' ? '/dashboard/teacher' : role === 'management' ? '/dashboard/employer' : '/dashboard/agency'} 
-                    onClick={() => setMobileOpen(false)}
+            {/* ALL content scrolls — profile card included */}
+            <div className="flex-1 overflow-y-auto">
+              {isAuthenticated && profile && (
+                <div className="flex items-center border-b border-xyroots-border bg-xyroots-cream">
+                  {/* Left: tapping navigates to dashboard */}
+                  <button
+                    onClick={() => {
+                      setMobileOpen(false);
+                      router.push(role === 'teacher' ? '/dashboard/teacher' : role === 'management' ? '/dashboard/employer' : '/dashboard/agency');
+                    }}
+                    className="flex-1 flex items-center gap-4 p-5 hover:bg-xyroots-mint transition-colors text-left min-w-0"
                   >
-                    My Dashboard
-                  </MobileNavLink>
-                  <MobileNavLink href="/profile" onClick={() => setMobileOpen(false)}>
-                    Account Settings
-                  </MobileNavLink>
-                  <button onClick={() => { handleSignOut(); setMobileOpen(false); }} className="w-full text-left px-6 py-3.5 text-base font-medium text-red-600 hover:bg-red-50 transition-colors">
-                    Sign Out
+                    <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-xyroots-teal font-bold text-lg border border-xyroots-border overflow-hidden shrink-0">
+                      {profile.avatar_url ? (
+                        <Image src={profile.avatar_url} alt="Avatar" width={48} height={48} />
+                      ) : (
+                        <Image src={`https://api.dicebear.com/7.x/initials/svg?seed=${profile?.full_name?.replace(/\s+/g, '') || 'x'}&chars=2`} alt="Avatar" width={48} height={48} unoptimized />
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-bold text-black truncate">{profile.full_name}</p>
+                      <p className="text-xs text-xyroots-muted mt-0.5 capitalize">{role} Account · tap to open dashboard</p>
+                    </div>
                   </button>
-                </>
+                  {/* Right: notification bell — isolated, does NOT trigger navigation */}
+                  <div className="pr-4 shrink-0" onClick={e => e.stopPropagation()}>
+                    <NotificationBell />
+                  </div>
+                </div>
+              )}
+
+              <div className="py-4">
+                {visibility.findJobs && (
+                  !isAuthenticated ? (
+                    <button onClick={() => requireTeacher(() => { setMobileOpen(false); router.push('/jobs') })} className="block w-full text-left px-6 py-3.5 text-base font-medium text-xyroots-text hover:bg-xyroots-mint hover:text-xyroots-teal transition-colors">Find Teaching Jobs</button>
+                  ) : (
+                    <MobileNavLink href="/jobs" onClick={() => setMobileOpen(false)}>Find Teaching Jobs</MobileNavLink>
+                  )
+                )}
+                {visibility.findInstitution && (
+                  !isAuthenticated ? (
+                    <button onClick={() => requireTeacher(() => { setMobileOpen(false); router.push('/institutions') })} className="block w-full text-left px-6 py-3.5 text-base font-medium text-xyroots-text hover:bg-xyroots-mint hover:text-xyroots-teal transition-colors">Find Institution</button>
+                  ) : (
+                    <MobileNavLink href="/institutions" onClick={() => setMobileOpen(false)}>Find Institution</MobileNavLink>
+                  )
+                )}
+                {visibility.findTeacher && (
+                  !isAuthenticated ? (
+                    <button onClick={() => requireInstitution(() => { setMobileOpen(false); router.push('/teachers') })} className="block w-full text-left px-6 py-3.5 text-base font-medium text-xyroots-text hover:bg-xyroots-mint hover:text-xyroots-teal transition-colors">Find Teachers</button>
+                  ) : (
+                    <MobileNavLink href="/teachers" onClick={() => setMobileOpen(false)}>Find Teachers</MobileNavLink>
+                  )
+                )}
+                <MobileNavLink href="/about" onClick={() => setMobileOpen(false)}>About Us</MobileNavLink>
+                <MobileNavLink href="/services" onClick={() => setMobileOpen(false)}>Services</MobileNavLink>
+                <MobileNavLink href="/testimonials" onClick={() => setMobileOpen(false)}>Testimonials</MobileNavLink>
+                <MobileNavLink href="/contact" onClick={() => setMobileOpen(false)}>Contact</MobileNavLink>
+
+                <div className="border-t border-xyroots-border my-4 mx-4" />
+
+                {!isAuthenticated ? (
+                  <button onClick={() => { openSignIn(); setMobileOpen(false); }} className="block w-full text-left px-6 py-3.5 text-base font-medium text-xyroots-text hover:bg-xyroots-mint hover:text-xyroots-teal transition-colors">
+                    Sign In
+                  </button>
+                ) : (
+                  <>
+                    <MobileNavLink
+                      href={role === 'teacher' ? '/dashboard/teacher' : role === 'management' ? '/dashboard/employer' : '/dashboard/agency'}
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      My Dashboard
+                    </MobileNavLink>
+                    <MobileNavLink href="/profile" onClick={() => setMobileOpen(false)}>
+                      Account Settings
+                    </MobileNavLink>
+                    <button onClick={() => { handleSignOut(); setMobileOpen(false); }} className="w-full text-left px-6 py-3.5 text-base font-medium text-red-600 hover:bg-red-50 transition-colors">
+                      Sign Out
+                    </button>
+                  </>
+                )}
+              </div>
+
+              {!isAuthenticated && (
+                <div className="p-4 border-t border-xyroots-border space-y-3">
+                  <button onClick={() => openTeacherRegistration()} className="block w-full text-center px-4 py-3 text-sm font-semibold border-2 border-xyroots-teal text-xyroots-teal hover:bg-xyroots-teal hover:text-white transition-all">
+                    Register as Teacher
+                  </button>
+                  <button onClick={() => openInstitutionRegistration()} className="block w-full text-center px-4 py-3 text-sm font-semibold bg-xyroots-teal text-white hover:opacity-90 transition-all">
+                    Post a Teaching Job
+                  </button>
+                </div>
               )}
             </div>
-            
-            {!isAuthenticated && (
-              <div className="p-4 border-t border-xyroots-border space-y-3">
-                <button onClick={() => openTeacherRegistration()} className="block w-full text-center px-4 py-3 text-sm font-semibold border-2 border-xyroots-teal text-xyroots-teal hover:bg-xyroots-teal hover:text-white transition-all">
-                  Register as Teacher
-                </button>
-                <button onClick={() => openInstitutionRegistration()} className="block w-full text-center px-4 py-3 text-sm font-semibold bg-xyroots-teal text-white hover:opacity-90 transition-all">
-                  Post a Teaching Job
-                </button>
-              </div>
-            )}
           </div>
         </div>
       )}

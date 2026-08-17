@@ -3,7 +3,7 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
-import { FaCircleCheck, FaUsers, FaBuilding, FaHandshake, FaLightbulb, FaGraduationCap, FaStar, FaArrowRight } from "react-icons/fa6";
+import { FaCircleCheck, FaUsers, FaBuilding, FaHandshake, FaLightbulb, FaGraduationCap, FaStar } from "react-icons/fa6";
 
 const stats = [
   { number: "10,000+", label: "Verified Educators" },
@@ -121,21 +121,6 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* CTA — clean, no gradient */}
-        <section className="py-20 bg-[#f7f8fa] border-t border-gray-100 text-center">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Find your next opportunity</h2>
-            <p className="text-gray-500 text-base mb-8">Thousands of educators have found their dream classrooms through Xyroots.</p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/jobs" className="px-7 py-3.5 bg-gray-900 text-white font-bold text-sm hover:bg-black transition-colors flex items-center gap-2" style={{ borderRadius: "0.75rem" }}>
-                Browse Jobs <FaArrowRight className="w-3.5 h-3.5" />
-              </Link>
-              <Link href="/services" className="px-7 py-3.5 border border-gray-200 text-gray-700 font-semibold text-sm hover:border-gray-400 transition-colors" style={{ borderRadius: "0.75rem" }}>
-                Our Services
-              </Link>
-            </div>
-          </div>
-        </section>
 
       </main>
 

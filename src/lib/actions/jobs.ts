@@ -87,6 +87,40 @@ export async function createJob(input: CreateJobInput): Promise<ServiceResponse<
     details: { title: jobData.title, status: jobData.status || 'draft' },
   })
 
+  // 5b. Auto-create/update institution record so it appears in the directory
+  if (role === 'management' && jobData.school_name) {
+    try {
+      // Check if an institution already exists for this profile
+      const { data: existingInst } = await supabase
+        .from('institutions')
+        .select('id')
+        .eq('created_by_profile_id', profile.id)
+        .single()
+
+      if (!existingInst) {
+        // Create a new institution entry visible in the directory
+        await supabase.from('institutions').insert({
+          name: jobData.school_name,
+          location: jobData.location || null,
+          type: null,
+          board: jobData.board ? [jobData.board] : [],
+          verified: false,
+          is_visible: true,
+          created_by_profile_id: profile.id,
+          description: null,
+        } as any)
+      } else {
+        // Update location/board if missing
+        await supabase.from('institutions').update({
+          is_visible: true,
+          ...(jobData.location ? { location: jobData.location } : {}),
+        } as any).eq('id', existingInst.id)
+      }
+    } catch {
+      // Non-blocking — don't fail job creation
+    }
+  }
+
   // 6. Send hiring-alert notifications to matching teachers (only for published jobs)
   if ((jobData.status || 'draft') === 'published' && jobData.subject) {
     try {

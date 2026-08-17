@@ -16,9 +16,8 @@ import {
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import Loader from "@/components/Loader";
 import GetVerifiedModal from "@/components/GetVerifiedModal";
-import { getWatchlist, removeFromWatchlist } from "@/lib/actions/watchlist";
+import { removeFromWatchlist } from "@/lib/actions/watchlist";
 
 type Tab = "candidates" | "vacancies" | "pipeline" | "watchlist" | "settings";
 
@@ -89,16 +88,7 @@ export default function EmployerDashboard() {
     setTimeout(() => setVisibilitySaved(false), 2500);
   };
 
-  // Load watchlist IDs from DB on mount
-  useEffect(() => {
-    if (!isAuthenticated) return;
-    getWatchlist().then(res => {
-      if (res.success && res.data) {
-        setWatchlistTeacherIds(res.data.teachers);
-        setWatchlistJobIds(res.data.jobs);
-      }
-    });
-  }, [isAuthenticated]);
+  // Watchlist loaded in fetchData — no separate call needed
 
   // Fetch watchlist data when tab opens
   useEffect(() => {
@@ -136,15 +126,27 @@ export default function EmployerDashboard() {
     if (!isAuthenticated || !profile) return;
     setIsLoadingData(true);
 
-    // Fetch jobs first (need IDs for applications query)
-    const { data: jData } = await supabase
-      .from("jobs")
-      .select("id, title, status, location, school_name, created_at, employment_type, salary_min, salary_max")
-      .eq("posted_by_profile_id", profile.id)
-      .order("created_at", { ascending: false });
+    // Fetch jobs and watchlist simultaneously
+    const [{ data: jData }, watchRes] = await Promise.all([
+      supabase
+        .from("jobs")
+        .select("id, title, status, location, school_name, created_at, employment_type, salary_min, salary_max")
+        .eq("posted_by_profile_id", profile.id)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("watchlist_items")
+        .select("item_id, item_type")
+        .eq("profile_id", profile.id)
+        .limit(100),
+    ]);
+
     if (jData) setJobs(jData);
 
-    // Fetch applicants in parallel once we have job IDs
+    const watchItems = ((watchRes as any).data || []) as any[];
+    setWatchlistTeacherIds(watchItems.filter((w: any) => w.item_type === "teacher").map((w: any) => w.item_id));
+    setWatchlistJobIds(watchItems.filter((w: any) => w.item_type === "job").map((w: any) => w.item_id));
+
+    // Fetch applicants in parallel with above
     if (jData && jData.length > 0) {
       const jobIds = jData.map((j: any) => j.id);
       const { data: appData } = await supabase
@@ -173,8 +175,29 @@ export default function EmployerDashboard() {
     return (
       <div className="min-h-screen flex flex-col bg-[#f7f8fa]">
         <Navbar />
-        <div className="flex-1 flex items-center justify-center">
-          <Loader />
+        <div className="flex-1 animate-pulse">
+          <div className="bg-white border-b border-gray-200">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-14 h-14 bg-gray-200 rounded-2xl shrink-0" />
+                <div className="space-y-2 flex-1">
+                  <div className="h-5 bg-gray-200 rounded w-44" />
+                  <div className="h-3.5 bg-gray-100 rounded w-56" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {[1,2,3,4].map(i => <div key={i} className="h-16 bg-gray-100 rounded-xl" />)}
+              </div>
+            </div>
+          </div>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+            <div className="flex gap-2 border-b border-gray-200 mb-6 pb-1">
+              {[1,2,3,4,5].map(i => <div key={i} className="h-8 w-24 bg-gray-100 rounded" />)}
+            </div>
+            <div className="space-y-3">
+              {[1,2,3,4].map(i => <div key={i} className="h-20 bg-white rounded-xl border border-gray-100" />)}
+            </div>
+          </div>
         </div>
       </div>
     );

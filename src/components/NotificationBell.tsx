@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { FaBell, FaCircle, FaCheckDouble, FaCalendarDays, FaBriefcase, FaStar, FaCircleInfo, FaUser } from "react-icons/fa6";
-import { getMyNotifications, markNotificationRead, markAllNotificationsRead } from "@/lib/actions/notifications";
+import { createClient } from "@/lib/supabase/client";
 import type { Notification } from "@/lib/actions/notifications";
 
 const TYPE_ICON: Record<Notification["type"], React.ElementType> = {
@@ -41,23 +41,41 @@ export default function NotificationBell() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const supabase = createClient();
   const router = useRouter();
 
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    const res = await getMyNotifications();
-    if (res.success && res.data) setNotifications(res.data);
-    setLoading(false);
-  }, []);
+  // Fetch notifications using client SDK — no server action POST, no page reload
+  const load = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data: profile } = await (supabase as any)
+        .from("profiles")
+        .select("id")
+        .eq("auth_user_id", user.id)
+        .single();
+      if (!profile) return;
+      const { data } = await (supabase as any)
+        .from("notifications")
+        .select("*")
+        .eq("recipient_profile_id", profile.id)
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (data) setNotifications(data as Notification[]);
+    } finally {
+      if (!silent) setLoading(false);
+    }
+  }, []); // eslint-disable-line
 
   // Load on mount
   useEffect(() => { load(); }, [load]);
 
-  // Poll every 60s
+  // Silent background poll every 90s — does NOT trigger page reload
   useEffect(() => {
-    const interval = setInterval(load, 60000);
+    const interval = setInterval(() => load(true), 90000);
     return () => clearInterval(interval);
   }, [load]);
 
@@ -75,7 +93,7 @@ export default function NotificationBell() {
   const handleClickNotification = async (n: Notification) => {
     if (!n.is_read) {
       setNotifications(prev => prev.map(x => x.id === n.id ? { ...x, is_read: true } : x));
-      await markNotificationRead(n.id);
+      await (supabase as any).from("notifications").update({ is_read: true }).eq("id", n.id);
     }
     setOpen(false);
     if (n.link) router.push(n.link);
@@ -83,7 +101,10 @@ export default function NotificationBell() {
 
   const handleMarkAllRead = async () => {
     setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
-    await markAllNotificationsRead();
+    await (supabase as any)
+      .from("notifications")
+      .update({ is_read: true })
+      .eq("is_read", false);
   };
 
   return (
@@ -150,12 +171,9 @@ export default function NotificationBell() {
                       !n.is_read ? "bg-blue-50/30" : ""
                     }`}
                   >
-                    {/* Icon */}
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${colorClass}`}>
                       <Icon className="w-3.5 h-3.5" />
                     </div>
-
-                    {/* Text */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <p className={`text-xs font-bold text-gray-900 leading-tight ${!n.is_read ? "font-extrabold" : ""}`}>

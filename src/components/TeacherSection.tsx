@@ -35,7 +35,9 @@ export default function TeacherSection() {
           <div>
             {role !== 'management' && (
               <h2 id="teacher-section-heading" className="font-editorial text-3xl sm:text-4xl lg:text-5xl text-black mb-5 leading-tight">
-                Dear <span className="font-serif font-normal text-xyroots-teal text-3xl sm:text-4xl lg:text-5xl tracking-normal">teachers</span>, <br className="hidden sm:block" />your next <span className="text-xyroots-teal text-stroke-sm">classroom</span> is <span className="text-xyroots-teal text-stroke-sm">closer</span> than you think.
+                Dear <span className="font-serif font-normal text-xyroots-teal text-3xl sm:text-4xl lg:text-5xl tracking-normal">teachers</span>,{" "}
+                <br className="hidden sm:block" />
+                your next classroom is closer than you think.
               </h2>
             )}
             <p className="text-base sm:text-lg text-xyroots-muted leading-relaxed mb-8 max-w-md">

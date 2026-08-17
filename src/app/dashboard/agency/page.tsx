@@ -145,8 +145,29 @@ export default function AgencyDashboard() {
     return (
       <div className="min-h-screen flex flex-col bg-[#f7f8fa]">
         <Navbar />
-        <div className="flex-1 flex items-center justify-center">
-          <FaSpinner className="w-8 h-8 text-[#00a264] animate-spin" />
+        <div className="flex-1 animate-pulse">
+          <div className="bg-white border-b border-gray-200">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-14 h-14 bg-gray-200 rounded-2xl shrink-0" />
+                <div className="space-y-2 flex-1">
+                  <div className="h-5 bg-gray-200 rounded w-44" />
+                  <div className="h-3.5 bg-gray-100 rounded w-56" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {[1,2,3,4].map(i => <div key={i} className="h-16 bg-gray-100 rounded-xl" />)}
+              </div>
+            </div>
+          </div>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+            <div className="flex gap-2 border-b border-gray-200 mb-6 pb-1">
+              {[1,2,3,4,5].map(i => <div key={i} className="h-8 w-24 bg-gray-100 rounded" />)}
+            </div>
+            <div className="space-y-3">
+              {[1,2,3,4].map(i => <div key={i} className="h-20 bg-white rounded-xl border border-gray-100" />)}
+            </div>
+          </div>
         </div>
       </div>
     );

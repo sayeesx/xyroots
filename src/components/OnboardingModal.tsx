@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { FaXmark, FaSpinner } from 'react-icons/fa6';
+import React, { useState, useEffect, useRef } from 'react';
+import { FaXmark, FaSpinner, FaCamera, FaUser } from 'react-icons/fa6';
 import { useAuth } from '@/lib/auth/AuthProvider';
-import ResumeUpload from '@/components/ResumeUpload';
-import type { ResumeData } from '@/lib/resume/schema';
 import CustomSelect from '@/components/ui/CustomSelect';
 import { updateTeacherProfile } from '@/lib/actions/profile';
 import { createClient } from '@/lib/supabase/client';
+import { v4 as uuidv4 } from 'uuid';
 import {
   SUBJECT_OPTIONS,
   QUALIFICATION_OPTIONS,
@@ -62,6 +61,11 @@ export default function OnboardingModal({ isOpen, onClose, role, onSaved }: Onbo
   const { profile, refreshProfile } = useAuth();
   const supabase = createClient();
 
+  // Avatar upload state
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   // Block body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
@@ -92,6 +96,7 @@ export default function OnboardingModal({ isOpen, onClose, role, onSaved }: Onbo
       setStep(1);
       setShowSuccess(false);
       setSaveError(null);
+      setAvatarPreview(null);
 
       const loadProfileData = async () => {
         if (!profile) return;
@@ -130,20 +135,44 @@ export default function OnboardingModal({ isOpen, onClose, role, onSaved }: Onbo
     }
   }, [isOpen, profile]); // eslint-disable-line
 
-  const handleResumeExtracted = (data: ResumeData) => {
-    setFormData(prev => ({
-      ...prev,
-      fullName: prev.fullName || data.fullName || '',
-      email: prev.email || data.email || '',
-      phone: prev.phone || data.phone || '',
-      location: prev.location || data.location || '',
-      title: prev.title || data.title || '',
-      subject: prev.subject || data.subject || '',
-      qualification: prev.qualification || data.qualification || '',
-      professionalQualification: prev.professionalQualification || data.professionalQualification || '',
-      experienceYears: prev.experienceYears || (data.experienceYears ? String(data.experienceYears) : ''),
-      bio: prev.bio || '',
-    }));
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !profile) return;
+    if (!file.type.startsWith('image/')) { setSaveError('Please select an image file.'); return; }
+    if (file.size > 5 * 1024 * 1024) { setSaveError('Image must be under 5MB.'); return; }
+
+    // Show preview immediately
+    const reader = new FileReader();
+    reader.onload = (ev) => setAvatarPreview(ev.target?.result as string);
+    reader.readAsDataURL(file);
+
+    // Upload to Supabase storage
+    setAvatarUploading(true);
+    setSaveError(null);
+    try {
+      const ext = file.name.split('.').pop() || 'jpg';
+      const filename = `avatar-${uuidv4()}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(`${profile.id}/${filename}`, file, { cacheControl: '3600', upsert: true });
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(`${profile.id}/${filename}`);
+      const publicUrl = urlData.publicUrl;
+
+      await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', profile.id);
+      if (profile.role === 'teacher') {
+        await supabase.from('teacher_profiles').update({ avatar_path: publicUrl } as any).eq('profile_id', profile.id);
+      }
+      await refreshProfile();
+    } catch (err: any) {
+      setSaveError(err.message || 'Failed to upload photo. Try again.');
+      setAvatarPreview(null);
+    } finally {
+      setAvatarUploading(false);
+    }
+    // Reset input so same file can be re-selected
+    e.target.value = '';
   };
 
   if (!isOpen) return null;
@@ -264,13 +293,46 @@ export default function OnboardingModal({ isOpen, onClose, role, onSaved }: Onbo
 
                   {role === 'teacher' && (
                     <div className="mb-6">
-                      <ResumeUpload onExtracted={handleResumeExtracted} />
-                      <div className="relative my-6">
-                        <div className="absolute inset-0 flex items-center">
-                          <div className="w-full border-t border-gray-200"></div>
+                      {/* Profile Picture Upload */}
+                      <div className="flex items-center gap-5 p-4 bg-gray-50 border border-gray-200 rounded-xl">
+                        <div className="relative shrink-0">
+                          <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-gray-200 bg-gray-100 flex items-center justify-center">
+                            {avatarPreview ? (
+                              <img src={avatarPreview} alt="Preview" className="w-full h-full object-cover" />
+                            ) : profile?.avatar_url ? (
+                              <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                            ) : (
+                              <FaUser className="w-8 h-8 text-gray-300" />
+                            )}
+                          </div>
+                          {avatarUploading && (
+                            <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center">
+                              <FaSpinner className="w-5 h-5 text-white animate-spin" />
+                            </div>
+                          )}
                         </div>
-                        <div className="relative flex justify-center text-xs">
-                          <span className="bg-white px-2 text-gray-500 uppercase font-bold">Or enter manually</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-gray-900 mb-0.5">Profile Photo</p>
+                          <p className="text-xs text-gray-500 mb-3">Upload a clear photo. JPG, PNG or WebP · Max 5MB</p>
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleAvatarChange}
+                            className="hidden"
+                            id="avatar-upload-input"
+                          />
+                          <label
+                            htmlFor="avatar-upload-input"
+                            className={`inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg border cursor-pointer transition-all ${
+                              avatarUploading
+                                ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
+                                : 'bg-white border-gray-300 text-gray-700 hover:border-xyroots-teal hover:text-xyroots-teal'
+                            }`}
+                          >
+                            <FaCamera className="w-3.5 h-3.5" />
+                            {avatarUploading ? 'Uploading...' : avatarPreview || profile?.avatar_url ? 'Change Photo' : 'Upload Photo'}
+                          </label>
                         </div>
                       </div>
                     </div>
@@ -333,6 +395,7 @@ export default function OnboardingModal({ isOpen, onClose, role, onSaved }: Onbo
                             options={locationOptions}
                             placeholder="Select location"
                             searchable
+                            allowOther
                           />
                         </div>
                       </div>
@@ -362,6 +425,7 @@ export default function OnboardingModal({ isOpen, onClose, role, onSaved }: Onbo
                               options={subjectOptions}
                               placeholder="Select subject"
                               searchable
+                              allowOther
                             />
                           </div>
                           <div>
@@ -372,6 +436,7 @@ export default function OnboardingModal({ isOpen, onClose, role, onSaved }: Onbo
                               options={qualificationOptions}
                               placeholder="Select qualification"
                               searchable
+                              allowOther
                             />
                           </div>
                           <div>
@@ -382,6 +447,7 @@ export default function OnboardingModal({ isOpen, onClose, role, onSaved }: Onbo
                               options={professionalQualificationOptions}
                               placeholder="Select teaching qualification"
                               searchable
+                              allowOther
                             />
                           </div>
                           <div>
@@ -391,6 +457,7 @@ export default function OnboardingModal({ isOpen, onClose, role, onSaved }: Onbo
                               onChange={(val) => setFormData(prev => ({ ...prev, experienceYears: val }))}
                               options={experienceSelectOptions}
                               placeholder="Select years"
+                              allowOther
                             />
                           </div>
                         </div>

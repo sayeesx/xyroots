@@ -7,28 +7,41 @@ import AuthGuardedLink from "@/components/AuthGuardedLink";
 
 function JobCard({ job, isAuthenticated }: { job: any, isAuthenticated: boolean }) {
   return (
-    <div className="flex flex-col h-full border border-indigo-100 bg-white hover:border-indigo-300 transition-all group shadow-sm hover:shadow-md" style={{ borderRadius: "0.75rem", background: "linear-gradient(135deg, #ffffff 75%, #eef2ff 100%)" }}>
+    <div className="flex flex-col h-full border border-gray-200 bg-white hover:border-gray-900 transition-all group shadow-sm hover:shadow-md" style={{ borderRadius: "0.75rem" }}>
       <div className="flex flex-1 flex-col">
-        {/* Top header */}
-        <div className="border-b border-indigo-100/60 px-4 py-3" style={{ borderRadius: "0.75rem 0.75rem 0 0", background: "linear-gradient(to right, #f8fafc, #eef2ff)" }}>
-          <div className="flex items-start justify-between gap-3">
+        {/* Top header — matches TeacherCard header style, black dominant */}
+        <div className="border-b border-gray-100 px-4 py-3" style={{ borderRadius: "0.75rem 0.75rem 0 0", background: "linear-gradient(to right, #f9fafb, #f3f4f6)" }}>
+          <div className="flex items-start gap-3">
+            {/* Institution icon */}
+            <div className="w-12 h-12 shrink-0 flex items-center justify-center bg-gray-900 text-white font-bold text-base border border-gray-800 overflow-hidden" style={{ borderRadius: "0.5rem" }}>
+              <FaBuilding className="w-5 h-5 text-gray-300" />
+            </div>
             <div className="flex-1 min-w-0">
-              {/* Institution type chip */}
-              <span className="inline-block text-[11px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200/60 px-2 py-0.5 mb-1.5" style={{ borderRadius: "0.25rem" }}>
+              <span className="inline-block text-[11px] font-bold uppercase tracking-wider bg-gray-100 text-gray-600 px-2 py-0.5 mb-1 leading-tight" style={{ borderRadius: "0.25rem" }}>
                 {job.type}
               </span>
-              <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="block text-gray-900 font-bold text-[13px] leading-snug hover:text-indigo-600 transition-colors line-clamp-2 text-left">
+              <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="block text-gray-900 font-bold text-[13px] leading-snug hover:text-black transition-colors line-clamp-2 text-left">
                 {job.title}
               </AuthGuardedLink>
+              <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+                <FaLocationDot className="inline w-2.5 h-2.5 text-gray-400" />
+                {job.location}
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Action buttons row */}
-        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-indigo-100/60">
-          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-medium py-1.5 border border-indigo-200 text-indigo-700 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 flex items-center justify-center gap-1 transition-all duration-200" style={{ borderRadius: "0.5rem" }}><FaBookmark className="inline w-2.5 h-2.5" /> Save</AuthGuardedLink>
-          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-bold py-1.5 bg-indigo-600 text-white hover:bg-indigo-700 hover:scale-[1.03] flex items-center justify-center gap-1 transition-all duration-200 shadow-sm" style={{ borderRadius: "0.5rem" }}>Apply Now <FaArrowRight className="inline w-2.5 h-2.5" /></AuthGuardedLink>
-          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-medium py-1.5 border border-indigo-200 text-indigo-700 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all duration-200 flex items-center justify-center" style={{ borderRadius: "0.5rem" }}>Quick Apply</AuthGuardedLink>
+        {/* Action buttons — black primary, green secondary */}
+        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-100">
+          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-bold py-1.5 bg-gray-900 text-white hover:bg-black hover:scale-[1.02] flex items-center justify-center gap-1 transition-all duration-200" style={{ borderRadius: "0.5rem" }}>
+            Apply Now <FaArrowRight className="inline w-2.5 h-2.5" />
+          </AuthGuardedLink>
+          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-medium py-1.5 border border-[#00a264]/40 text-[#00a264] hover:bg-[#00a264] hover:text-white flex items-center justify-center gap-1 transition-all duration-200" style={{ borderRadius: "0.5rem" }}>
+            <FaBookmark className="inline w-2.5 h-2.5" /> Save
+          </AuthGuardedLink>
+          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-medium py-1.5 border border-gray-200 text-gray-600 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all duration-200 flex items-center justify-center" style={{ borderRadius: "0.5rem" }}>
+            Details
+          </AuthGuardedLink>
         </div>
 
         {/* Meta + Details */}
@@ -38,7 +51,7 @@ function JobCard({ job, isAuthenticated }: { job: any, isAuthenticated: boolean 
               Posted: <span className="text-gray-700 font-medium">{job.postedDate}</span>
             </span>
             <span className="flex items-center gap-1">
-              <FaPeopleGroup className="inline w-2.5 h-2.5 text-indigo-400" />
+              <FaPeopleGroup className="inline w-2.5 h-2.5 text-gray-400" />
               Openings: <span className="text-gray-700 font-medium ml-0.5">{job.openings}</span>
             </span>
           </div>
@@ -53,19 +66,19 @@ function JobCard({ job, isAuthenticated }: { job: any, isAuthenticated: boolean 
               <p className="text-gray-700 text-sm">{job.experience}</p>
             </div>
             <div>
-              <p className="text-[11px] font-semibold text-indigo-600 uppercase tracking-wide mb-0.5">Salary</p>
+              <p className="text-[11px] font-semibold text-[#00a264] uppercase tracking-wide mb-0.5">Salary</p>
               <p className="text-gray-900 font-bold">{job.salary}</p>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="px-4 py-2.5 border-t border-indigo-100/60 flex items-center justify-between" style={{ borderRadius: "0 0 0.75rem 0.75rem", background: "linear-gradient(to right, #f8fafc, #eef2ff)" }}>
+        <div className="px-4 py-2.5 border-t border-gray-100 flex items-center justify-between" style={{ borderRadius: "0 0 0.75rem 0.75rem", background: "linear-gradient(to right, #f9fafb, #f3f4f6)" }}>
           <span className="flex items-center gap-1 text-xs text-gray-500">
-            <FaLocationDot className="inline w-2.5 h-2.5 text-indigo-500" />
+            <FaLocationDot className="inline w-2.5 h-2.5 text-gray-400" />
             {job.location}
           </span>
-          <span className="text-[11px] font-mono text-indigo-400">{job.id}</span>
+          <span className="text-[11px] font-mono text-gray-400">{job.id}</span>
         </div>
       </div>
     </div>
@@ -233,10 +246,10 @@ export default async function LatestVacancies() {
             <div className={`${role === 'teacher' ? 'md:col-span-2' : ''}`}>
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-                  <FaBuilding className="w-4 h-4 text-indigo-600" />
+                  <FaBuilding className="w-4 h-4 text-gray-700" />
                   Institutions Hiring
                 </h3>
-                <AuthGuardedLink href="/jobs" type="teacher" className="text-xs text-indigo-600 hover:text-indigo-800 hover:underline font-semibold">
+                <AuthGuardedLink href="/jobs" type="teacher" className="text-xs text-gray-700 hover:text-black hover:underline font-semibold">
                   Browse All →
                 </AuthGuardedLink>
               </div>

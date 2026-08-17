@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { FaBars, FaXmark, FaArrowRightFromBracket, FaBriefcase, FaGear, FaPlus } from "react-icons/fa6";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { getNavVisibility } from "@/lib/auth/permissions";
+import NotificationBell from "./NotificationBell";
 
 import AuthModal from "./AuthModal";
 
@@ -104,6 +105,10 @@ export default function Navbar() {
                   </button>
                 </>
               ) : isAuthenticated ? (
+                <div className="flex items-center gap-2">
+      {/* Notification Bell — only for authenticated users */}
+                  <NotificationBell />
+
                 <div className="relative">
                   <button
                     onClick={() => setProfileOpen(!profileOpen)}
@@ -170,6 +175,7 @@ export default function Navbar() {
                       </button>
                     </div>
                   )}
+                </div>
                 </div>
               ) : null}
             </div>

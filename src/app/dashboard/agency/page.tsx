@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PostJobModal from "@/components/PostJobModal";
@@ -16,6 +17,7 @@ import {
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { getWatchlist, removeFromWatchlist } from "@/lib/actions/watchlist";
 
 type Tab = "candidates" | "vacancies" | "pipeline" | "watchlist" | "settings";
 
@@ -32,6 +34,7 @@ const STATUS_COLORS: Record<string, string> = {
 export default function AgencyDashboard() {
   const { profile, loading, isAuthenticated, role } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [tab, setTab] = useState<Tab>("candidates");
   const [showPostJob, setShowPostJob] = useState(false);
   const [showPostTeacher, setShowPostTeacher] = useState(false);
@@ -41,7 +44,13 @@ export default function AgencyDashboard() {
   const [isLoadingData, setIsLoadingData] = useState(true);
   const supabase = createClient();
 
-  // Watchlist — stored in localStorage
+  // Open PostJobModal if ?action=post-job in URL
+  useEffect(() => {
+    if (searchParams?.get("action") === "post-job") setShowPostJob(true);
+    if (searchParams?.get("action") === "post-teacher") setShowPostTeacher(true);
+  }, [searchParams]);
+
+  // Watchlist — DB-based
   const [watchlistTeacherIds, setWatchlistTeacherIds] = useState<string[]>([]);
   const [watchlistJobIds, setWatchlistJobIds] = useState<string[]>([]);
   const [watchlistTeachers, setWatchlistTeachers] = useState<any[]>([]);
@@ -52,15 +61,16 @@ export default function AgencyDashboard() {
     if (!loading && (!isAuthenticated || role !== "agency")) router.push("/");
   }, [loading, isAuthenticated, role, router]);
 
-  // Load watchlist IDs from localStorage
+  // Load watchlist IDs from DB
   useEffect(() => {
-    try {
-      const tIds = JSON.parse(localStorage.getItem("agency_watchlist_teachers") || "[]");
-      const jIds = JSON.parse(localStorage.getItem("xyroots_watchlist") || "[]");
-      setWatchlistTeacherIds(tIds);
-      setWatchlistJobIds(jIds);
-    } catch { /* ignore */ }
-  }, []);
+    if (!isAuthenticated) return;
+    getWatchlist().then(res => {
+      if (res.success && res.data) {
+        setWatchlistTeacherIds(res.data.teachers);
+        setWatchlistJobIds(res.data.jobs);
+      }
+    });
+  }, [isAuthenticated]);
 
   // Fetch watchlist data when tab is opened
   useEffect(() => {
@@ -82,18 +92,16 @@ export default function AgencyDashboard() {
     loadWatchlist();
   }, [tab, watchlistTeacherIds, watchlistJobIds]); // eslint-disable-line
 
-  const removeWatchlistTeacher = (id: string) => {
-    const next = watchlistTeacherIds.filter(i => i !== id);
-    setWatchlistTeacherIds(next);
+  const removeWatchlistTeacher = async (id: string) => {
+    setWatchlistTeacherIds(prev => prev.filter(i => i !== id));
     setWatchlistTeachers(prev => prev.filter(t => t.id !== id));
-    localStorage.setItem("agency_watchlist_teachers", JSON.stringify(next));
+    await removeFromWatchlist('teacher', id);
   };
 
-  const removeWatchlistJob = (id: string) => {
-    const next = watchlistJobIds.filter(i => i !== id);
-    setWatchlistJobIds(next);
+  const removeWatchlistJob = async (id: string) => {
+    setWatchlistJobIds(prev => prev.filter(i => i !== id));
     setWatchlistJobs(prev => prev.filter(j => j.id !== id));
-    localStorage.setItem("xyroots_watchlist", JSON.stringify(next));
+    await removeFromWatchlist('job', id);
   };
 
   const fetchData = useCallback(async () => {

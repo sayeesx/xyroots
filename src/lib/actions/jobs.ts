@@ -87,6 +87,36 @@ export async function createJob(input: CreateJobInput): Promise<ServiceResponse<
     details: { title: jobData.title, status: jobData.status || 'draft' },
   })
 
+  // 6. Send hiring-alert notifications to matching teachers (only for published jobs)
+  if ((jobData.status || 'draft') === 'published' && jobData.subject) {
+    try {
+      // Find teachers with matching subject who have notifications enabled
+      const { data: matchingTeachers } = await supabase
+        .from('teacher_profiles')
+        .select('profile_id, subject')
+        .eq('subject', jobData.subject)
+        .eq('is_visible', true)
+        .limit(50)
+
+      if (matchingTeachers && matchingTeachers.length > 0) {
+        const locationText = jobData.location ? ` in ${jobData.location}` : ''
+        const schoolText = jobData.school_name ? ` at ${jobData.school_name}` : ''
+        const notifications = matchingTeachers.map((t: any) => ({
+          recipient_profile_id: t.profile_id,
+          type: 'hiring_alert' as const,
+          title: `New ${jobData.subject} Job Alert`,
+          body: `A new ${jobData.subject} position "${jobData.title}"${schoolText}${locationText} matches your profile.`,
+          link: `/jobs/${job.id as string}`,
+          metadata: { job_id: job.id, subject: jobData.subject },
+        }))
+        await supabase.from('notifications').insert(notifications as any)
+      }
+    } catch (notifErr) {
+      // Non-blocking — don't fail the job creation
+      console.error('Hiring alert notification error:', notifErr)
+    }
+  }
+
   return { success: true, data: job as unknown as Job }
 }
 

@@ -104,6 +104,18 @@ export default function ContinueProfileButton() {
           isOpen={showModal}
           onClose={() => setShowModal(false)}
           role="teacher"
+          onSaved={async () => {
+            // Re-check completion after save
+            const result = await getTeacherProfile();
+            if (result.success && result.data) {
+              const completionResult = calculateTeacherProfileCompletion(
+                result.data,
+                result.data.teacher_profile
+              );
+              setCompletion(completionResult.percentage);
+              setMissingFields(completionResult.missingFields);
+            }
+          }}
         />
       )}
     </>

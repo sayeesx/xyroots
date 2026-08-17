@@ -2,12 +2,12 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { updateTeacherProfileSchema } from '@/lib/validations'
+import { calculateTeacherProfileCompletion } from '@/lib/utils/profile-completion'
 import type { ServiceResponse } from '@/lib/types'
 
 /**
- * Update teacher profile with comprehensive data
- * Can be called after registration to add resume-extracted data
- * or anytime to update profile information
+ * Update teacher profile with comprehensive data.
+ * Also recalculates and persists profile_completion after update.
  */
 export async function updateTeacherProfile(
   profileId: string,
@@ -43,25 +43,24 @@ export async function updateTeacherProfile(
 
   const supabase = await createClient()
 
-  // Get current user
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return { success: false, error: 'Not authenticated' }
-  }
+  if (!user) return { success: false, error: 'Not authenticated' }
 
-  // Verify the profile belongs to the current user
-  const { data: profile } = await supabase
+  // profiles table has proper types — cast result
+  const { data: profileRow } = await supabase
     .from('profiles')
-    .select('id, auth_user_id')
+    .select('id, auth_user_id, full_name, email, phone')
     .eq('id', profileId)
     .single()
+
+  const profile = profileRow as { id: string; auth_user_id: string; full_name: string; email: string; phone: string | null } | null
 
   if (!profile || profile.auth_user_id !== user.id) {
     return { success: false, error: 'Unauthorized' }
   }
 
-  // Update teacher profile
-  const { error } = await supabase
+  // Update teacher profile — cast to any because db stub uses Record<string,unknown>
+  const { error: updateError } = await (supabase as any)
     .from('teacher_profiles')
     .update({
       ...validation.data,
@@ -69,9 +68,29 @@ export async function updateTeacherProfile(
     })
     .eq('profile_id', profileId)
 
-  if (error) {
-    console.error('Teacher profile update error:', error)
+  if (updateError) {
+    console.error('Teacher profile update error:', updateError)
     return { success: false, error: 'Failed to update profile. Please try again.' }
+  }
+
+  // Recalculate and persist profile_completion
+  const { data: teacherProfileRow } = await (supabase as any)
+    .from('teacher_profiles')
+    .select('*')
+    .eq('profile_id', profileId)
+    .single()
+
+  const teacherProfile = teacherProfileRow as Record<string, unknown> | null
+
+  if (teacherProfile) {
+    const completion = calculateTeacherProfileCompletion(profile, teacherProfile)
+    await (supabase as any)
+      .from('teacher_profiles')
+      .update({
+        profile_completion: completion.percentage,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('profile_id', profileId)
   }
 
   return { success: true }
@@ -84,27 +103,27 @@ export async function getTeacherProfile(): Promise<ServiceResponse<any>> {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return { success: false, error: 'Not authenticated' }
-  }
+  if (!user) return { success: false, error: 'Not authenticated' }
 
-  // Get profile
-  const { data: profile, error: profileError } = await supabase
+  const { data: profileRow, error: profileError } = await supabase
     .from('profiles')
     .select('*')
     .eq('auth_user_id', user.id)
     .single()
 
+  const profile = profileRow as { id: string; [key: string]: unknown } | null
+
   if (profileError || !profile) {
     return { success: false, error: 'Profile not found' }
   }
 
-  // Get teacher profile
-  const { data: teacherProfile, error: teacherError } = await supabase
+  const { data: teacherProfileRow, error: teacherError } = await (supabase as any)
     .from('teacher_profiles')
     .select('*')
     .eq('profile_id', profile.id)
     .single()
+
+  const teacherProfile = teacherProfileRow as Record<string, unknown> | null
 
   if (teacherError || !teacherProfile) {
     return { success: false, error: 'Teacher profile not found' }

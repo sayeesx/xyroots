@@ -62,6 +62,33 @@ export type Database = {
         Insert: Record<string, unknown>
         Update: Record<string, unknown>
       }
+      notifications: {
+        Row: {
+          id: string
+          recipient_profile_id: string
+          type: string
+          title: string
+          body: string
+          link: string | null
+          is_read: boolean
+          metadata: Record<string, unknown>
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          recipient_profile_id: string
+          type: string
+          title: string
+          body: string
+          link?: string | null
+          is_read?: boolean
+          metadata?: Record<string, unknown>
+        }
+        Update: {
+          is_read?: boolean
+          updated_at?: string
+        }
+      }
     }
     Views: Record<string, never>
     Functions: Record<string, never>

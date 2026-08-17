@@ -4,6 +4,17 @@ import { useState } from "react";
 import { FaXmark, FaSpinner, FaCircleCheck } from "react-icons/fa6";
 import { createJob } from "@/lib/actions/jobs";
 import CustomSelect from "@/components/ui/CustomSelect";
+import {
+  SUBJECT_OPTIONS,
+  QUALIFICATION_OPTIONS,
+  PROFESSIONAL_QUALIFICATION_OPTIONS,
+  BOARD_OPTIONS,
+  LEVEL_OPTIONS,
+  EMPLOYMENT_TYPE_OPTIONS,
+  INSTITUTION_TYPE_OPTIONS,
+  EXPERIENCE_OPTIONS,
+  toSelectOptions,
+} from "@/lib/constants/options";
 
 interface PostJobModalProps {
   isOpen: boolean;
@@ -11,25 +22,16 @@ interface PostJobModalProps {
   onSuccess?: () => void;
 }
 
-const subjectOptions = [
-  "Mathematics","Physics","Chemistry","Biology","English","Hindi","Social Science",
-  "Computer Science","Commerce","Economics","History","Geography","Sanskrit",
-  "Physical Education","Art & Craft","Music","EVS","General Science",
-];
-
-const boardOptions = ["CBSE","ICSE","State Board","IB / IGCSE","NIOS","Other"];
-const levelOptions = ["Nursery / KG","Primary (1–5)","Middle (6–8)","Secondary (9–10)","Senior Secondary (11–12)","All Levels"];
-const employmentTypes = ["Full-time","Part-time","Contract","Temporary","Substitute"];
-
-// CustomSelect option arrays
-const subjectSelectOptions = [{ value: "", label: "Select subject" }, ...subjectOptions.map(s => ({ value: s, label: s }))];
-const boardSelectOptions = [{ value: "", label: "Any Board" }, ...boardOptions.map(b => ({ value: b, label: b }))];
-const levelSelectOptions = [{ value: "", label: "Any Level" }, ...levelOptions.map(l => ({ value: l, label: l }))];
-const employmentSelectOptions = employmentTypes.map(t => ({ value: t, label: t }));
-const institutionTypeOptions = [
-  { value: "", label: "Select type" },
-  ...["School","International School","College","University","Coaching Centre","Preschool / Nursery","Special Needs School","Vocational Institute","Other"].map(t => ({ value: t, label: t }))
-];
+// Build select options from centralized constants
+const subjectSelectOptions = toSelectOptions(SUBJECT_OPTIONS, "Select subject");
+const boardSelectOptions = toSelectOptions(BOARD_OPTIONS, "Any Board");
+const levelSelectOptions = toSelectOptions(LEVEL_OPTIONS, "Any Level");
+const employmentSelectOptions = EMPLOYMENT_TYPE_OPTIONS.map(t => ({ value: t, label: t }));
+const institutionTypeOptions = toSelectOptions(INSTITUTION_TYPE_OPTIONS, "Select type");
+const qualificationSelectOptions = toSelectOptions(QUALIFICATION_OPTIONS, "e.g. B.Sc / M.Sc");
+const professionalQualificationSelectOptions = toSelectOptions(PROFESSIONAL_QUALIFICATION_OPTIONS, "e.g. B.Ed");
+const expMinOptions = [{ value: "", label: "Min exp" }, ...EXPERIENCE_OPTIONS];
+const expMaxOptions = [{ value: "", label: "Max exp" }, ...EXPERIENCE_OPTIONS];
 const statusSelectOptions = [
   { value: "published", label: "Published (Live Now)" },
   { value: "draft", label: "Draft (Save for Later)" },
@@ -196,43 +198,23 @@ export default function PostJobModal({ isOpen, onClose, onSuccess }: PostJobModa
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Academic Qualification</label>
-                <input
-                  value={form.qualification} onChange={e => set("qualification", e.target.value)}
-                  placeholder="e.g. B.Sc / M.Sc"
-                  className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
-                  style={{ borderRadius: "0.75rem" }}
-                />
+                <CustomSelect value={form.qualification} onChange={val => set("qualification", val)} options={qualificationSelectOptions} placeholder="e.g. B.Sc / M.Sc" searchable />
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Teaching Qualification</label>
-                <input
-                  value={form.professional_qualification} onChange={e => set("professional_qualification", e.target.value)}
-                  placeholder="e.g. B.Ed"
-                  className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
-                  style={{ borderRadius: "0.75rem" }}
-                />
+                <CustomSelect value={form.professional_qualification} onChange={val => set("professional_qualification", val)} options={professionalQualificationSelectOptions} placeholder="e.g. B.Ed" searchable />
               </div>
             </div>
 
             {/* Experience & Salary */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Min Exp (yrs)</label>
-                <input
-                  type="number" min="0" value={form.experience_min} onChange={e => set("experience_min", e.target.value)}
-                  placeholder="0"
-                  className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
-                  style={{ borderRadius: "0.75rem" }}
-                />
+                <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Min Exp</label>
+                <CustomSelect value={form.experience_min} onChange={val => set("experience_min", val)} options={expMinOptions} placeholder="Min" />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Max Exp (yrs)</label>
-                <input
-                  type="number" min="0" value={form.experience_max} onChange={e => set("experience_max", e.target.value)}
-                  placeholder="10"
-                  className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
-                  style={{ borderRadius: "0.75rem" }}
-                />
+                <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Max Exp</label>
+                <CustomSelect value={form.experience_max} onChange={val => set("experience_max", val)} options={expMaxOptions} placeholder="Max" />
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Salary Min (₹)</label>

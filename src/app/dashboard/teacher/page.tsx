@@ -10,14 +10,16 @@ import {
   FaBriefcase, FaBookmark, FaLocationDot, FaGraduationCap,
   FaCircleCheck, FaArrowRight, FaUser, FaSpinner, FaEnvelope,
   FaPhone, FaPencil, FaStar, FaBuilding, FaClock, FaCalendarDays,
-  FaShieldHalved, FaCheckDouble, FaCalendar
+  FaShieldHalved, FaCheckDouble, FaCalendar, FaBell, FaTriangleExclamation
 } from "react-icons/fa6";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { getMyApplications } from "@/lib/actions/jobs";
 import { getMyInterviews } from "@/lib/actions/interviews";
+import { getWatchlist, removeFromWatchlist } from "@/lib/actions/watchlist";
 import Loader from "@/components/Loader";
+import NotificationBell from "@/components/NotificationBell";
 
 type Tab = "applications" | "saved" | "interviews" | "profile";
 
@@ -101,8 +103,7 @@ export default function TeacherDashboard() {
   const [applications, setApplications] = useState<any[]>([]);
   const [interviews, setInterviews] = useState<any[]>([]);
   const [savedJobs, setSavedJobs] = useState<any[]>([]);
-  const [savedIds, setSavedIds] = useState<string[]>([]);
-  const [isLoadingData, setIsLoadingData] = useState(true);
+  const [savedIds, setSavedIds] = useState<string[]>([]);  const [isLoadingData, setIsLoadingData] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showVerifiedModal, setShowVerifiedModal] = useState(false);
   const [isProfileVisible, setIsProfileVisible] = useState(true);
@@ -112,13 +113,13 @@ export default function TeacherDashboard() {
     if (!loading && (!isAuthenticated || role !== "teacher")) router.push("/");
   }, [loading, isAuthenticated, role, router]);
 
-  // Load saved IDs from localStorage
+  // Load saved job IDs from DB
   useEffect(() => {
-    try {
-      const ids = JSON.parse(localStorage.getItem("xyroots_watchlist") || "[]");
-      setSavedIds(ids);
-    } catch { /* ignore */ }
-  }, []);
+    if (!isAuthenticated) return;
+    getWatchlist().then(res => {
+      if (res.success && res.data) setSavedIds(res.data.jobs);
+    });
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (!isAuthenticated || !profile) return;
@@ -168,7 +169,7 @@ export default function TeacherDashboard() {
   const tabs = [
     { id: "applications", label: "Applied", count: applications.length, icon: FaBriefcase },
     { id: "saved", label: "Saved", count: savedIds.length, icon: FaBookmark },
-    { id: "interviews", label: "Interviews", count: interviews.length, icon: FaCalendar },
+    { id: "interviews", label: "Interviews", count: interviews.length, icon: FaCalendar, hasNew: interviews.some((iv: any) => iv.status === "scheduled" || iv.status === "confirmed") },
     { id: "profile", label: "Profile", count: null, icon: FaUser },
   ] as const;
 
@@ -184,7 +185,7 @@ export default function TeacherDashboard() {
               {/* Avatar */}
               <div className="relative shrink-0">
                 <img src={avatar} alt={profile?.full_name || "Teacher"}
-                  className="w-14 h-14 sm:w-16 sm:h-16 object-cover border-2 border-gray-200"
+                  className="w-16 h-16 sm:w-20 sm:h-20 object-cover border-2 border-gray-200"
                   style={{ borderRadius: "50%" }} />
                 <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-gray-800 flex items-center justify-center" style={{ borderRadius: "50%" }}>
                   <FaCircleCheck className="w-2.5 h-2.5 text-white" />
@@ -194,7 +195,7 @@ export default function TeacherDashboard() {
               {/* Info */}
               <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2 mb-1">
-                  <h1 className="text-lg sm:text-xl font-bold text-gray-900">{profile?.full_name}</h1>
+                  <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{profile?.full_name}</h1>
                   {/* Not verified by default — show Get Verified */}
                   <button
                     onClick={() => setShowVerifiedModal(true)}
@@ -222,18 +223,26 @@ export default function TeacherDashboard() {
                 </div>
               </div>
 
-              {/* Stats — compact on mobile */}
-              <div className="flex gap-2 sm:gap-3 shrink-0">
-                {[
-                  { label: "Applied", value: applications.length, accent: false },
-                  { label: "Active", value: activeCount, accent: true },
-                  { label: "Saved", value: savedIds.length, accent: false },
-                ].map(s => (
-                  <div key={s.label} className={`text-center px-2.5 sm:px-4 py-1.5 sm:py-2 border ${s.accent ? "bg-gray-100 border-gray-200" : "bg-gray-50 border-gray-200"}`} style={{ borderRadius: "0.75rem" }}>
-                    <p className={`text-lg sm:text-2xl font-bold ${s.accent ? "text-gray-900" : "text-gray-900"}`}>{s.value}</p>
-                    <p className={`text-[10px] sm:text-xs font-medium ${s.accent ? "text-gray-600" : "text-gray-500"}`}>{s.label}</p>
-                  </div>
-                ))}
+              {/* Right side: notification bell + stats */}
+              <div className="flex items-start gap-3 shrink-0">
+                {/* Notification bell — desktop dashboard */}
+                <div className="hidden sm:block">
+                  <NotificationBell />
+                </div>
+
+                {/* Stats */}
+                <div className="flex gap-2 sm:gap-3">
+                  {[
+                    { label: "Applied", value: applications.length, accent: false },
+                    { label: "Active", value: activeCount, accent: true },
+                    { label: "Saved", value: savedIds.length, accent: false },
+                  ].map(s => (
+                    <div key={s.label} className={`text-center px-2.5 sm:px-4 py-1.5 sm:py-2 border ${s.accent ? "bg-gray-100 border-gray-200" : "bg-gray-50 border-gray-200"}`} style={{ borderRadius: "0.75rem" }}>
+                      <p className={`text-lg sm:text-2xl font-bold ${s.accent ? "text-gray-900" : "text-gray-900"}`}>{s.value}</p>
+                      <p className={`text-[10px] sm:text-xs font-medium ${s.accent ? "text-gray-600" : "text-gray-500"}`}>{s.label}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -259,6 +268,9 @@ export default function TeacherDashboard() {
                   <span className={`text-[10px] px-1.5 py-0.5 font-bold ${
                     tab === t.id ? "bg-gray-100 text-gray-800" : "bg-gray-100 text-gray-500"
                   }`} style={{ borderRadius: "999px" }}>{t.count}</span>
+                )}
+                {'hasNew' in t && t.hasNew && (
+                  <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
                 )}
               </button>
             ))}
@@ -364,27 +376,51 @@ export default function TeacherDashboard() {
                   <h3 className="text-base font-bold text-gray-900 mb-1">No Interviews Scheduled</h3>
                   <p className="text-gray-500 text-sm">When a recruiter schedules an interview with you, it will appear here.</p>
                 </div>
-              ) : interviews.map((iv: any) => (
-                <div key={iv.id} className="bg-white border border-gray-100 p-4 sm:p-5" style={{ borderRadius: "1rem" }}>
-                  <div className="flex items-start justify-between gap-3 flex-wrap">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-sm font-bold text-gray-900">{iv.institution_name || iv.recruiter_name}</h3>
-                        <span className={`text-xs font-bold px-2 py-0.5 ${INTERVIEW_STATUS_STYLE[iv.status] || "bg-gray-100 text-gray-500"}`} style={{ borderRadius: "0.375rem" }}>
-                          {iv.status.charAt(0).toUpperCase() + iv.status.slice(1)}
-                        </span>
+              ) : interviews.map((iv: any) => {
+                const isNew = (Date.now() - new Date(iv.created_at).getTime()) < 48 * 60 * 60 * 1000;
+                const isUpcoming = iv.status === "scheduled" || iv.status === "confirmed";
+                return (
+                  <div key={iv.id} className={`bg-white border p-4 sm:p-5 ${isUpcoming ? "border-blue-200 shadow-sm shadow-blue-50" : "border-gray-100"}`} style={{ borderRadius: "1rem" }}>
+                    <div className="flex items-start justify-between gap-3 flex-wrap">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <h3 className="text-sm font-bold text-gray-900">{iv.institution_name || iv.recruiter_name}</h3>
+                          <span className={`text-xs font-bold px-2 py-0.5 ${INTERVIEW_STATUS_STYLE[iv.status] || "bg-gray-100 text-gray-500"}`} style={{ borderRadius: "0.375rem" }}>
+                            {iv.status.charAt(0).toUpperCase() + iv.status.slice(1)}
+                          </span>
+                          {/* Important badge for new/upcoming interviews */}
+                          {(isNew || isUpcoming) && (
+                            <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 bg-red-500 text-white animate-pulse" style={{ borderRadius: "0.375rem" }}>
+                              <FaTriangleExclamation className="w-2.5 h-2.5" /> Important
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-500 mb-2">{iv.interview_type}</p>
+                        <div className="flex flex-wrap gap-3 text-xs text-gray-600">
+                          <span className="flex items-center gap-1">
+                            <FaCalendarDays className="w-3 h-3 text-gray-500" />
+                            {new Date(iv.interview_date).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" })}
+                          </span>
+                          <span className="flex items-center gap-1"><FaClock className="w-3 h-3 text-gray-500" />{iv.time_slot}</span>
+                        </div>
+                        {iv.recruiter_email && (
+                          <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1">
+                            <FaEnvelope className="w-2.5 h-2.5" /> {iv.recruiter_email}
+                          </p>
+                        )}
+                        {iv.message && <p className="text-xs text-gray-500 mt-2 italic">&ldquo;{iv.message}&rdquo;</p>}
                       </div>
-                      <p className="text-xs text-gray-500 mb-2">{iv.interview_type}</p>
-                      <div className="flex flex-wrap gap-3 text-xs text-gray-600">
-                        <span className="flex items-center gap-1"><FaCalendarDays className="w-3 h-3 text-gray-500" />{new Date(iv.interview_date).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" })}
-                        </span>
-                        <span className="flex items-center gap-1"><FaClock className="w-3 h-3 text-gray-500" />{iv.time_slot}</span>
-                      </div>
-                      {iv.message && <p className="text-xs text-gray-500 mt-2 italic">&ldquo;{iv.message}&rdquo;</p>}
+                      {isUpcoming && (
+                        <div className="shrink-0">
+                          <span className="flex items-center gap-1 text-xs font-bold text-blue-700 bg-blue-50 px-3 py-1.5" style={{ borderRadius: "0.5rem" }}>
+                            <FaCalendarDays className="w-3 h-3" /> Upcoming
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
@@ -394,15 +430,48 @@ export default function TeacherDashboard() {
               <div className="lg:col-span-1 space-y-4">
                 <div className="bg-white border border-gray-100 p-6" style={{ borderRadius: "1rem" }}>
                   <div className="text-center mb-5">
-                    <img src={avatar} alt={profile?.full_name || "Teacher"} className="w-20 h-20 mx-auto object-cover mb-3" style={{ borderRadius: "50%" }} />
-                    <h2 className="font-bold text-gray-900 text-lg">{profile?.full_name}</h2>
-                    <p className="text-sm text-gray-500">{teacherProfile?.title || "Teacher"}</p>
+                    <div className="relative inline-block mb-4">
+                      <img
+                        src={avatar}
+                        alt={profile?.full_name || "Teacher"}
+                        className="w-28 h-28 sm:w-32 sm:h-32 mx-auto object-cover border-4 border-gray-100 shadow-md"
+                        style={{ borderRadius: "50%" }}
+                      />
+                      <button
+                        onClick={() => setShowEditModal(true)}
+                        className="absolute bottom-1 right-1 w-8 h-8 bg-gray-800 text-white flex items-center justify-center shadow-lg hover:bg-black transition-colors"
+                        style={{ borderRadius: "50%" }}
+                        title="Edit profile"
+                      >
+                        <FaPencil className="w-3 h-3" />
+                      </button>
+                    </div>
+                    <h2 className="font-bold text-gray-900 text-xl leading-tight">{profile?.full_name}</h2>
+                    <p className="text-sm font-medium text-xyroots-teal mt-0.5">{teacherProfile?.title || "Teacher"}</p>
+                    {teacherProfile?.subject && (
+                      <p className="text-xs text-gray-500 mt-0.5">{teacherProfile.subject}</p>
+                    )}
                   </div>
 
-                  <div className="space-y-2.5 text-sm">
-                    {profile?.email && <div className="flex items-center gap-2 text-gray-600"><FaEnvelope className="w-3.5 h-3.5 text-gray-400 shrink-0" /><span className="truncate text-xs">{profile.email}</span></div>}
-                    {profile?.phone && <div className="flex items-center gap-2 text-gray-600"><FaPhone className="w-3.5 h-3.5 text-gray-400 shrink-0" /><span className="text-xs">{profile.phone}</span></div>}
-                    {teacherProfile?.location && <div className="flex items-center gap-2 text-gray-600"><FaLocationDot className="w-3.5 h-3.5 text-gray-400 shrink-0" /><span className="text-xs">{teacherProfile.location}</span></div>}
+                  <div className="space-y-2.5 text-sm border-t border-gray-100 pt-4">
+                    {profile?.email && (
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <FaEnvelope className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                        <span className="truncate text-xs">{profile.email}</span>
+                      </div>
+                    )}
+                    {profile?.phone && (
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <FaPhone className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                        <span className="text-xs">{profile.phone}</span>
+                      </div>
+                    )}
+                    {teacherProfile?.location && (
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <FaLocationDot className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                        <span className="text-xs">{teacherProfile.location}</span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Visibility */}
@@ -415,7 +484,9 @@ export default function TeacherDashboard() {
                       onClick={async () => {
                         const v = !isProfileVisible;
                         setIsProfileVisible(v);
-                        await supabase.from("teacher_profiles").update({ is_visible: v }).eq("profile_id", profile?.id);
+                        if (profile?.id) {
+                          await (supabase.from("teacher_profiles") as any).update({ is_visible: v }).eq("profile_id", profile.id);
+                        }
                       }}
                       className={`relative shrink-0 transition-colors ${isProfileVisible ? "bg-gray-800" : "bg-gray-300"}`}
                       style={{ width: 38, height: 20, borderRadius: 999 }}
@@ -433,7 +504,11 @@ export default function TeacherDashboard() {
                     <FaShieldHalved className="w-3.5 h-3.5" /> Get Verified
                   </button>
 
-                  <button onClick={() => setShowEditModal(true)} className="w-full mt-2 py-2.5 text-sm font-semibold bg-gray-900 text-white hover:bg-black transition-colors flex items-center justify-center gap-2" style={{ borderRadius: "0.75rem" }}>
+                  <button
+                    onClick={() => setShowEditModal(true)}
+                    className="w-full mt-2 py-2.5 text-sm font-semibold bg-gray-900 text-white hover:bg-black transition-colors flex items-center justify-center gap-2"
+                    style={{ borderRadius: "0.75rem" }}
+                  >
                     <FaPencil className="w-3.5 h-3.5" /> Edit Profile
                   </button>
                   <Link href="/profile" className="block w-full mt-2 py-2.5 text-sm font-semibold border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors text-center" style={{ borderRadius: "0.75rem" }}>
@@ -523,7 +598,27 @@ export default function TeacherDashboard() {
 
       <Footer />
 
-      {showEditModal && <OnboardingModal isOpen={showEditModal} onClose={() => setShowEditModal(false)} role="teacher" />}
+      {showEditModal && (
+        <OnboardingModal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          role="teacher"
+          onSaved={async () => {
+            // Reload teacher profile after saving
+            if (profile) {
+              const { data: tp } = await supabase
+                .from("teacher_profiles")
+                .select("*")
+                .eq("profile_id", profile.id)
+                .single();
+              if (tp) {
+                setTeacherProfile(tp);
+                setIsProfileVisible((tp as any).is_visible ?? true);
+              }
+            }
+          }}
+        />
+      )}
       <GetVerifiedModal isOpen={showVerifiedModal} onClose={() => setShowVerifiedModal(false)} />
     </div>
   );

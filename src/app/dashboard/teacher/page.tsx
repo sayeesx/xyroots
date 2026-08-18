@@ -90,7 +90,7 @@ export default function TeacherDashboard() {
               .eq("teacher_profile_id", (tp as any).id)
               .order("interview_date", { ascending: true });
           }),
-        supabase.from("watchlist_items")
+        supabase.from("watchlist")
           .select("item_id, item_type")
           .eq("profile_id", profile.id)
           .limit(100)
@@ -129,23 +129,52 @@ export default function TeacherDashboard() {
     ? new Date(profile.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
     : null;
 
-  // Profile strength — compute missing fields for hint text
+  // Profile strength — only count fields the user can actually fill in the modal
+  // Required core fields (each = ~14% of 100 / 7 fields)
+  const coreFields = [
+    !!profile?.full_name,
+    !!profile?.phone,
+    !!teacherProfile?.title,
+    !!teacherProfile?.subject,
+    !!teacherProfile?.location,
+    !!teacherProfile?.qualification,
+    teacherProfile?.experience_years != null,
+  ];
+  const coreScore = coreFields.filter(Boolean).length;
+
+  // Bonus fields
+  const bonusFields = [
+    !!teacherProfile?.professional_qualification,
+    !!teacherProfile?.bio,
+    !!profile?.avatar_url,
+  ];
+  const bonusScore = bonusFields.filter(Boolean).length;
+
+  // Total out of 10, displayed as percentage
+  const totalFields = coreFields.length + bonusFields.length; // 10
+  const filledFields = coreScore + bonusScore;
+  const computedCompletionPct = Math.round((filledFields / totalFields) * 100);
+  // Use DB value if available and close, otherwise use computed
+  const displayCompletionPct = teacherProfile ? Math.max(completionPct, computedCompletionPct) : 0;
+
   const missingFields: string[] = [];
+  if (!profile?.phone) missingFields.push("phone number");
+  if (!teacherProfile?.title) missingFields.push("professional title");
   if (!teacherProfile?.subject) missingFields.push("subject");
   if (!teacherProfile?.qualification) missingFields.push("qualification");
   if (!teacherProfile?.professional_qualification) missingFields.push("teaching qualification");
   if (teacherProfile?.experience_years == null) missingFields.push("experience years");
   if (!teacherProfile?.location) missingFields.push("location");
   if (!teacherProfile?.bio) missingFields.push("bio");
+  if (!profile?.avatar_url) missingFields.push("profile photo");
 
   const completionSegments = [
-    { label: "Basic Info", done: completionPct >= 25 },
-    { label: "Professional", done: completionPct >= 50 },
-    { label: "Experience", done: completionPct >= 75 },
-    { label: "Complete", done: completionPct >= 100 },
+    { label: "Basic Info", done: displayCompletionPct >= 25 },
+    { label: "Professional", done: displayCompletionPct >= 50 },
+    { label: "Experience", done: displayCompletionPct >= 75 },
+    { label: "Complete", done: displayCompletionPct >= 100 },
   ];
 
-  // Sidebar nav items — Interviews before Saved Jobs
   const navItems: { id: Tab; label: string; icon: React.ElementType; badge?: number; dot?: boolean }[] = [
     { id: "overview", label: "Overview", icon: FaHouse },
     { id: "applications", label: "Applications", icon: FaBriefcase, badge: applications.length },
@@ -247,8 +276,17 @@ export default function TeacherDashboard() {
         ))}
       </nav>
 
-      {/* Bottom: sign out */}
-      <div className="px-3 py-3 border-t border-gray-100 shrink-0">
+      {/* Bottom: home + sign out */}
+      <div className="px-3 py-3 border-t border-gray-100 shrink-0 space-y-0.5">
+        <Link
+          href="/"
+          onClick={() => setMobileMenuOpen(false)}
+          className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+          style={{ borderRadius: "0.625rem" }}
+        >
+          <FaHouse className="w-4 h-4 text-gray-400" />
+          Go to Homepage
+        </Link>
         <button
           onClick={handleSignOut}
           className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 transition-colors"
@@ -382,23 +420,23 @@ export default function TeacherDashboard() {
               </div>
 
               {/* Profile Strength card */}
-              {completionPct < 100 && (
+              {displayCompletionPct < 100 && (
                 <div className="bg-white border border-gray-200 p-6" style={{ borderRadius: "1rem" }}>
                   <div className="flex items-center justify-between mb-3">
                     <div>
                       <h2 className="text-base font-bold text-gray-900">Profile Strength</h2>
                       <p className="text-xs text-gray-500 mt-0.5">Complete your profile to get more interview calls</p>
                     </div>
-                    <span className="text-2xl font-bold text-gray-900">{completionPct}%</span>
+                    <span className="text-2xl font-bold text-gray-900">{displayCompletionPct}%</span>
                   </div>
                   <div className="flex gap-1 mb-3">
                     {[25, 50, 75, 100].map(t => (
-                      <div key={t} className="flex-1 h-2" style={{ borderRadius: "999px", backgroundColor: completionPct >= t ? "#00a264" : "#e5e7eb" }} />
+                      <div key={t} className="flex-1 h-2" style={{ borderRadius: "999px", backgroundColor: displayCompletionPct >= t ? "#00a264" : "#e5e7eb" }} />
                     ))}
                   </div>
-                  <div className="flex flex-wrap gap-3 mb-3">
+                  <div className="flex flex-nowrap items-center gap-x-2 mb-3 overflow-hidden">
                     {completionSegments.map(s => (
-                      <span key={s.label} className={`text-xs flex items-center gap-1 font-medium ${s.done ? "text-[#00a264]" : "text-gray-400"}`}>
+                      <span key={s.label} className={`text-[9px] flex items-center gap-0.5 font-medium whitespace-nowrap ${s.done ? "text-[#00a264]" : "text-gray-400"}`}>
                         {s.done
                           ? <FaCheck className="w-3 h-3" />
                           : <div className="w-3 h-3 border border-gray-300 rounded-full" />}
@@ -835,10 +873,18 @@ export default function TeacherDashboard() {
           onClose={() => setShowEditModal(false)}
           role="teacher"
           onSaved={async () => {
+            cacheRef.current = null; // force re-fetch next time
             if (profile) {
-              const { data: tp } = await supabase.from("teacher_profiles").select("*").eq("profile_id", profile.id).single();
-              if (tp) { setTeacherProfile(tp); setIsProfileVisible((tp as any).is_visible ?? true); }
-              cacheRef.current = null;
+              // Re-fetch teacher_profile to get the fresh completion %
+              const { data: tp } = await supabase
+                .from("teacher_profiles")
+                .select("*")
+                .eq("profile_id", profile.id)
+                .single();
+              if (tp) {
+                setTeacherProfile({ ...tp });
+                setIsProfileVisible((tp as any).is_visible ?? true);
+              }
             }
           }}
         />

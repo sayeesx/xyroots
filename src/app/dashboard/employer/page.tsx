@@ -92,7 +92,7 @@ export default function EmployerDashboard() {
     setIsLoadingData(true);
     const [{ data: jData }, watchRes] = await Promise.all([
       supabase.from("jobs").select("id, title, status, location, school_name, created_at, employment_type, salary_min, salary_max").eq("posted_by_profile_id", profile.id).order("created_at", { ascending: false }),
-      supabase.from("watchlist_items").select("item_id, item_type").eq("profile_id", profile.id).limit(100),
+      supabase.from("watchlist").select("item_id, item_type").eq("profile_id", profile.id).limit(100),
     ]);
     if (jData) setJobs(jData);
     const watchItems = ((watchRes as any).data || []) as any[];

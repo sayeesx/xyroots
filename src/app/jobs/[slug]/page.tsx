@@ -14,6 +14,7 @@ import { createClient } from "@/lib/supabase/client";
 import { formatSalary } from "@/lib/utils";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { applyToJob } from "@/lib/actions/jobs";
+import { addToWatchlist, removeFromWatchlist } from "@/lib/actions/watchlist";
 import Loader from "@/components/Loader";
 
 export default function JobDetailPage() {
@@ -56,20 +57,38 @@ export default function JobDetailPage() {
       .catch(() => { setNotFound(true); setPageLoading(false); });
   }, [actualId]); // eslint-disable-line
 
-  // Save state — persisted in localStorage
+  // Save state — DB-backed with optimistic update
   const [saved, setSaved] = useState(false);
   useEffect(() => {
-    if (!actualId) return;
-    const ids: string[] = JSON.parse(localStorage.getItem('xyroots_watchlist') || '[]');
-    setSaved(ids.includes(actualId));
-  }, [actualId]);
+    if (!actualId || !user) return;
+    // Check if already saved in DB
+    const checkSaved = async () => {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) return;
+      const { data: profileRow } = await (supabase as any)
+        .from("profiles").select("id").eq("auth_user_id", authUser.id).single();
+      if (!profileRow) return;
+      const { data } = await (supabase as any)
+        .from("watchlist")
+        .select("item_id")
+        .eq("profile_id", profileRow.id)
+        .eq("item_type", "job")
+        .eq("item_id", actualId)
+        .single();
+      setSaved(!!data);
+    };
+    checkSaved();
+  }, [actualId, user]); // eslint-disable-line
 
-  const toggleSave = () => {
+  const toggleSave = async () => {
     if (!actualId) return;
-    const ids: string[] = JSON.parse(localStorage.getItem('xyroots_watchlist') || '[]');
-    const next = saved ? ids.filter(i => i !== actualId) : [...ids, actualId];
-    localStorage.setItem('xyroots_watchlist', JSON.stringify(next));
-    setSaved(!saved);
+    const newSaved = !saved;
+    setSaved(newSaved); // optimistic
+    if (newSaved) {
+      await addToWatchlist("job", actualId);
+    } else {
+      await removeFromWatchlist("job", actualId);
+    }
   };
 
   // Apply state
@@ -93,6 +112,8 @@ export default function JobDetailPage() {
     }
   };
 
+  // Look up institution ID for the institution link
+  const institutionId = dbJob?.institution_id || null;
   const [showShareModal, setShowShareModal] = useState(false);
 
   if (pageLoading) {
@@ -160,7 +181,13 @@ export default function JobDetailPage() {
                   <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">
                     <span className="flex items-center gap-1.5 font-semibold text-gray-800">
                       <FaBuilding className="w-3.5 h-3.5 text-[#00a264] shrink-0" />
-                      {job.school}
+                      {institutionId ? (
+                        <a href={`/institutions/${institutionId}`} className="hover:text-[#00a264] hover:underline transition-colors">
+                          {job.school}
+                        </a>
+                      ) : (
+                        job.school
+                      )}
                       {job.schoolVerified && <FaShieldHalved className="w-3.5 h-3.5 text-[#00a264]" />}
                     </span>
                     <span className="flex items-center gap-1.5">
@@ -376,17 +403,32 @@ export default function JobDetailPage() {
               {/* School card */}
               <div className="bg-white border border-gray-100 p-5" style={{ borderRadius: "1rem" }}>
                 <h3 className="text-sm font-bold text-gray-900 mb-3">About the Institution</h3>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gray-100 flex items-center justify-center font-bold text-gray-700 text-base border border-gray-200" style={{ borderRadius: "0.75rem" }}>
-                    {(job.school || 'S').charAt(0)}
+                {institutionId ? (
+                  <a href={`/institutions/${institutionId}`} className="flex items-center gap-3 group">
+                    <div className="w-10 h-10 bg-gray-100 flex items-center justify-center font-bold text-gray-700 text-base border border-gray-200 group-hover:border-[#00a264]/50 transition-colors" style={{ borderRadius: "0.75rem" }}>
+                      {(job.school || 'S').charAt(0)}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-gray-900 group-hover:text-[#00a264] transition-colors flex items-center gap-1">
+                        {job.school} {job.schoolVerified && <FaShieldHalved className="w-3.5 h-3.5 text-[#00a264]" />}
+                      </p>
+                      <p className="text-xs text-gray-500">{job.location}</p>
+                      <p className="text-xs text-[#00a264] mt-0.5 font-medium">View institution →</p>
+                    </div>
+                  </a>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gray-100 flex items-center justify-center font-bold text-gray-700 text-base border border-gray-200" style={{ borderRadius: "0.75rem" }}>
+                      {(job.school || 'S').charAt(0)}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-gray-900 flex items-center gap-1">
+                        {job.school} {job.schoolVerified && <FaShieldHalved className="w-3.5 h-3.5 text-[#00a264]" />}
+                      </p>
+                      <p className="text-xs text-gray-500">{job.location}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-bold text-gray-900 flex items-center gap-1">
-                      {job.school} {job.schoolVerified && <FaShieldHalved className="w-3.5 h-3.5 text-[#00a264]" />}
-                    </p>
-                    <p className="text-xs text-gray-500">{job.location}</p>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           </div>

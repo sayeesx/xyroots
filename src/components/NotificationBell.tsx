@@ -1,8 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { FaBell, FaCircle, FaCheckDouble, FaCalendarDays, FaBriefcase, FaStar, FaCircleInfo, FaUser, FaXmark } from "react-icons/fa6";
+import {
+  FaBell, FaCircle, FaCheckDouble, FaCalendarDays, FaBriefcase,
+  FaStar, FaCircleInfo, FaUser, FaXmark
+} from "react-icons/fa6";
 import { createClient } from "@/lib/supabase/client";
 import type { Notification } from "@/lib/actions/notifications";
 
@@ -51,17 +54,12 @@ export default function NotificationBell() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
       const { data: profile } = await (supabase as any)
-        .from("profiles")
-        .select("id")
-        .eq("auth_user_id", user.id)
-        .single();
+        .from("profiles").select("id").eq("auth_user_id", user.id).single();
       if (!profile) return;
       const { data } = await (supabase as any)
-        .from("notifications")
-        .select("*")
+        .from("notifications").select("*")
         .eq("recipient_profile_id", profile.id)
-        .order("created_at", { ascending: false })
-        .limit(50);
+        .order("created_at", { ascending: false }).limit(50);
       if (data) setNotifications(data as Notification[]);
     } finally {
       if (!silent) setLoading(false);
@@ -75,13 +73,9 @@ export default function NotificationBell() {
     return () => clearInterval(interval);
   }, [load]);
 
-  // Lock body scroll when modal is open
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    if (open) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
@@ -96,10 +90,7 @@ export default function NotificationBell() {
 
   const handleMarkAllRead = async () => {
     setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
-    await (supabase as any)
-      .from("notifications")
-      .update({ is_read: true })
-      .eq("is_read", false);
+    await (supabase as any).from("notifications").update({ is_read: true }).eq("is_read", false);
   };
 
   return (
@@ -121,20 +112,22 @@ export default function NotificationBell() {
         )}
       </button>
 
-      {/* Full-screen modal — fixed, not a dropdown, so it never bubbles to parent buttons */}
+      {/* Left slide-in drawer */}
       {open && (
-        <div
-          className="fixed inset-0 z-[500] flex items-start justify-center pt-14 sm:pt-16 px-4 bg-black/50 backdrop-blur-sm"
-          onClick={() => setOpen(false)}
-        >
+        <div className="fixed inset-0 z-[500] flex" onClick={() => setOpen(false)}>
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+
+          {/* Panel — slides from left */}
           <div
-            className="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden animate-modal-in"
-            style={{ maxHeight: "calc(100vh - 4rem)" }}
+            className="relative w-full max-w-sm bg-white shadow-2xl flex flex-col"
+            style={{ height: "100vh", animation: "slide-in-left 0.28s cubic-bezier(0.16,1,0.3,1)" }}
             onClick={e => e.stopPropagation()}
           >
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
               <div className="flex items-center gap-2">
+                <FaBell className="w-4 h-4 text-gray-600" />
                 <h3 className="text-base font-bold text-gray-900">Notifications</h3>
                 {unreadCount > 0 && (
                   <span className="text-xs font-bold bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full">
@@ -144,10 +137,7 @@ export default function NotificationBell() {
               </div>
               <div className="flex items-center gap-2">
                 {unreadCount > 0 && (
-                  <button
-                    onClick={handleMarkAllRead}
-                    className="flex items-center gap-1 text-xs font-semibold text-xyroots-teal hover:underline"
-                  >
+                  <button onClick={handleMarkAllRead} className="flex items-center gap-1 text-xs font-semibold text-xyroots-teal hover:underline">
                     <FaCheckDouble className="w-3 h-3" /> Mark all read
                   </button>
                 )}
@@ -162,7 +152,7 @@ export default function NotificationBell() {
             </div>
 
             {/* List */}
-            <div className="overflow-y-auto flex-1 custom-scrollbar">
+            <div className="overflow-y-auto flex-1">
               {loading && notifications.length === 0 ? (
                 <div className="p-10 text-center text-sm text-gray-400">Loading...</div>
               ) : notifications.length === 0 ? (
@@ -171,40 +161,33 @@ export default function NotificationBell() {
                   <p className="text-sm font-semibold text-gray-500">You&apos;re all caught up!</p>
                   <p className="text-xs text-gray-400 mt-1">Notifications about interviews, applications, and more will appear here.</p>
                 </div>
-              ) : (
-                notifications.map(n => {
-                  const Icon = TYPE_ICON[n.type] || FaCircleInfo;
-                  const colorClass = TYPE_COLOR[n.type] || TYPE_COLOR.general;
-                  return (
-                    <button
-                      key={n.id}
-                      onClick={() => handleClickNotification(n)}
-                      className={`w-full text-left flex items-start gap-3 px-5 py-4 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0 ${
-                        !n.is_read ? "bg-blue-50/30" : ""
-                      }`}
-                    >
-                      <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${colorClass}`}>
-                        <Icon className="w-4 h-4" />
+              ) : notifications.map(n => {
+                const Icon = TYPE_ICON[n.type] || FaCircleInfo;
+                const colorClass = TYPE_COLOR[n.type] || TYPE_COLOR.general;
+                return (
+                  <button
+                    key={n.id}
+                    onClick={() => handleClickNotification(n)}
+                    className={`w-full text-left flex items-start gap-3 px-5 py-4 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0 ${!n.is_read ? "bg-blue-50/30" : ""}`}
+                  >
+                    <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${colorClass}`}>
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <p className={`text-sm font-bold text-gray-900 leading-tight ${!n.is_read ? "font-extrabold" : ""}`}>
+                          {n.title}
+                        </p>
+                        {!n.is_read && <div className="w-2 h-2 rounded-full bg-blue-500 shrink-0 mt-1" />}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <p className={`text-sm font-bold text-gray-900 leading-tight ${!n.is_read ? "font-extrabold" : ""}`}>
-                            {n.title}
-                          </p>
-                          {!n.is_read && (
-                            <div className="w-2 h-2 rounded-full bg-blue-500 shrink-0 mt-1" />
-                          )}
-                        </div>
-                        <p className="text-xs text-gray-600 mt-0.5 leading-relaxed line-clamp-2">{n.body}</p>
-                        <p className="text-[10px] text-gray-400 mt-1">{timeAgo(n.created_at)}</p>
-                      </div>
-                    </button>
-                  );
-                })
-              )}
+                      <p className="text-xs text-gray-600 mt-0.5 leading-relaxed line-clamp-2">{n.body}</p>
+                      <p className="text-[10px] text-gray-400 mt-1">{timeAgo(n.created_at)}</p>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Footer */}
             {notifications.length > 0 && (
               <div className="px-5 py-3 border-t border-gray-100 bg-gray-50 shrink-0">
                 <p className="text-xs text-center text-gray-400">Showing last 50 notifications</p>
@@ -213,6 +196,13 @@ export default function NotificationBell() {
           </div>
         </div>
       )}
+
+      <style>{`
+        @keyframes slide-in-left {
+          from { transform: translateX(-100%); opacity: 0.5; }
+          to   { transform: translateX(0);     opacity: 1; }
+        }
+      `}</style>
     </>
   );
 }

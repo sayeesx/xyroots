@@ -3,10 +3,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaXmark, FaSpinner, FaCamera, FaUser } from 'react-icons/fa6';
 import { useAuth } from '@/lib/auth/AuthProvider';
-import CustomSelect from '@/components/ui/CustomSelect';
 import { updateTeacherProfile } from '@/lib/actions/profile';
 import { createClient } from '@/lib/supabase/client';
 import { v4 as uuidv4 } from 'uuid';
+import CustomSelect from '@/components/ui/CustomSelect';
 import {
   SUBJECT_OPTIONS,
   QUALIFICATION_OPTIONS,
@@ -52,6 +52,35 @@ const experienceSelectOptions = [
   { value: "", label: "Select years" },
   ...EXPERIENCE_OPTIONS,
 ];
+
+// ─── SuggestInput — plain text input with datalist suggestions (no OK button, no Other option)
+function SuggestInput({
+  id, value, onChange, suggestions, placeholder, className,
+}: {
+  id?: string; value: string; onChange: (v: string) => void;
+  suggestions: readonly string[]; placeholder?: string; className?: string;
+}) {
+  const listId = `suggest-${id || Math.random().toString(36).slice(2)}`;
+  return (
+    <div className="relative w-full">
+      <input
+        id={id}
+        type="text"
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        list={listId}
+        placeholder={placeholder}
+        autoComplete="off"
+        className={`w-full px-4 py-2.5 text-sm bg-white border border-gray-200 rounded-lg outline-none focus:border-xyroots-teal ${className || ""}`}
+      />
+      <datalist id={listId}>
+        {suggestions.filter(s => s !== "Other").map(s => (
+          <option key={s} value={s} />
+        ))}
+      </datalist>
+    </div>
+  );
+}
 
 export default function OnboardingModal({ isOpen, onClose, role, onSaved }: OnboardingModalProps) {
   const [step, setStep] = useState<number>(1);
@@ -146,18 +175,21 @@ export default function OnboardingModal({ isOpen, onClose, role, onSaved }: Onbo
     reader.onload = (ev) => setAvatarPreview(ev.target?.result as string);
     reader.readAsDataURL(file);
 
-    // Upload to Supabase storage
+    // Upload to Supabase storage — path must start with auth.uid() to pass RLS
     setAvatarUploading(true);
     setSaveError(null);
     try {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) { setSaveError('Not authenticated.'); setAvatarPreview(null); return; }
       const ext = file.name.split('.').pop() || 'jpg';
       const filename = `avatar-${uuidv4()}.${ext}`;
+      const storagePath = `${authUser.id}/${filename}`;
       const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(`${profile.id}/${filename}`, file, { cacheControl: '3600', upsert: true });
+        .upload(storagePath, file, { cacheControl: '3600', upsert: true });
       if (uploadError) throw uploadError;
 
-      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(`${profile.id}/${filename}`);
+      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(storagePath);
       const publicUrl = urlData.publicUrl;
 
       await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', profile.id);
@@ -219,12 +251,9 @@ export default function OnboardingModal({ isOpen, onClose, role, onSaved }: Onbo
         // profile_completion is recalculated server-side in updateTeacherProfile
         await refreshProfile();
 
-        if (step === 1) {
-          setStep(2);
-        } else {
-          setShowSuccess(true);
-          setTimeout(() => { onSaved?.(); onClose(); }, 1200);
-        }
+        // Close directly — no step 2 needed, profile is saved
+        setShowSuccess(true);
+        setTimeout(() => { onSaved?.(); onClose(); }, 1200);
       } else if (role === 'management') {
         if (step === 1) {
           // Upsert management profile (handles both new and existing rows)
@@ -406,13 +435,12 @@ export default function OnboardingModal({ isOpen, onClose, role, onSaved }: Onbo
                           <label className="text-xs font-bold text-gray-700 block mb-1">
                             {role === 'management' ? 'Institution Location' : 'Current Location'}
                           </label>
-                          <CustomSelect
+                          <SuggestInput
+                            id="location-input"
                             value={formData.location}
                             onChange={(val) => setFormData(prev => ({ ...prev, location: val }))}
-                            options={locationOptions}
-                            placeholder="Select location"
-                            searchable
-                            allowOther
+                            suggestions={LOCATION_OPTIONS as readonly string[]}
+                            placeholder="e.g. Mumbai, Kerala…"
                           />
                         </div>
                       </div>
@@ -434,47 +462,46 @@ export default function OnboardingModal({ isOpen, onClose, role, onSaved }: Onbo
                               className="w-full px-4 py-2.5 text-sm bg-white border border-gray-200 rounded-lg outline-none focus:border-xyroots-teal"
                             />
                           </div>
-                          <div>
+                        <div>
                             <label className="text-xs font-bold text-gray-700 block mb-1">Primary Subject <span className="text-red-500">*</span></label>
-                            <CustomSelect
+                            <SuggestInput
+                              id="subject-input"
                               value={formData.subject}
                               onChange={(val) => setFormData(prev => ({ ...prev, subject: val }))}
-                              options={subjectOptions}
-                              placeholder="Select subject"
-                              searchable
-                              allowOther
+                              suggestions={SUBJECT_OPTIONS}
+                              placeholder="e.g. Mathematics, Physics…"
                             />
                           </div>
                           <div>
                             <label className="text-xs font-bold text-gray-700 block mb-1">Academic Qualification</label>
-                            <CustomSelect
+                            <SuggestInput
+                              id="qual-input"
                               value={formData.qualification}
                               onChange={(val) => setFormData(prev => ({ ...prev, qualification: val }))}
-                              options={qualificationOptions}
-                              placeholder="Select qualification"
-                              searchable
-                              allowOther
+                              suggestions={QUALIFICATION_OPTIONS}
+                              placeholder="e.g. B.Sc., M.A.…"
                             />
                           </div>
                           <div>
                             <label className="text-xs font-bold text-gray-700 block mb-1">Teaching Qualification</label>
-                            <CustomSelect
+                            <SuggestInput
+                              id="profqual-input"
                               value={formData.professionalQualification}
                               onChange={(val) => setFormData(prev => ({ ...prev, professionalQualification: val }))}
-                              options={professionalQualificationOptions}
-                              placeholder="Select teaching qualification"
-                              searchable
-                              allowOther
+                              suggestions={PROFESSIONAL_QUALIFICATION_OPTIONS}
+                              placeholder="e.g. B.Ed., CTET…"
                             />
                           </div>
                           <div>
                             <label className="text-xs font-bold text-gray-700 block mb-1">Years of Experience</label>
-                            <CustomSelect
+                            <input
+                              type="number"
+                              min="0"
+                              max="50"
                               value={formData.experienceYears}
-                              onChange={(val) => setFormData(prev => ({ ...prev, experienceYears: val }))}
-                              options={experienceSelectOptions}
-                              placeholder="Select years"
-                              allowOther
+                              onChange={e => setFormData(prev => ({ ...prev, experienceYears: e.target.value }))}
+                              placeholder="e.g. 5"
+                              className="w-full px-4 py-2.5 text-sm bg-white border border-gray-200 rounded-lg outline-none focus:border-xyroots-teal"
                             />
                           </div>
                         </div>

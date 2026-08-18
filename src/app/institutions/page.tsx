@@ -7,10 +7,9 @@ import Footer from "@/components/Footer";
 import CustomSelect from "@/components/ui/CustomSelect";
 import {
   FaMagnifyingGlass, FaLocationDot, FaShieldHalved, FaUsers, FaChevronRight,
-  FaBuilding, FaStar, FaBriefcase, FaCheck, FaArrowRight,
+  FaBuilding, FaBriefcase, FaStar,
   FaSchool, FaRegBuilding, FaLock
 } from "react-icons/fa6";
-import { schools } from "@/data/schools";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth/AuthProvider";
 
@@ -65,10 +64,13 @@ function RealInstitutionCard({ inst, openPositions }: { inst: any; openPositions
       >
         <div className="flex items-center gap-3.5">
           <div
-            className="w-12 h-12 shrink-0 flex items-center justify-center text-white text-sm font-bold"
-            style={{ borderRadius: "0.875rem", background: `linear-gradient(135deg, ${accents[idx]}, ${accents[idx]}cc)` }}
+            className="w-12 h-12 shrink-0 flex items-center justify-center text-white text-sm font-bold overflow-hidden"
+            style={{ borderRadius: "0.875rem", background: inst.logo_url ? "transparent" : `linear-gradient(135deg, ${accents[idx]}, ${accents[idx]}cc)` }}
           >
-            {(inst.name || "I").charAt(0).toUpperCase()}
+            {inst.logo_url
+              ? <img src={inst.logo_url} alt={inst.name} className="w-full h-full object-cover" style={{ borderRadius: "0.875rem" }} />
+              : (inst.name || "I").charAt(0).toUpperCase()
+            }
           </div>
           <div>
             <h2 className="text-base font-bold text-gray-900 group-hover:text-[#00a264] transition-colors leading-tight">{inst.name}</h2>
@@ -115,103 +117,6 @@ function RealInstitutionCard({ inst, openPositions }: { inst: any; openPositions
   );
 }
 
-// ─── Institution Card ──────────────────────────────────────────────────────────
-function InstitutionCard({ school }: { school: typeof schools[0] }) {
-  const bgColors = ["#f0fdf4", "#eff6ff", "#fdf4ff", "#fff7ed", "#f0fdf4"];
-  const accentColors = ["#00a264", "#2563eb", "#9333ea", "#ea580c", "#00a264"];
-  const idx = parseInt(school.id) % bgColors.length;
-
-  return (
-    <Link
-      href={`/institutions/${school.id}`}
-      className="bg-white border border-gray-200 hover:border-[#00a264]/50 hover:shadow-[0_4px_24px_rgba(0,162,100,0.10)] transition-all duration-300 flex flex-col group"
-      style={{ borderRadius: "1.25rem" }}
-    >
-      {/* Card Header */}
-      <div
-        className="px-5 pt-5 pb-4 flex items-start justify-between"
-        style={{ background: `linear-gradient(135deg, ${bgColors[idx]} 0%, #fff 100%)`, borderRadius: "1.25rem 1.25rem 0 0" }}
-      >
-        <div className="flex items-center gap-3.5">
-          {/* Logo */}
-          <div
-            className="w-12 h-12 shrink-0 flex items-center justify-center text-white text-sm font-bold"
-            style={{ borderRadius: "0.875rem", background: `linear-gradient(135deg, ${accentColors[idx]}, ${accentColors[idx]}cc)` }}
-          >
-            {school.logo}
-          </div>
-          <div>
-            <h2 className="text-base font-bold text-gray-900 group-hover:text-[#00a264] transition-colors leading-tight">{school.name}</h2>
-            <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
-              <FaLocationDot className="w-3 h-3 text-[#00a264]" />
-              {school.location}
-            </p>
-          </div>
-        </div>
-        {school.verified && (
-          <span
-            className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 bg-[#e6f7ed] text-[#00a264] shrink-0"
-            style={{ borderRadius: "999px" }}
-          >
-            <FaShieldHalved className="w-2.5 h-2.5" /> Verified
-          </span>
-        )}
-      </div>
-
-      {/* Body */}
-      <div className="px-5 py-3 flex-1 flex flex-col gap-3">
-        <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">{school.description}</p>
-
-        {/* Stats row */}
-        <div className="grid grid-cols-3 gap-2">
-          <div className="text-center p-2 bg-gray-50" style={{ borderRadius: "0.625rem" }}>
-            <p className="text-sm font-bold text-gray-900">{school.students.toLocaleString()}</p>
-            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Students</p>
-          </div>
-          <div className="text-center p-2 bg-gray-50" style={{ borderRadius: "0.625rem" }}>
-            <p className="text-sm font-bold text-gray-900">{school.teachers}</p>
-            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Teachers</p>
-          </div>
-          <div className="text-center p-2 bg-[#e6f7ed]" style={{ borderRadius: "0.625rem" }}>
-            <p className="text-sm font-bold text-[#00a264]">{school.openPositions}</p>
-            <p className="text-[10px] font-semibold text-[#00a264]/70 uppercase tracking-wide">Vacancies</p>
-          </div>
-        </div>
-
-        {/* Board tags */}
-        <div className="flex flex-wrap gap-1.5">
-          {school.board.map((b) => (
-            <span key={b} className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 font-semibold" style={{ borderRadius: "0.375rem" }}>
-              {b}
-            </span>
-          ))}
-          <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 font-semibold" style={{ borderRadius: "0.375rem" }}>
-            {school.type}
-          </span>
-          <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-500 font-medium" style={{ borderRadius: "0.375rem" }}>
-            Est. {school.established}
-          </span>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div className="px-5 py-3 border-t border-gray-100 flex items-center justify-between" style={{ borderRadius: "0 0 1.25rem 1.25rem" }}>
-        <span className="text-xs font-bold text-[#00a264] flex items-center gap-1">
-          <FaBriefcase className="w-3 h-3" />
-          {school.openPositions} open {school.openPositions === 1 ? "vacancy" : "vacancies"}
-        </span>
-        <Link
-          href={`/institutions/${school.id}`}
-          className="inline-flex items-center gap-1.5 text-[11px] font-bold text-white bg-[#00a264] hover:bg-[#007a4d] transition-all px-3 py-1.5 group-hover:scale-[1.03]"
-          style={{ borderRadius: "0.5rem" }}
-        >
-          View Details <FaChevronRight className="w-2.5 h-2.5" />
-        </Link>
-      </div>
-    </Link>
-  );
-}
-
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 export default function InstitutionsPage() {
   const { openInstitutionRegistration, openSignIn, user, loading } = useAuth();
@@ -230,50 +135,47 @@ export default function InstitutionsPage() {
     if (!user) { setRealLoading(false); return; }
     const fetchReal = async () => {
       setRealLoading(true);
-      // Fetch visible institutions created by management accounts only (not agencies)
+
+      // Fetch all visible institutions — skip profile role filter since RLS blocks
+      // cross-user profile lookups. The is_visible flag is the primary access control.
       const { data: instData } = await supabase
         .from("institutions")
-        .select("id, name, location, type, board, established, verified, description, is_visible, created_by_profile_id")
+        .select("id, name, location, type, board, established, verified, description, is_visible, created_by_profile_id, logo_url")
         .eq("is_visible", true)
         .order("created_at", { ascending: false })
         .limit(50);
 
       if (!instData || instData.length === 0) { setRealLoading(false); return; }
 
-      // Filter to only management-owned institutions (not agency)
-      const profileIds = instData.map((i: any) => i.created_by_profile_id).filter(Boolean);
-      let managementIds = new Set<string>(profileIds); // default: show all
-      if (profileIds.length > 0) {
-        const { data: profileRoles } = await supabase
-          .from("profiles")
-          .select("id, role")
-          .in("id", profileIds);
-        if (profileRoles) {
-          managementIds = new Set(
-            (profileRoles as any[])
-              .filter((p: any) => p.role === "management")
-              .map((p: any) => p.id)
-          );
-        }
-      }
-      const managementInstData = instData.filter((i: any) =>
-        !i.created_by_profile_id || managementIds.has(i.created_by_profile_id)
-      );
+      const allInstData = instData as any[];
 
-      // Count open jobs per institution
-      const ids = managementInstData.map((i: any) => i.id);
-      const { data: jobCounts } = await supabase
-        .from("jobs")
-        .select("institution_id, posted_by_profile_id")
-        .in("institution_id", ids.length > 0 ? ids : ["__none__"])
-        .eq("status", "published");
+      // Count published jobs per institution using BOTH institution_id and posted_by_profile_id
+      const instIds = allInstData.map((i: any) => i.id);
+      const profIds = allInstData.map((i: any) => i.created_by_profile_id).filter(Boolean);
+
+      const [byInstId, byProfile] = await Promise.all([
+        instIds.length > 0
+          ? supabase.from("jobs").select("institution_id").in("institution_id", instIds).eq("status", "published")
+          : Promise.resolve({ data: [] }),
+        profIds.length > 0
+          ? supabase.from("jobs").select("posted_by_profile_id").in("posted_by_profile_id", profIds).eq("status", "published").is("institution_id", null)
+          : Promise.resolve({ data: [] }),
+      ]);
 
       const countMap: Record<string, number> = {};
-      (jobCounts || []).forEach((j: any) => {
+      ((byInstId.data || []) as any[]).forEach((j: any) => {
         if (j.institution_id) countMap[j.institution_id] = (countMap[j.institution_id] || 0) + 1;
       });
+      const profileToInstId: Record<string, string> = {};
+      allInstData.forEach((i: any) => {
+        if (i.created_by_profile_id) profileToInstId[i.created_by_profile_id] = i.id;
+      });
+      ((byProfile.data || []) as any[]).forEach((j: any) => {
+        const instId = profileToInstId[j.posted_by_profile_id];
+        if (instId) countMap[instId] = (countMap[instId] || 0) + 1;
+      });
 
-      setRealInstitutions(managementInstData.map((inst: any) => ({
+      setRealInstitutions(allInstData.map((inst: any) => ({
         inst,
         openPositions: countMap[inst.id] || 0,
       })));
@@ -282,19 +184,7 @@ export default function InstitutionsPage() {
     fetchReal();
   }, [user]); // eslint-disable-line
 
-  // Filter static schools
-  const filteredStatic = schools.filter((s) => {
-    const matchSearch =
-      s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.type.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchType = selectedType === "All" || s.type === selectedType;
-    const matchLoc = selectedLocation === "All" || s.location.includes(selectedLocation);
-    const matchBoard = selectedBoard === "All" || s.board.includes(selectedBoard);
-    return matchSearch && matchType && matchLoc && matchBoard;
-  });
-
-  // Filter real institutions
+  // Filter real institutions only
   const filteredReal = realInstitutions.filter(({ inst }) => {
     const matchSearch =
       (inst.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -306,7 +196,7 @@ export default function InstitutionsPage() {
     return matchSearch && matchType && matchLoc && matchBoard;
   });
 
-  const totalCount = filteredReal.length + filteredStatic.length;
+  const totalCount = filteredReal.length;
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f7f9f8]">
@@ -326,7 +216,7 @@ export default function InstitutionsPage() {
             <div className="absolute top-12 left-1/2 w-48 h-48 bg-white/5" style={{ borderRadius: "50%" }} />
           </div>
 
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
             <div className="max-w-3xl">
               <span
                 className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white/70 mb-4 px-3 py-1 bg-white/10"
@@ -439,13 +329,8 @@ export default function InstitutionsPage() {
               </div>
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
-                {/* Real institutions from Supabase first (newest, most relevant) */}
                 {filteredReal.map(({ inst, openPositions }) => (
                   <RealInstitutionCard key={inst.id} inst={inst} openPositions={openPositions} />
-                ))}
-                {/* Static demo institutions */}
-                {filteredStatic.map((school) => (
-                  <InstitutionCard key={school.id} school={school} />
                 ))}
               </div>
             )}

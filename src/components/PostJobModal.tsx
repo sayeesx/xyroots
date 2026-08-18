@@ -63,14 +63,20 @@ export default function PostJobModal({ isOpen, onClose, onSuccess }: PostJobModa
     reader.readAsDataURL(file);
     setLogoUploading(true);
     try {
+      // Must use auth.uid() as first folder to match storage RLS policy
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
       const ext = file.name.split(".").pop() || "jpg";
       const filename = `logo-${uuidv4()}.${ext}`;
-      const { error: upErr } = await supabase.storage.from("avatars").upload(`institutions/${profile.id}/${filename}`, file, { upsert: true });
+      const storagePath = `${user.id}/institution-logos/${filename}`;
+      const { error: upErr } = await supabase.storage
+        .from("avatars")
+        .upload(storagePath, file, { upsert: true, cacheControl: "3600" });
       if (upErr) throw upErr;
-      const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(`institutions/${profile.id}/${filename}`);
+      const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(storagePath);
       setLogoUrl(urlData.publicUrl);
-    } catch {
-      setError("Failed to upload logo.");
+    } catch (err: any) {
+      setError(err?.message || "Failed to upload logo.");
       setLogoPreview(null);
     } finally {
       setLogoUploading(false);

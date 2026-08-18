@@ -7,6 +7,7 @@ import CustomSelect from "@/components/ui/CustomSelect";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { formatSalary } from "@/lib/utils";
+import { addToWatchlist, removeFromWatchlist } from "@/lib/actions/watchlist";
 import {
   FaMagnifyingGlass, FaLocationDot, FaBookmark, FaRegBookmark, FaCircleCheck,
   FaBars, FaTableCellsLarge, FaBriefcase, FaFilter, FaXmark, FaIndianRupeeSign, FaSort, FaLock, FaChevronDown, FaCheck
@@ -383,23 +384,39 @@ function JobsPageInner() {
   const [selectedState, setSelectedState] = useState("All States");
   const [sortBy, setSortBy] = useState("default");
 
-  // Watchlist — stores actual job UUIDs
+  // Watchlist — DB-backed, falls back to optimistic local state
   const [watchlist, setWatchlist] = useState<string[]>([]);
-  useEffect(() => {
-    const savedIds = localStorage.getItem('xyroots_watchlist');
-    if (savedIds) { try { setWatchlist(JSON.parse(savedIds)); } catch (e) {} }
-  }, []);
+  const supabaseClient = createClient();
 
-  const toggleWatchlist = (jobId: string) => {
-    if (!user) {
-      openSignIn();
-      return;
+  useEffect(() => {
+    if (!user) return;
+    // Load saved job IDs from the watchlist table
+    const loadWatchlist = async () => {
+      const { data: { user: authUser } } = await supabaseClient.auth.getUser();
+      if (!authUser) return;
+      const { data: profileRow } = await (supabaseClient as any)
+        .from("profiles").select("id").eq("auth_user_id", authUser.id).single();
+      if (!profileRow) return;
+      const { data } = await (supabaseClient as any)
+        .from("watchlist")
+        .select("item_id")
+        .eq("profile_id", profileRow.id)
+        .eq("item_type", "job");
+      if (data) setWatchlist(data.map((r: any) => r.item_id as string));
+    };
+    loadWatchlist();
+  }, [user]); // eslint-disable-line
+
+  const toggleWatchlist = async (jobId: string) => {
+    if (!user) { openSignIn(); return; }
+    const isSaved = watchlist.includes(jobId);
+    // Optimistic update
+    setWatchlist(prev => isSaved ? prev.filter(id => id !== jobId) : [...prev, jobId]);
+    if (isSaved) {
+      await removeFromWatchlist("job", jobId);
+    } else {
+      await addToWatchlist("job", jobId);
     }
-    setWatchlist(prev => {
-      const next = prev.includes(jobId) ? prev.filter(s => s !== jobId) : [...prev, jobId];
-      localStorage.setItem('xyroots_watchlist', JSON.stringify(next));
-      return next;
-    });
   };
 
   const clearAll = () => {
@@ -468,6 +485,19 @@ function JobsPageInner() {
         });
         if (!hasMatch) return false;
       }
+
+      // Date Posted filter
+      if (postedDate && postedDate !== "Any time") {
+        const jobDate = new Date(job.created_at);
+        const now = Date.now();
+        const cutoff =
+          postedDate === "Past 24 hours" ? now - 24 * 60 * 60 * 1000 :
+          postedDate === "Past week"     ? now - 7 * 24 * 60 * 60 * 1000 :
+          postedDate === "Past month"    ? now - 30 * 24 * 60 * 60 * 1000 :
+          null;
+        if (cutoff && jobDate.getTime() < cutoff) return false;
+      }
+
       return true;
     });
 

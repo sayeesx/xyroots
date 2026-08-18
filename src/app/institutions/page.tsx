@@ -230,22 +230,42 @@ export default function InstitutionsPage() {
     if (!user) { setRealLoading(false); return; }
     const fetchReal = async () => {
       setRealLoading(true);
-      // Fetch visible institutions + open job count
+      // Fetch visible institutions created by management accounts only (not agencies)
       const { data: instData } = await supabase
         .from("institutions")
-        .select("id, name, location, type, board, established, verified, description, is_visible")
+        .select("id, name, location, type, board, established, verified, description, is_visible, created_by_profile_id")
         .eq("is_visible", true)
         .order("created_at", { ascending: false })
         .limit(50);
 
       if (!instData || instData.length === 0) { setRealLoading(false); return; }
 
+      // Filter to only management-owned institutions (not agency)
+      const profileIds = instData.map((i: any) => i.created_by_profile_id).filter(Boolean);
+      let managementIds = new Set<string>(profileIds); // default: show all
+      if (profileIds.length > 0) {
+        const { data: profileRoles } = await supabase
+          .from("profiles")
+          .select("id, role")
+          .in("id", profileIds);
+        if (profileRoles) {
+          managementIds = new Set(
+            (profileRoles as any[])
+              .filter((p: any) => p.role === "management")
+              .map((p: any) => p.id)
+          );
+        }
+      }
+      const managementInstData = instData.filter((i: any) =>
+        !i.created_by_profile_id || managementIds.has(i.created_by_profile_id)
+      );
+
       // Count open jobs per institution
-      const ids = instData.map((i: any) => i.id);
+      const ids = managementInstData.map((i: any) => i.id);
       const { data: jobCounts } = await supabase
         .from("jobs")
-        .select("institution_id")
-        .in("institution_id", ids)
+        .select("institution_id, posted_by_profile_id")
+        .in("institution_id", ids.length > 0 ? ids : ["__none__"])
         .eq("status", "published");
 
       const countMap: Record<string, number> = {};
@@ -253,7 +273,7 @@ export default function InstitutionsPage() {
         if (j.institution_id) countMap[j.institution_id] = (countMap[j.institution_id] || 0) + 1;
       });
 
-      setRealInstitutions(instData.map((inst: any) => ({
+      setRealInstitutions(managementInstData.map((inst: any) => ({
         inst,
         openPositions: countMap[inst.id] || 0,
       })));

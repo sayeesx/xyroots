@@ -19,15 +19,15 @@ import {
 const Loader = () => (
   <>
     <style>{`
-      .loading { width: 124px; height: 124px; }
+      .loading { width: 96px; height: 96px; }
       .loading svg { display: block; width: 100%; height: 100%; }
-      .circle { transform: rotate(-90deg); transform-origin: center; stroke-dasharray: 380; stroke-dashoffset: 380; animation: circle_4 2s ease-in-out forwards; }
-      .check { stroke-dasharray: 45; stroke-dashoffset: 45; animation: check_4 0.2s 2s ease-in-out forwards; }
+      .circle { transform: rotate(-90deg); transform-origin: center; stroke-dasharray: 380; stroke-dashoffset: 380; animation: circle_4 0.7s ease-in-out forwards; }
+      .check { stroke-dasharray: 45; stroke-dashoffset: 45; animation: check_4 0.2s 0.75s ease-in-out forwards; }
       @keyframes circle_4 { 0% { stroke-dashoffset: 380; } 100% { stroke-dashoffset: 0; } }
       @keyframes check_4 { 0% { stroke-dashoffset: 45; } 100% { stroke-dashoffset: 90; } }
     `}</style>
     <div className="loading">
-      <svg xmlns="http://www.w3.org/2000/svg" width={124} height={124} viewBox="0 0 124 124">
+      <svg xmlns="http://www.w3.org/2000/svg" width={96} height={96} viewBox="0 0 124 124">
         <circle cx={62} cy={62} r={59} fill="none" stroke="hsl(271, 76%, 74%)" strokeWidth="6px" />
         <circle className="circle" cx={62} cy={62} r={59} fill="none" stroke="hsl(271, 76%, 53%)" strokeWidth="6px" strokeLinecap="round" />
         <polyline className="check" points="73.56 48.63 57.88 72.69 49.38 62" fill="none" stroke="hsl(271, 76%, 53%)" strokeWidth="6px" strokeLinecap="round" />
@@ -223,33 +223,50 @@ export default function OnboardingModal({ isOpen, onClose, role, onSaved }: Onbo
           setStep(2);
         } else {
           setShowSuccess(true);
-          setTimeout(() => { onSaved?.(); onClose(); }, 2500);
+          setTimeout(() => { onSaved?.(); onClose(); }, 1200);
         }
       } else if (role === 'management') {
         if (step === 1) {
-          // Update management profile
-          await (supabase.from('management_profiles') as any)
-            .update({
+          // Upsert management profile (handles both new and existing rows)
+          const { error: mpError } = await (supabase.from('management_profiles') as any)
+            .upsert({
+              profile_id: profile.id,
               contact_name: formData.fullName,
+              phone: formData.phone || null,
+              institution_name: formData.title || null,
+              updated_at: new Date().toISOString(),
+            }, { onConflict: 'profile_id' });
+
+          if (mpError) {
+            // If upsert fails, try insert (first time)
+            await (supabase.from('management_profiles') as any)
+              .insert({
+                profile_id: profile.id,
+                contact_name: formData.fullName,
+                phone: formData.phone || null,
+                institution_name: formData.title || null,
+              }).select().single();
+          }
+
+          await (supabase.from('profiles') as any)
+            .update({
+              full_name: formData.fullName || profile.full_name,
               phone: formData.phone || null,
               updated_at: new Date().toISOString(),
             })
-            .eq('profile_id', profile.id);
-
-          await (supabase.from('profiles') as any)
-            .update({ phone: formData.phone || null, updated_at: new Date().toISOString() })
             .eq('id', profile.id);
 
           await refreshProfile();
-          setStep(2);
+          setShowSuccess(true);
+          setTimeout(() => { onSaved?.(); onClose(); }, 1200);
         } else {
           setShowSuccess(true);
-          setTimeout(() => { onSaved?.(); onClose(); }, 2500);
+          setTimeout(() => { onSaved?.(); onClose(); }, 1200);
         }
       } else {
         // Agency — just close after confirming
         setShowSuccess(true);
-        setTimeout(() => { onSaved?.(); onClose(); }, 2000);
+        setTimeout(() => { onSaved?.(); onClose(); }, 1200);
       }
     } catch (err) {
       setSaveError('An unexpected error occurred. Please try again.');
@@ -544,7 +561,7 @@ export default function OnboardingModal({ isOpen, onClose, role, onSaved }: Onbo
                             }
                             setLoading(false);
                             setShowSuccess(true);
-                            setTimeout(() => { onSaved?.(); onClose(); }, 2500);
+                            setTimeout(() => { onSaved?.(); onClose(); }, 1200);
                           }}
                           disabled={loading}
                           className="px-6 py-3 rounded-xl border-2 border-gray-200 hover:border-gray-300 font-bold transition-all"
@@ -561,7 +578,7 @@ export default function OnboardingModal({ isOpen, onClose, role, onSaved }: Onbo
                             }
                             setLoading(false);
                             setShowSuccess(true);
-                            setTimeout(() => { onSaved?.(); onClose(); }, 2500);
+                            setTimeout(() => { onSaved?.(); onClose(); }, 1200);
                           }}
                           disabled={loading}
                           className="px-6 py-3 rounded-xl bg-xyroots-teal text-white font-bold hover:bg-xyroots-teal/90 transition-all shadow-lg shadow-xyroots-teal/20"
@@ -576,25 +593,18 @@ export default function OnboardingModal({ isOpen, onClose, role, onSaved }: Onbo
                       <p className="text-gray-500 mb-8 max-w-md mx-auto">Your details are saved! Would you like to post a new job opening right now?</p>
                       <div className="flex justify-center gap-4">
                         <button
-                          onClick={async () => {
-                            setLoading(true);
-                            await new Promise(r => setTimeout(r, 500));
-                            setLoading(false);
-                            setShowSuccess(true);
-                            setTimeout(() => { onSaved?.(); onClose(); }, 2500);
-                          }}
+                          onClick={() => { setShowSuccess(true); setTimeout(() => { onSaved?.(); onClose(); }, 1200); }}
                           disabled={loading}
                           className="px-6 py-3 rounded-xl border-2 border-gray-200 hover:border-gray-300 font-bold transition-all"
                         >
-                          Cancel
+                          Skip
                         </button>
                         <button
                           onClick={() => {
                             onClose();
-                            // Navigate to employer dashboard and trigger post-job modal via URL param
                             window.location.href = '/dashboard/employer?action=post-job';
                           }}
-                          className="px-6 py-3 rounded-xl bg-xyroots-yellow text-black font-bold hover:bg-xyroots-yellow/90 transition-all shadow-lg shadow-xyroots-yellow/20"
+                          className="px-6 py-3 rounded-xl bg-xyroots-teal text-white font-bold hover:bg-xyroots-teal/90 transition-all"
                         >
                           Post a Job
                         </button>

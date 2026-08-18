@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { FaXmark, FaSpinner, FaCircleCheck } from "react-icons/fa6";
+import { useState, useRef } from "react";
+import { FaXmark, FaSpinner, FaCircleCheck, FaCamera } from "react-icons/fa6";
 import { createJob } from "@/lib/actions/jobs";
+import { createClient } from "@/lib/supabase/client";
+import { useAuth } from "@/lib/auth/AuthProvider";
+import { v4 as uuidv4 } from "uuid";
 import CustomSelect from "@/components/ui/CustomSelect";
 import {
   SUBJECT_OPTIONS,
@@ -41,6 +44,39 @@ export default function PostJobModal({ isOpen, onClose, onSuccess }: PostJobModa
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const { profile } = useAuth();
+  const supabase = createClient();
+
+  // Institution logo
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+
+  const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !profile) return;
+    if (!file.type.startsWith("image/")) { setError("Please select an image."); return; }
+    if (file.size > 3 * 1024 * 1024) { setError("Logo must be under 3MB."); return; }
+    const reader = new FileReader();
+    reader.onload = ev => setLogoPreview(ev.target?.result as string);
+    reader.readAsDataURL(file);
+    setLogoUploading(true);
+    try {
+      const ext = file.name.split(".").pop() || "jpg";
+      const filename = `logo-${uuidv4()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("avatars").upload(`institutions/${profile.id}/${filename}`, file, { upsert: true });
+      if (upErr) throw upErr;
+      const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(`institutions/${profile.id}/${filename}`);
+      setLogoUrl(urlData.publicUrl);
+    } catch {
+      setError("Failed to upload logo.");
+      setLogoPreview(null);
+    } finally {
+      setLogoUploading(false);
+      e.target.value = "";
+    }
+  };
 
   const [form, setForm] = useState({
     title: "",
@@ -96,6 +132,19 @@ export default function PostJobModal({ isOpen, onClose, onSuccess }: PostJobModa
       if (!result.success) {
         setError(result.error || "Failed to post vacancy.");
         return;
+      }
+
+      // If a logo was uploaded, save it to the institution record
+      if (logoUrl && profile) {
+        const supabaseClient = createClient();
+        const { data: inst } = await supabaseClient
+          .from("institutions")
+          .select("id")
+          .eq("created_by_profile_id", profile.id)
+          .single();
+        if (inst) {
+          await supabaseClient.from("institutions").update({ logo_url: logoUrl } as any).eq("id", inst.id);
+        }
       }
 
       setSuccess(true);
@@ -160,6 +209,30 @@ export default function PostJobModal({ isOpen, onClose, onSuccess }: PostJobModa
                 {error}
               </div>
             )}
+
+            {/* Institution Logo */}
+            <div className="flex items-center gap-4 p-4 bg-gray-50 border border-gray-200" style={{ borderRadius: "0.75rem" }}>
+              <div className="relative shrink-0">
+                <div className="w-14 h-14 flex items-center justify-center bg-gray-100 border-2 border-gray-200 overflow-hidden" style={{ borderRadius: "0.625rem" }}>
+                  {logoPreview
+                    ? <img src={logoPreview} alt="Logo" className="w-full h-full object-cover" />
+                    : <FaCamera className="w-6 h-6 text-gray-300" />}
+                </div>
+                {logoUploading && (
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center" style={{ borderRadius: "0.625rem" }}>
+                    <FaSpinner className="w-4 h-4 text-white animate-spin" />
+                  </div>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-gray-900 mb-0.5">Institution Logo <span className="text-xs font-normal text-gray-400">(optional)</span></p>
+                <p className="text-xs text-gray-500 mb-2">JPG, PNG · Max 3MB</p>
+                <input ref={logoInputRef} type="file" accept="image/*" onChange={handleLogoChange} className="hidden" id="logo-upload-input" />
+                <label htmlFor="logo-upload-input" className={`inline-flex items-center gap-2 px-3 py-1.5 text-xs font-bold border cursor-pointer transition-all ${logoUploading ? "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed" : "bg-white border-gray-300 text-gray-700 hover:border-xyroots-teal hover:text-xyroots-teal"}`} style={{ borderRadius: "0.5rem" }}>
+                  <FaCamera className="w-3 h-3" />{logoUploading ? "Uploading..." : logoPreview ? "Change Logo" : "Upload Logo"}
+                </label>
+              </div>
+            </div>
 
             {/* Basic */}
             <div>

@@ -50,14 +50,36 @@ export default function InstitutionDetailPage() {
     }
 
     // Fall back to Supabase for real institution UUIDs
-    Promise.all([
-      supabase.from("institutions").select("*").eq("id", id).single(),
-      supabase.from("jobs").select("id, title, subject, level, status, created_at, qualification, experience_min, experience_max, salary_min, salary_max, location, employment_type, description").eq("institution_id", id).order("created_at", { ascending: false }),
-    ]).then(([{ data: inst, error }, { data: jobsData }]) => {
-      if (error || !inst) { setNotFound(true); }
-      else { setInstitution(inst); setJobs(jobsData || []); }
-      setPageLoading(false);
-    });
+    supabase.from("institutions").select("*").eq("id", id).single()
+      .then(async ({ data: inst, error }) => {
+        if (error || !inst) { setNotFound(true); setPageLoading(false); return; }
+        setInstitution(inst);
+
+        // Query jobs by institution_id OR by the profile who owns this institution
+        const [{ data: byInstId }, { data: byProfile }] = await Promise.all([
+          supabase.from("jobs")
+            .select("id, title, subject, level, status, created_at, qualification, experience_min, experience_max, salary_min, salary_max, location, employment_type, description")
+            .eq("institution_id", id)
+            .order("created_at", { ascending: false }),
+          (inst as any).created_by_profile_id
+            ? supabase.from("jobs")
+                .select("id, title, subject, level, status, created_at, qualification, experience_min, experience_max, salary_min, salary_max, location, employment_type, description")
+                .eq("posted_by_profile_id", (inst as any).created_by_profile_id)
+                .order("created_at", { ascending: false })
+            : Promise.resolve({ data: [] }),
+        ]);
+
+        // Merge and deduplicate by job id
+        const allJobs = [...(byInstId || []), ...(byProfile || [])];
+        const seen = new Set<string>();
+        const merged = allJobs.filter((j: any) => {
+          if (seen.has(j.id)) return false;
+          seen.add(j.id);
+          return true;
+        });
+        setJobs(merged);
+        setPageLoading(false);
+      });
   }, [id]); // eslint-disable-line
 
   if (pageLoading || authLoading) {

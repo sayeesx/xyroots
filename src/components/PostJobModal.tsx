@@ -42,6 +42,7 @@ const statusSelectOptions = [
 
 export default function PostJobModal({ isOpen, onClose, onSuccess }: PostJobModalProps) {
   const [loading, setLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string,string>>({});
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const { profile } = useAuth();
@@ -108,12 +109,13 @@ export default function PostJobModal({ isOpen, onClose, onSuccess }: PostJobModa
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.title || !form.subject) {
-      setError("Job title and subject are required.");
-      return;
-    }
     setLoading(true);
     setError(null);
+    setFieldErrors({});
+    const errs: Record<string,string> = {};
+    if (!form.title) errs.title = "Job title is required.";
+    if (!form.subject) errs.subject = "Subject is required.";
+    if (Object.keys(errs).length > 0) { setFieldErrors(errs); setLoading(false); return; }
 
     try {
       const result = await createJob({
@@ -211,9 +213,7 @@ export default function PostJobModal({ isOpen, onClose, onSuccess }: PostJobModa
         ) : (
           <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-7 py-5 space-y-5">
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-sm" style={{ borderRadius: "0.75rem" }}>
-                {error}
-              </div>
+              <p className="text-red-600 text-sm">{error}</p>
             )}
 
             {/* Institution Logo */}
@@ -249,12 +249,24 @@ export default function PostJobModal({ isOpen, onClose, onSuccess }: PostJobModa
                 className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
                 style={{ borderRadius: "0.75rem" }}
               />
+              {fieldErrors.title && <p className="text-red-500 text-xs mt-1">{fieldErrors.title}</p>}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Subject <span className="text-red-500">*</span></label>
-                <CustomSelect value={form.subject} onChange={val => set("subject", val)} options={subjectSelectOptions} placeholder="Select subject" searchable />
+                {form.subject === "Other" || (form.subject && !subjectSelectOptions.find(o => o.value === form.subject && o.value !== "")) && form.subject !== "" ? (
+                  <input
+                    value={form.subject === "Other" ? "" : form.subject}
+                    onChange={e => set("subject", e.target.value)}
+                    placeholder="Type your subject..."
+                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 outline-none focus:border-xyroots-teal focus:bg-white transition-all"
+                    style={{ borderRadius: "0.75rem" }}
+                  />
+                ) : (
+                  <CustomSelect value={form.subject} onChange={val => set("subject", val)} options={subjectSelectOptions} placeholder="Select subject" searchable />
+                )}
+                {fieldErrors.subject && <p className="text-red-500 text-xs mt-1">{fieldErrors.subject}</p>}
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Employment Type</label>

@@ -114,11 +114,7 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.03em;
 }
 
-/* Strictly NO SHADOWS and PURE SHARP CORNERS on any elements */
-*, *::before, *::after {
-  box-shadow: none !important;
-  border-radius: 0 !important;
-}
+/* Base font and smooth rendering */
 
 /* Re-allow minimal focus rings on inputs */
 input:focus, textarea:focus, select:focus {

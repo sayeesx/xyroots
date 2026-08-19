@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FaTrophy } from "react-icons/fa6";
 
 const steps = [
   {
@@ -54,25 +55,23 @@ const steps = [
     desc: "Simple registration — upload your profile, add your qualifications, and let institutions find you.",
   },
   {
-    // Person hired / award illustration
+    // Clean trophy illustration with matching circular dashed border
     icon: (
       <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-24 h-24">
         <circle cx="60" cy="60" r="58" fill="#f0fdf4" stroke="#00a264" strokeWidth="1.5" strokeDasharray="4 3" />
-        {/* Person */}
-        <circle cx="48" cy="42" r="12" fill="#e6f7ed" stroke="#00a264" strokeWidth="2" />
-        <circle cx="48" cy="39" r="5.5" fill="#00a264" />
-        <path d="M36 58 Q48 50 60 58" stroke="#00a264" strokeWidth="2.2" fill="none" strokeLinecap="round" />
-        {/* Board / whiteboard */}
-        <rect x="63" y="30" width="32" height="42" rx="3" fill="white" stroke="#374151" strokeWidth="2" />
-        <line x1="69" y1="40" x2="89" y2="40" stroke="#00a264" strokeWidth="1.8" strokeLinecap="round" />
-        <line x1="69" y1="48" x2="89" y2="48" stroke="#d1d5db" strokeWidth="1.5" strokeLinecap="round" />
-        <line x1="69" y1="56" x2="82" y2="56" stroke="#d1d5db" strokeWidth="1.5" strokeLinecap="round" />
-        {/* Pointer */}
-        <line x1="58" y1="52" x2="63" y2="44" stroke="#374151" strokeWidth="1.8" strokeLinecap="round" />
-        <circle cx="63" cy="43" r="2.5" fill="#374151" />
-        {/* Star trophy */}
-        <path d="M45 72 L47.5 80 L55 80 L49 85 L51.5 93 L45 88 L38.5 93 L41 85 L35 80 L42.5 80 Z" fill="#00a264" opacity="0.85" />
-        <circle cx="45" cy="82" r="4" fill="#e6f7ed" />
+        {/* Main Priority Profile Card */}
+        <rect x="30" y="22" width="52" height="68" rx="5" fill="white" stroke="#374151" strokeWidth="2.2" />
+        <rect x="36" y="30" width="40" height="5" rx="2.5" fill="#00a264" />
+        {/* Star Priority Emblem */}
+        <circle cx="56" cy="48" r="10" fill="#e6f7ed" stroke="#00a264" strokeWidth="1.6" />
+        <path d="M56 42 L58 46 H62 L59 48.5 L60 53 L56 50 L52 53 L53 48.5 L50 46 H54 Z" fill="#00a264" />
+        {/* Text / detail lines */}
+        <rect x="36" y="62" width="36" height="2.5" rx="1.2" fill="#e5e7eb" />
+        <rect x="36" y="68" width="28" height="2.5" rx="1.2" fill="#e5e7eb" />
+        <rect x="36" y="74" width="22" height="2.5" rx="1.2" fill="#e5e7eb" />
+        {/* Green checkmark badge */}
+        <circle cx="82" cy="82" r="14" fill="#00a264" stroke="white" strokeWidth="2.5" />
+        <polyline points="75,82 80,87 89,75" stroke="white" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
     title: "Get hired on top priority",

@@ -347,15 +347,15 @@ export default function Hero() {
                 {/* SEEKER FILTER ROW */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4 items-end">
                   <div>
-                    <label className="block text-xs font-semibold text-xyroots-text mb-1.5">Where do you want the job?*</label>
+                    <label className="block text-sm font-semibold text-xyroots-text mb-1.5">Where do you want the job?*</label>
                     <CustomSelect value={jobOption} onChange={handleInstitutionChange} options={institutionOptions} placeholder="Choose an option" icon={<i className="bi bi-briefcase text-sm" />} searchable />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-xyroots-text mb-1.5">State</label>
+                    <label className="block text-sm font-semibold text-xyroots-text mb-1.5">State</label>
                     <CustomSelect value={stateVal} onChange={handleStateChange} options={stateOptions} placeholder="State" searchable />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-xyroots-text mb-1.5">Designation</label>
+                    <label className="block text-sm font-semibold text-xyroots-text mb-1.5">Designation</label>
                     <CustomSelect value={designation} onChange={setDesignation} options={availableDesignations} placeholder="Select a designation" icon={<i className="bi bi-book text-sm" />} searchable />
                   </div>
                   <div>
@@ -396,15 +396,15 @@ export default function Hero() {
                 {/* MANAGEMENT FILTER ROW */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4 items-end">
                   <div>
-                    <label className="block text-xs font-semibold text-xyroots-text mb-1.5">Are you looking for?*</label>
+                    <label className="block text-sm font-semibold text-xyroots-text mb-1.5">Are you looking for?*</label>
                     <CustomSelect value={subject} onChange={setSubject} options={managementSubjectOptions} placeholder="Subject specialisation" icon={<i className="bi bi-book text-sm" />} searchable />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-xyroots-text mb-1.5">State</label>
+                    <label className="block text-sm font-semibold text-xyroots-text mb-1.5">State</label>
                     <CustomSelect value={stateVal} onChange={handleStateChange} options={stateOptions} placeholder="State" searchable />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-xyroots-text mb-1.5">Qualification</label>
+                    <label className="block text-sm font-semibold text-xyroots-text mb-1.5">Qualification</label>
                     <CustomSelect value={qualification} onChange={setQualification} options={managementQualOptions} placeholder="Any Qualification" icon={<i className="bi bi-award text-sm" />} searchable />
                   </div>
                   <div>

@@ -7,15 +7,15 @@ import AuthGuardedLink from "@/components/AuthGuardedLink";
 
 function JobCard({ job }: { job: any }) {
   return (
-    <div className="flex flex-col h-full border border-gray-200 bg-white hover:border-[#00a264]/50 hover:shadow-[0_2px_12px_rgba(0,162,100,0.08)] transition-all group" style={{ borderRadius: "0.75rem" }}>
+    <div className="flex flex-col h-full border border-gray-200 bg-white hover:border-[#00a264]/50 hover:shadow-[0_4px_20px_rgba(0,162,100,0.10)] transition-all group" style={{ borderRadius: "1rem" }}>
       <div className="flex flex-1 flex-col">
-        {/* Top header — light, clean */}
-        <div className="border-b border-gray-100 px-4 py-3" style={{ borderRadius: "0.75rem 0.75rem 0 0", background: "#f9fafb" }}>
+        {/* Top header — clean */}
+        <div className="border-b border-gray-100 px-5 py-4" style={{ borderRadius: "1rem 1rem 0 0", background: "#f9fafb" }}>
           <div className="flex-1 min-w-0">
-            <span className="inline-block text-[10px] font-semibold uppercase tracking-wider bg-gray-100 text-gray-500 px-2 py-0.5 mb-1 leading-tight" style={{ borderRadius: "0.25rem" }}>
+            <span className="inline-block text-[10px] font-semibold uppercase tracking-wider bg-gray-100 text-gray-500 px-2 py-0.5 mb-1.5 leading-tight" style={{ borderRadius: "0.25rem" }}>
               {job.type}
             </span>
-            <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="block text-gray-900 font-bold text-[13px] leading-snug hover:text-[#00a264] transition-colors line-clamp-2 text-left">
+            <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="block text-gray-900 font-bold text-base leading-snug hover:text-[#00a264] transition-colors line-clamp-2 text-left">
               {job.title}
             </AuthGuardedLink>
             <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
@@ -26,7 +26,7 @@ function JobCard({ job }: { job: any }) {
         </div>
 
         {/* Meta */}
-        <div className="px-4 py-3 flex-1 flex flex-col gap-2">
+        <div className="px-5 py-3 flex-1 flex flex-col gap-2">
           <div className="grid grid-cols-3 gap-x-2 gap-y-1 text-xs">
             <div>
               <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Exp</p>
@@ -43,14 +43,18 @@ function JobCard({ job }: { job: any }) {
           </div>
         </div>
 
-        {/* Footer actions — teal primary */}
-        <div className="px-4 py-2.5 border-t border-gray-100 flex items-center gap-2" style={{ borderRadius: "0 0 0.75rem 0.75rem" }}>
-          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-bold py-1.5 bg-[#00a264] text-white hover:bg-[#007a4d] flex items-center justify-center gap-1 transition-all duration-200" style={{ borderRadius: "0.5rem" }}>
+        {/* Footer actions */}
+        <div className="px-5 py-3 border-t border-gray-100 flex items-center gap-2" style={{ borderRadius: "0 0 1rem 1rem" }}>
+          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-bold py-2 bg-[#00a264] text-white hover:bg-[#007a4d] flex items-center justify-center gap-1 transition-all duration-200" style={{ borderRadius: "0.5rem" }}>
             Apply Now <FaArrowRight className="inline w-2.5 h-2.5" />
           </AuthGuardedLink>
-          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-medium py-1.5 border border-gray-200 text-gray-600 hover:border-[#00a264] hover:text-[#00a264] transition-all duration-200 flex items-center justify-center" style={{ borderRadius: "0.5rem" }}>
+          <AuthGuardedLink href={`/jobs/${job.slug}`} type="teacher" className="flex-1 text-center text-xs font-medium py-2 border border-gray-200 text-gray-600 hover:border-[#00a264] hover:text-[#00a264] transition-all duration-200 flex items-center justify-center" style={{ borderRadius: "0.5rem" }}>
             Details
           </AuthGuardedLink>
+        </div>
+        {/* Posted time */}
+        <div className="px-5 pb-3 text-[11px] text-gray-400">
+          Posted {job.postedAgo || job.postedDate}
         </div>
       </div>
     </div>
@@ -61,21 +65,21 @@ function JobCard({ job }: { job: any }) {
 
 function TeacherCard({ teacher, isAuthenticated }: { teacher: any, isAuthenticated: boolean }) {
   return (
-    <div className="flex flex-col h-full border border-gray-200 bg-white hover:border-gray-400 transition-all group shadow-sm" style={{ borderRadius: "0.75rem", background: "linear-gradient(135deg, #fff 80%, #f0fdf4 100%)" }}>
+    <div className="flex flex-col h-full border border-gray-200 bg-white hover:border-gray-400 transition-all group shadow-sm" style={{ borderRadius: "1rem", background: "linear-gradient(135deg, #fff 80%, #f0fdf4 100%)" }}>
       {/* Top header */}
-      <div className="border-b border-gray-100 px-4 py-3" style={{ borderRadius: "0.75rem 0.75rem 0 0", background: "linear-gradient(to right, #f9fafb, #f0fdf4)" }}>
+      <div className="border-b border-gray-100 px-5 py-4" style={{ borderRadius: "1rem 1rem 0 0", background: "linear-gradient(to right, #f9fafb, #f0fdf4)" }}>
         <div className="flex items-center gap-3">
-          {/* Avatar — photo or initials */}
-          <div className="w-12 h-12 shrink-0 flex items-center justify-center bg-gray-200 text-gray-600 font-bold text-base border border-gray-200 overflow-hidden" style={{ borderRadius: "0.5rem" }}>
+          {/* Avatar — larger */}
+          <div className="w-14 h-14 shrink-0 flex items-center justify-center bg-gray-200 text-gray-600 font-bold text-lg border border-gray-200 overflow-hidden" style={{ borderRadius: "0.625rem" }}>
             {teacher.avatar_url
-              ? <img src={teacher.avatar_url} alt={teacher.name} className="w-full h-full object-cover" style={{ borderRadius: "0.5rem" }} />
+              ? <img src={teacher.avatar_url} alt={teacher.name} className="w-full h-full object-cover" style={{ borderRadius: "0.625rem" }} />
               : (teacher.name || "T").charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
-            <span className="inline-block text-[11px] font-semibold uppercase tracking-wider bg-gray-100 text-gray-500 px-2 py-0.5 mb-1 leading-tight" style={{ borderRadius: "0.25rem" }}>
+            <span className="inline-block text-[11px] font-semibold uppercase tracking-wide bg-gray-100 text-gray-500 px-2 py-0.5 mb-1 leading-tight max-w-full truncate" style={{ borderRadius: "0.25rem" }}>
               {teacher.designation}
             </span>
-            <AuthGuardedLink href={`/teachers/${teacher.slug}`} type="institution" className="block text-gray-900 font-semibold text-[13px] leading-snug hover:text-black transition-colors text-left">
+            <AuthGuardedLink href={`/teachers/${teacher.slug}`} type="institution" className="block text-gray-900 font-semibold text-base leading-snug hover:text-black transition-colors text-left">
               {teacher.name}
             </AuthGuardedLink>
             <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
@@ -155,7 +159,7 @@ export default async function LatestVacancies() {
 
   // Fetch jobs and teachers in parallel
   const [{ data: rawJobs }, { data: rawTeachers }] = await Promise.all([
-    supabase.from("jobs").select("id, title, level, created_at, qualification, experience_min, experience_max, salary_min, salary_max, location").eq("status", "published").limit(jobLimit).order("created_at", { ascending: false }),
+    supabase.from("jobs").select("id, title, level, created_at, qualification, experience_min, experience_max, salary_min, salary_max, location, school_name, employment_type").eq("status", "published").limit(jobLimit).order("created_at", { ascending: false }),
     supabase.from("teacher_profiles").select("id, subject, title, location, experience_years, professional_qualification, languages, availability, profile_completion, profiles(full_name, avatar_url, status)").eq("is_visible", true).gte("profile_completion", 80).limit(3).order("profile_completion", { ascending: false }),
   ]);
 
@@ -164,6 +168,19 @@ export default async function LatestVacancies() {
     title: j.title || "Untitled Job",
     type: j.level || "Educator",
     postedDate: new Date(j.created_at).toLocaleDateString(),
+    postedAgo: (() => {
+      const diff = Date.now() - new Date(j.created_at).getTime();
+      const mins = Math.floor(diff / 60000);
+      if (mins < 60) return `${mins}m ago`;
+      const hrs = Math.floor(mins / 60);
+      if (hrs < 24) return `${hrs}h ago`;
+      const days = Math.floor(hrs / 24);
+      if (days < 7) return `${days}d ago`;
+      const weeks = Math.floor(days / 7);
+      if (weeks < 5) return `${weeks}w ago`;
+      const months = Math.floor(days / 30);
+      return `${months}mo ago`;
+    })(),
     openings: 1,
     qualification: j.qualification || "Graduation",
     experience: j.experience_min ? `${j.experience_min}-${j.experience_max} Years` : "Fresher",
@@ -217,8 +234,8 @@ export default async function LatestVacancies() {
           {role !== 'management' && (
             <div className={`${role === 'teacher' ? 'md:col-span-2' : ''}`}>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-                  <FaBuilding className="w-4 h-4 text-gray-700" />
+                <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                  <FaBuilding className="w-4 h-4 text-[#00a264]" />
                   Institutions Hiring
                 </h3>
                 <AuthGuardedLink href="/jobs" type="teacher" className="text-xs text-gray-700 hover:text-black hover:underline font-semibold">
@@ -238,8 +255,8 @@ export default async function LatestVacancies() {
           {role !== 'teacher' && (
             <div className={`${role === 'management' ? 'md:col-span-2' : ''}`}>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                  <FaUsers className="w-4 h-4 text-gray-500" />
+                <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                  <FaUsers className="w-4 h-4 text-[#00a264]" />
                   Teacher Profiles
                 </h3>
                 <AuthGuardedLink href="/teachers" type="institution" className="text-xs text-gray-600 hover:text-black hover:underline font-medium">

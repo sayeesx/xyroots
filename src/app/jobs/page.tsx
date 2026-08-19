@@ -135,14 +135,14 @@ function FilterPanel({
       <div className="flex-1 overflow-y-auto pr-1 space-y-4 custom-scrollbar">
         {/* Job Type */}
         <div>
-          <p className="text-xs font-bold mb-2.5 text-gray-700 uppercase tracking-wide">Job Type</p>
+          <p className="text-sm font-bold mb-2.5 text-gray-900 uppercase tracking-wide">Job Type</p>
           <div className="space-y-2">
             {["Contract", "Full-time", "Part-time", "Internship"].map(type => (
               <label key={type} className="flex items-center gap-2.5 cursor-pointer group" onClick={(e) => { e.preventDefault(); toggleCheckbox(selectedJobTypes, setSelectedJobTypes, type); }}>
                 <div className={`w-4 h-4 rounded flex items-center justify-center border transition-colors shrink-0 ${selectedJobTypes.includes(type) ? 'bg-gray-900 border-gray-900' : 'border-gray-300 group-hover:border-gray-500 bg-white'}`}>
                   {selectedJobTypes.includes(type) && <FaCircleCheck className="w-2.5 h-2.5 text-white" />}
                 </div>
-                <span className="text-xs font-medium text-gray-600 group-hover:text-gray-900 select-none">{type}</span>
+                <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 select-none">{type}</span>
               </label>
             ))}
           </div>
@@ -164,14 +164,14 @@ function FilterPanel({
 
         {/* Board / Curriculum */}
         <div>
-          <p className="text-xs font-bold mb-2.5 text-gray-700 uppercase tracking-wide">Board / Curriculum</p>
+          <p className="text-sm font-bold mb-2.5 text-gray-900 uppercase tracking-wide">Board / Curriculum</p>
           <div className="space-y-2">
             {["CBSE", "ICSE", "IB", "IGCSE", "State Board"].map(board => (
               <label key={board} className="flex items-center gap-2.5 cursor-pointer group" onClick={(e) => { e.preventDefault(); toggleCheckbox(selectedBoards, setSelectedBoards, board); }}>
                 <div className={`w-4 h-4 rounded flex items-center justify-center border transition-colors shrink-0 ${selectedBoards.includes(board) ? 'bg-gray-900 border-gray-900' : 'border-gray-300 group-hover:border-gray-500 bg-white'}`}>
                   {selectedBoards.includes(board) && <FaCircleCheck className="w-2.5 h-2.5 text-white" />}
                 </div>
-                <span className="text-xs font-medium text-gray-600 group-hover:text-gray-900 select-none">{board}</span>
+                <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 select-none">{board}</span>
               </label>
             ))}
           </div>
@@ -198,13 +198,13 @@ function FilterPanel({
               />
               <input type="range" min={SALARY_MIN} max={SALARY_MAX} step={5000} value={salaryRange[0]}
                 onChange={(e) => { const val = Math.min(Number(e.target.value), salaryRange[1] - 5000); setSalaryRange([val, salaryRange[1]]); }}
-                className="absolute w-full h-1.5 appearance-none bg-transparent cursor-pointer salary-slider-thumb"
-                style={{ zIndex: salaryRange[0] > SALARY_MAX - 5000 ? 5 : 3 }}
+                className="absolute w-full h-1.5 appearance-none bg-transparent cursor-pointer salary-slider-thumb pointer-events-none"
+                style={{ zIndex: salaryRange[0] > (SALARY_MAX - SALARY_MIN) / 2 ? 5 : 3 }}
               />
               <input type="range" min={SALARY_MIN} max={SALARY_MAX} step={5000} value={salaryRange[1]}
                 onChange={(e) => { const val = Math.max(Number(e.target.value), salaryRange[0] + 5000); setSalaryRange([salaryRange[0], val]); }}
-                className="absolute w-full h-1.5 appearance-none bg-transparent cursor-pointer salary-slider-thumb"
-                style={{ zIndex: 4 }}
+                className="absolute w-full h-1.5 appearance-none bg-transparent cursor-pointer salary-slider-thumb pointer-events-none"
+                style={{ zIndex: salaryRange[0] > (SALARY_MAX - SALARY_MIN) / 2 ? 4 : 5 }}
               />
             </div>
           </div>
@@ -213,14 +213,14 @@ function FilterPanel({
 
         {/* Experience */}
         <div>
-          <p className="text-xs font-bold mb-2.5 text-gray-700 uppercase tracking-wide">Experience</p>
+          <p className="text-sm font-bold mb-2.5 text-gray-900 uppercase tracking-wide">Experience</p>
           <div className="space-y-2">
             {["Less than a year", "1-3 years", "3-5 years", "5-10 years", "More than 10 years"].map(exp => (
               <label key={exp} className="flex items-center gap-2.5 cursor-pointer group" onClick={(e) => { e.preventDefault(); toggleCheckbox(selectedExperiences, setSelectedExperiences, exp); }}>
                 <div className={`w-4 h-4 rounded flex items-center justify-center border transition-colors shrink-0 ${selectedExperiences.includes(exp) ? 'bg-gray-900 border-gray-900' : 'border-gray-300 group-hover:border-gray-500 bg-white'}`}>
                   {selectedExperiences.includes(exp) && <FaCircleCheck className="w-2.5 h-2.5 text-white" />}
                 </div>
-                <span className="text-xs font-medium text-gray-600 group-hover:text-gray-900 select-none">{exp}</span>
+                <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 select-none">{exp}</span>
               </label>
             ))}
           </div>
@@ -349,12 +349,14 @@ function JobsPageInner() {
     setIsLoading(true);
     supabase
       .from('jobs')
-      .select('*, institutions(verified)')
+      .select('*, institutions(verified, logo_url)')
       .eq('status', 'published')
       .then(({ data }) => {
         if (data) {
           const mappedJobs = (data as any[]).map((j: any) => ({
             ...j,
+            created_at: j.created_at,
+            logoUrl: j.institutions?.logo_url || j.logo_url || null,
             school: j.school_name || "Unknown School",
             schoolVerified: j.institutions?.verified || false,
             location: j.location || "Remote",
@@ -365,6 +367,19 @@ function JobsPageInner() {
             subject: j.subject,
             employmentType: j.employment_type || "Full-time",
             postedDate: new Date(j.created_at).toLocaleDateString(),
+            postedAgo: (() => {
+              const diff = Date.now() - new Date(j.created_at).getTime();
+              const mins = Math.floor(diff / 60000);
+              if (mins < 60) return `${mins}m ago`;
+              const hrs = Math.floor(mins / 60);
+              if (hrs < 24) return `${hrs}h ago`;
+              const days = Math.floor(hrs / 24);
+              if (days < 7) return `${days}d ago`;
+              const weeks = Math.floor(days / 7);
+              if (weeks < 5) return `${weeks}w ago`;
+              const months = Math.floor(days / 30);
+              return `${months}mo ago`;
+            })(),
           }));
           setDbJobs(mappedJobs);
         }
@@ -504,6 +519,7 @@ function JobsPageInner() {
     if (sortBy === "salary_desc") result = [...result].sort((a, b) => (b.salaryMax ?? b.salaryMin ?? 0) - (a.salaryMax ?? a.salaryMin ?? 0));
     else if (sortBy === "salary_asc") result = [...result].sort((a, b) => (a.salaryMin ?? 0) - (b.salaryMin ?? 0));
     else if (sortBy === "title_asc") result = [...result].sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+    else if (sortBy === "default" || sortBy === "newest") result = [...result].sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
 
     return result;
   }, [searchTerm, citySearch, activeSubject, dbJobs, selectedJobTypes, selectedExperiences, selectedBoards, selectedInstTypes, selectedQuals, postedDate, selectedState, salaryRange, sortBy]);
@@ -551,7 +567,7 @@ function JobsPageInner() {
 
             {/* Desktop Sidebar */}
             <aside className="hidden lg:block w-64 shrink-0">
-              <div className="sticky top-14 bg-white rounded-2xl border border-gray-200 shadow-sm p-4.5 h-[calc(100vh-4.5rem)] overflow-hidden flex flex-col">
+              <div className="sticky top-14 bg-white rounded-2xl border border-gray-200 p-4.5 h-[calc(100vh-4.5rem)] overflow-hidden flex flex-col">
                 <FilterPanel {...filterProps} />
               </div>
             </aside>
@@ -665,7 +681,10 @@ function JobsPageInner() {
                     return (
                       <div key={job.id} className="bg-white border border-gray-200 overflow-hidden hover:border-[#00a264]/50 hover:shadow-[0_2px_12px_rgba(0,162,100,0.08)] transition-all group flex flex-col" style={{ borderRadius: "1rem" }}>
                         <div className="p-4 flex-1">
-                          <div className="flex items-start justify-between mb-2">
+                          <div className="flex items-start justify-between mb-2 gap-3">
+                            {job.logoUrl && (
+                              <img src={job.logoUrl} alt={job.school} className="w-9 h-9 rounded-lg object-cover border border-gray-100 shrink-0 mt-0.5" />
+                            )}
                             <div className="min-w-0 flex-1">
                               <h3 className="text-sm font-bold text-gray-900 group-hover:text-black transition-colors line-clamp-1 leading-tight mb-0.5">{job.title}</h3>
                               <p className="text-xs text-gray-500 line-clamp-1">{job.school} • {job.location}</p>
@@ -693,7 +712,7 @@ function JobsPageInner() {
                             </div>
                             <div>
                               <p className="font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Posted</p>
-                              <p className="text-gray-700 font-medium">{job.postedDate}</p>
+                              <p className="text-gray-700 font-medium">{job.postedAgo || job.postedDate}</p>
                             </div>
                             <div>
                               <p className="font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Salary</p>

@@ -142,195 +142,247 @@ export default function InstitutionDetailPage() {
   const inactiveJobs = jobs.filter(j => j.status !== "published");
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f7f8fa]">
+    <div className="min-h-screen flex flex-col bg-[#f8faf9]">
       <Navbar />
 
-      <main className="flex-1 pt-20 pb-12">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <main className="flex-1 pb-24">
+        {/* ─── Glassdoor / Indeed Clean White Header Card ───────────────────── */}
+        <section className="bg-white border-b border-gray-200 py-6 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto">
+            <button
+              onClick={() => router.back()}
+              className="inline-flex items-center gap-2 text-xs font-semibold text-gray-600 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg mb-4 transition-all"
+            >
+              <FaArrowLeft className="w-3 h-3" /> Back
+            </button>
 
-          {/* Back */}
-          <button onClick={() => router.back()} className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-900 mb-5 transition-colors">
-            <FaArrowLeft className="w-3.5 h-3.5" /> Back
-          </button>
-
-          {/* Institution Header Card */}
-          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden mb-6 shadow-sm">
-            <div className="px-6 py-5 border-b border-gray-100" style={{ background: "linear-gradient(135deg, #f0fdf4 0%, #fff 70%)" }}>
-              <div className="flex items-start justify-between gap-4 flex-wrap">
-                <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 rounded-xl bg-[#00a264] flex items-center justify-center text-white text-xl font-bold shrink-0">
-                    {(institution.name || "I").charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <h1 className="text-2xl font-bold text-gray-900">{institution.name}</h1>
-                      {institution.verified && (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 bg-[#e6f7ed] text-[#00a264] rounded-full">
-                          <FaShieldHalved className="w-3 h-3" /> Verified
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-3 text-sm text-gray-500 flex-wrap">
-                      {institution.location && (
-                        <span className="flex items-center gap-1">
-                          <FaLocationDot className="w-3.5 h-3.5 text-[#00a264]" />
-                          {institution.location}
-                        </span>
-                      )}
-                      {institution.type && (
-                        <span className="flex items-center gap-1">
-                          <FaBuilding className="w-3 h-3 text-gray-400" />
-                          {institution.type}
-                        </span>
-                      )}
-                      {institution.established && (
-                        <span className="flex items-center gap-1">
-                          <FaCalendarDays className="w-3 h-3 text-gray-400" />
-                          Est. {institution.established}
-                        </span>
-                      )}
-                    </div>
-                  </div>
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+              <div className="flex items-start gap-4 sm:gap-5 flex-1 min-w-0">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 flex items-center justify-center font-bold text-2xl text-gray-700 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                  {(institution.name || "I").charAt(0).toUpperCase()}
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <span className="px-3 py-1.5 bg-[#e6f7ed] text-[#00a264] text-sm font-bold rounded-lg">
-                    {activeJobs.length} Open {activeJobs.length === 1 ? "Position" : "Positions"}
-                  </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    {institution.verified && (
+                      <span className="px-2.5 py-0.5 text-xs font-bold bg-[#e6f7ed] text-[#00a264] rounded-md border border-[#00a264]/20 flex items-center gap-1">
+                        <FaShieldHalved className="w-3.5 h-3.5" /> Verified Institution
+                      </span>
+                    )}
+                    {institution.type && (
+                      <span className="px-2.5 py-0.5 text-xs font-semibold bg-gray-100 text-gray-700 rounded-md">
+                        {institution.type}
+                      </span>
+                    )}
+                  </div>
+
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight mb-2">
+                    {institution.name}
+                  </h1>
+
+                  <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
+                    {institution.location && (
+                      <span className="flex items-center gap-1.5 font-bold text-gray-900">
+                        <FaLocationDot className="w-3.5 h-3.5 text-[#00a264]" /> {institution.location}
+                      </span>
+                    )}
+                    {institution.established && (
+                      <>
+                        <span className="text-gray-300">•</span>
+                        <span className="flex items-center gap-1.5">
+                          <FaCalendarDays className="w-3.5 h-3.5 text-gray-400" /> Est. {institution.established}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="shrink-0 pt-1">
+                <div className="px-5 py-2.5 bg-[#e6f7ed] border border-[#00a264]/30 rounded-xl text-center">
+                  <p className="text-[10px] font-bold text-[#00a264] uppercase tracking-wider">Hiring Status</p>
+                  <p className="text-base font-extrabold text-gray-900 mt-0.5">
+                    {activeJobs.length} Open {activeJobs.length === 1 ? "Role" : "Roles"}
+                  </p>
                 </div>
               </div>
             </div>
+          </div>
+        </section>
 
-            {/* Details Grid */}
-            <div className="px-6 py-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* ─── Main Content ─────────────────────────────────────────────────── */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+          <div className="grid lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-6">
+              {/* Institution Bio */}
               {institution.description && (
-                <div className="sm:col-span-2 lg:col-span-3">
-                  <p className="text-sm text-gray-600 leading-relaxed">{institution.description}</p>
+                <div className="bg-white border border-gray-200/80 rounded-2xl p-6 sm:p-7 shadow-sm">
+                  <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2.5">
+                    <span className="w-2 h-6 bg-[#00a264] rounded-full" />
+                    About Institution
+                  </h2>
+                  <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{institution.description}</p>
                 </div>
               )}
-              {institution.website && (
-                <div className="flex items-center gap-2 text-sm">
-                  <FaGlobe className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                  <a href={institution.website} target="_blank" rel="noopener noreferrer" className="text-[#00a264] hover:underline truncate">{institution.website}</a>
-                </div>
-              )}
-              {institution.contact_email && (
-                <div className="flex items-center gap-2 text-sm">
-                  <FaEnvelope className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                  <span className="text-gray-600 truncate">{institution.contact_email}</span>
-                </div>
-              )}
-              {institution.contact_phone && (
-                <div className="flex items-center gap-2 text-sm">
-                  <FaPhone className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                  <span className="text-gray-600">{institution.contact_phone}</span>
-                </div>
-              )}
-              {institution.board?.length > 0 && (
-                <div className="flex items-start gap-2 text-sm">
-                  <FaGraduationCap className="w-3.5 h-3.5 text-gray-400 mt-0.5 shrink-0" />
-                  <div className="flex flex-wrap gap-1">
-                    {institution.board.map((b: string) => (
-                      <span key={b} className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs font-semibold rounded">{b}</span>
+
+              {/* Active Jobs */}
+              <div className="bg-white border border-gray-200/80 rounded-2xl p-6 sm:p-7 shadow-sm">
+                <h2 className="text-lg font-bold text-gray-900 mb-5 flex items-center gap-2.5">
+                  <span className="w-2 h-6 bg-emerald-600 rounded-full" />
+                  <FaBriefcase className="w-4 h-4 text-[#00a264]" />
+                  Active Vacancies
+                  {activeJobs.length > 0 && <span className="text-xs font-bold text-gray-400">({activeJobs.length})</span>}
+                </h2>
+
+                {activeJobs.length === 0 ? (
+                  <div className="py-12 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                    <FaBriefcase className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+                    <p className="text-sm font-bold text-gray-600">No active job openings right now.</p>
+                    <p className="text-xs text-gray-400 mt-1">Check back later for new teaching opportunities.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {activeJobs.map(job => (
+                      <div
+                        key={job.id}
+                        className="bg-white border border-gray-200/80 rounded-xl p-5 hover:border-[#00a264] hover:shadow-md transition-all group"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          <div className="space-y-1.5 min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <h3 className="text-base font-bold text-gray-900 group-hover:text-[#00a264] transition-colors truncate">
+                                {job.title}
+                              </h3>
+                              {job.employment_type && (
+                                <span className="text-[10px] font-bold px-2.5 py-0.5 bg-gray-100 text-gray-600 rounded-full uppercase tracking-wider">
+                                  {job.employment_type}
+                                </span>
+                              )}
+                              {job.subject && (
+                                <span className="text-[10px] font-bold px-2.5 py-0.5 bg-[#e6f7ed] text-[#00a264] rounded-full uppercase tracking-wider">
+                                  {job.subject}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                              {job.location && (
+                                <span className="flex items-center gap-1">
+                                  <FaLocationDot className="w-3 h-3 text-[#00a264]" /> {job.location}
+                                </span>
+                              )}
+                              {job.experience_min != null && (
+                                <span>{job.experience_min}–{job.experience_max ?? 5} Yrs Exp</span>
+                              )}
+                              {job.salary_min && (
+                                <span className="text-[#00a264] font-extrabold">
+                                  ₹{(job.salary_min / 1000).toFixed(0)}k–{(job.salary_max / 1000).toFixed(0)}k/mo
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <Link
+                            href={`/jobs/${job.id}`}
+                            className="px-5 py-2.5 bg-[#00a264] hover:bg-[#007a4d] text-white text-xs font-bold rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5 shrink-0"
+                          >
+                            View Job <FaArrowRight className="w-3 h-3" />
+                          </Link>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Past / Closed Jobs */}
+              {inactiveJobs.length > 0 && (
+                <div className="bg-white border border-gray-200/80 rounded-2xl p-6 sm:p-7 shadow-sm opacity-80">
+                  <h2 className="text-base font-bold text-gray-500 mb-4 flex items-center gap-2">
+                    <FaCircleXmark className="w-4 h-4 text-gray-400" />
+                    Past / Closed Positions ({inactiveJobs.length})
+                  </h2>
+                  <div className="space-y-3">
+                    {inactiveJobs.map(job => (
+                      <div key={job.id} className="p-4 bg-gray-50 border border-gray-200/60 rounded-xl flex items-center justify-between gap-4">
+                        <div>
+                          <p className="text-sm font-bold text-gray-600 line-through">{job.title}</p>
+                          <p className="text-xs text-gray-400 mt-0.5">{job.location} • Posted {new Date(job.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</p>
+                        </div>
+                        <span className="text-xs font-bold text-gray-400 bg-gray-200 px-3 py-1 rounded-full uppercase tracking-wider">
+                          Closed
+                        </span>
+                      </div>
                     ))}
                   </div>
                 </div>
               )}
             </div>
-          </div>
 
-          {/* Active Jobs */}
-          <div className="mb-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
-              <FaBriefcase className="w-4 h-4 text-[#00a264]" />
-              Open Positions
-              {activeJobs.length > 0 && <span className="text-sm font-normal text-gray-500">({activeJobs.length})</span>}
-            </h2>
+            {/* Right Sidebar: Contact & Info */}
+            <div className="space-y-6">
+              <div className="bg-white border border-gray-200/80 rounded-2xl p-6 shadow-md lg:sticky lg:top-24">
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 pb-3 border-b border-gray-100">
+                  Institution Info
+                </h3>
 
-            {activeJobs.length === 0 ? (
-              <div className="bg-white border border-dashed border-gray-200 rounded-xl p-10 text-center">
-                <FaBriefcase className="w-8 h-8 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-500 text-sm">No open positions at this institution right now.</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {activeJobs.map(job => (
-                  <div key={job.id} className="bg-white border border-gray-200 rounded-xl p-4 hover:border-[#00a264]/50 hover:shadow-sm transition-all">
-                    <div className="flex items-start justify-between gap-4 flex-wrap">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <h3 className="text-base font-bold text-gray-900">{job.title}</h3>
-                          {job.employment_type && (
-                            <span className="text-[11px] px-2 py-0.5 bg-gray-100 text-gray-600 font-semibold rounded">{job.employment_type}</span>
-                          )}
-                          {job.subject && (
-                            <span className="text-[11px] px-2 py-0.5 bg-[#e6f7ed] text-[#00a264] font-semibold rounded">{job.subject}</span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-3 text-xs text-gray-500 flex-wrap">
-                          {job.location && <span className="flex items-center gap-1"><FaLocationDot className="w-2.5 h-2.5 text-[#00a264]" />{job.location}</span>}
-                          {job.experience_min != null && <span>{job.experience_min}–{job.experience_max ?? "?"} yrs exp</span>}
-                          {job.salary_min && <span className="text-[#00a264] font-semibold">₹{(job.salary_min/1000).toFixed(0)}k–{(job.salary_max/1000).toFixed(0)}k/mo</span>}
-                          <span>Posted {new Date(job.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</span>
-                        </div>
-                        {job.description && <p className="text-xs text-gray-500 mt-1.5 line-clamp-2">{job.description}</p>}
-                      </div>
-                      <Link
-                        href={`/jobs/${job.id}`}
-                        className="px-4 py-2 bg-[#00a264] text-white text-sm font-bold rounded-lg hover:bg-[#007a4d] transition-colors shrink-0 flex items-center gap-1.5"
-                      >
-                        Apply Now <FaArrowRight className="w-3 h-3" />
-                      </Link>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Inactive / Closed Jobs */}
-          {inactiveJobs.length > 0 && (
-            <div>
-              <h2 className="text-base font-bold text-gray-500 mb-3 flex items-center gap-2">
-                <FaCircleXmark className="w-4 h-4 text-gray-400" />
-                Closed / Past Positions
-                <span className="text-sm font-normal">({inactiveJobs.length})</span>
-              </h2>
-              <div className="space-y-3">
-                {inactiveJobs.map(job => (
-                  <div key={job.id} className="relative bg-white border border-gray-100 rounded-xl p-4 opacity-60 overflow-hidden pointer-events-none select-none">
-                    {/* Watermark */}
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-                      <span className="text-gray-300 font-bold text-xl rotate-[-20deg] tracking-widest uppercase opacity-40 select-none">
-                        No Longer Available
-                      </span>
-                    </div>
-                    <div className="flex items-start justify-between gap-4 flex-wrap">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <h3 className="text-base font-bold text-gray-500 line-through">{job.title}</h3>
-                          <span className="text-[11px] px-2 py-0.5 bg-gray-100 text-gray-400 font-semibold rounded">
-                            {job.status === "closed" ? "Closed" : job.status === "archived" ? "Archived" : "Inactive"}
+                <div className="space-y-4 text-xs sm:text-sm">
+                  {institution.board?.length > 0 && (
+                    <div>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Curriculum Boards</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {institution.board.map((b: string) => (
+                          <span key={b} className="px-2.5 py-1 bg-emerald-50 text-emerald-800 font-bold text-xs rounded-lg border border-emerald-100">
+                            {b}
                           </span>
-                        </div>
-                        <div className="flex items-center gap-3 text-xs text-gray-400 flex-wrap">
-                          {job.location && <span className="flex items-center gap-1"><FaLocationDot className="w-2.5 h-2.5" />{job.location}</span>}
-                          {job.subject && <span>{job.subject}</span>}
-                          <span>Posted {new Date(job.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</span>
-                        </div>
+                        ))}
                       </div>
-                      <span className="px-4 py-2 bg-gray-100 text-gray-400 text-sm font-bold rounded-lg cursor-not-allowed shrink-0">
-                        Closed
-                      </span>
                     </div>
-                  </div>
-                ))}
+                  )}
+
+                  {institution.website && (
+                    <div className="flex items-center gap-3 pt-2">
+                      <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 shrink-0">
+                        <FaGlobe className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase">Official Website</p>
+                        <a href={institution.website} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-[#00a264] hover:underline truncate block">
+                          {institution.website}
+                        </a>
+                      </div>
+                    </div>
+                  )}
+
+                  {institution.contact_email && (
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 shrink-0">
+                        <FaEnvelope className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase">Contact Email</p>
+                        <p className="text-xs font-bold text-gray-800 truncate">{institution.contact_email}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {institution.contact_phone && (
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 shrink-0">
+                        <FaPhone className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase">Phone Number</p>
+                        <p className="text-xs font-bold text-gray-800">{institution.contact_phone}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          )}
-
+          </div>
         </div>
       </main>
+
       <Footer />
     </div>
   );

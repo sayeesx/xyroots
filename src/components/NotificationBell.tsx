@@ -112,16 +112,16 @@ export default function NotificationBell() {
         )}
       </button>
 
-      {/* Left slide-in drawer */}
+      {/* Right slide-in drawer */}
       {open && (
-        <div className="fixed inset-0 z-[500] flex" onClick={() => setOpen(false)}>
-          {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+        <div className="fixed inset-0 z-[500] flex justify-end" onClick={() => setOpen(false)}>
+          {/* Backdrop — positioned below navbar so navbar stays bright & sharp */}
+          <div className="absolute inset-x-0 top-12 lg:top-14 bottom-0 bg-black/20" />
 
-          {/* Panel — slides from left */}
+          {/* Panel — slides from right */}
           <div
             className="relative w-full max-w-sm bg-white shadow-2xl flex flex-col"
-            style={{ height: "100vh", animation: "slide-in-left 0.28s cubic-bezier(0.16,1,0.3,1)" }}
+            style={{ height: "100vh", animation: "slide-in-right 0.28s cubic-bezier(0.16,1,0.3,1)" }}
             onClick={e => e.stopPropagation()}
           >
             {/* Header */}
@@ -198,9 +198,9 @@ export default function NotificationBell() {
       )}
 
       <style>{`
-        @keyframes slide-in-left {
-          from { transform: translateX(-100%); opacity: 0.5; }
-          to   { transform: translateX(0);     opacity: 1; }
+        @keyframes slide-in-right {
+          from { transform: translateX(100%); opacity: 0.5; }
+          to   { transform: translateX(0);    opacity: 1; }
         }
       `}</style>
     </>

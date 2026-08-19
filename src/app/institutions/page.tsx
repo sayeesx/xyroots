@@ -204,55 +204,7 @@ export default function InstitutionsPage() {
 
       <main className="flex-1">
 
-        {/* ─── Hero Banner ─────────────────────────────────────────── */}
-        <section
-          className="relative overflow-hidden"
-          style={{ background: "linear-gradient(135deg, #074526 0%, #00a264 60%, #00c278 100%)" }}
-        >
-          {/* Decorative shapes */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/5" style={{ borderRadius: "50%" }} />
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10" style={{ borderRadius: "50%" }} />
-            <div className="absolute top-12 left-1/2 w-48 h-48 bg-white/5" style={{ borderRadius: "50%" }} />
-          </div>
 
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
-            <div className="max-w-3xl">
-              <span
-                className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white/70 mb-4 px-3 py-1 bg-white/10"
-                style={{ borderRadius: "999px" }}
-              >
-                <FaSchool className="w-3 h-3" /> Partner Institutions
-              </span>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-[1.1] tracking-tight mb-5">
-                Find qualified teachers<br />
-                <span className="text-[#a3e6c3]">faster than ever before</span>
-              </h1>
-              <p className="text-base sm:text-lg text-white/80 leading-relaxed mb-8 max-w-xl">
-                Xyroots connects your institution with verified, experienced educators across India. Post a vacancy, browse profiles, and hire with confidence.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3">
-              </div>
-            </div>
-          </div>
-
-          {/* Stats strip */}
-          <div className="border-t border-white/10 bg-black/10">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {stats.map((s) => (
-                <div key={s.label} className="flex items-center gap-3">
-                  <div className="w-8 h-8 shrink-0 flex items-center justify-center bg-white/10" style={{ borderRadius: "0.5rem" }}>
-                    <s.icon className="w-4 h-4 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-base font-bold text-white leading-none">{s.value}</p>
-                    <p className="text-[11px] text-white/60 mt-0.5">{s.label}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
 
         {/* ─── Institution Directory ────────────────────────────────── */}
         <section className="py-12 lg:py-16">

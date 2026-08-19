@@ -167,125 +167,171 @@ export default function TeacherProfilePage() {
   const teacher = dbTeacher;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f7f8fa]">
+    <div className="min-h-screen flex flex-col bg-[#f8faf9]">
       <Navbar />
 
-      <main className="flex-1 pt-6 pb-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <button onClick={() => router.back()} className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-[#00a264] mb-6 transition-colors group">
-            <FaArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" /> Back
-          </button>
+      <main className="flex-1 pb-24">
+        {/* ─── Glassdoor / Indeed Clean White Header Card ───────────────────── */}
+        <section className="bg-white border-b border-gray-200 py-6 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto">
+            <button
+              onClick={() => router.back()}
+              className="inline-flex items-center gap-2 text-xs font-semibold text-gray-600 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg mb-4 transition-all"
+            >
+              <FaArrowLeft className="w-3 h-3" /> Back to Profiles
+            </button>
 
-          {/* Header */}
-          <div className="bg-white border border-gray-100 p-6 sm:p-8 mb-6" style={{ borderRadius: "1.25rem" }}>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center text-white font-bold text-2xl sm:text-3xl shrink-0 overflow-hidden" style={{ borderRadius: "1.25rem", backgroundColor: "#374151" }}>
-                  {teacher.avatar
-                    ? <img src={teacher.avatar} alt={teacher.name} className="w-full h-full object-cover" />
-                    : teacher.name.charAt(0).toUpperCase()}
+                <div className="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center text-gray-700 font-bold text-3xl shrink-0 overflow-hidden bg-white border border-gray-200 rounded-2xl shadow-sm">
+                  {teacher.avatar ? (
+                    <img src={teacher.avatar} alt={teacher.name} className="w-full h-full object-cover" />
+                  ) : (
+                    teacher.name.charAt(0).toUpperCase()
+                  )}
                 </div>
+
                 <div>
-                  <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{teacher.name}</h1>
-                    {teacher.verified && <span title="Verified Educator"><FaShieldHalved className="w-5 h-5 text-[#00a264]" /></span>}
-                  </div>
-                  <p className="text-base text-gray-500 mb-2">{teacher.title}</p>
-                  <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">
-                    <span className="flex items-center gap-1.5"><FaLocationDot className="w-3.5 h-3.5 text-[#00a264]" />{teacher.location}</span>
-                    <span className="flex items-center gap-1.5"><FaBriefcase className="w-3.5 h-3.5 text-[#00a264]" />{teacher.experience} Years Exp.</span>
-                    {teacher.rating && (
-                      <span className="flex items-center gap-1 bg-yellow-50 px-2.5 py-0.5 border border-yellow-200 text-yellow-700 font-bold" style={{ borderRadius: "0.5rem" }}>
-                        <FaStar className="w-3 h-3 text-yellow-500" />{teacher.rating}
+                  <div className="flex items-center gap-2.5 mb-1 flex-wrap">
+                    <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900">{teacher.name}</h1>
+                    {teacher.verified && (
+                      <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 bg-[#e6f7ed] text-[#00a264] rounded-md border border-[#00a264]/20">
+                        <FaShieldHalved className="w-3.5 h-3.5" /> Verified Educator
                       </span>
+                    )}
+                  </div>
+                  <p className="text-sm sm:text-base text-gray-600 font-medium mb-2.5">{teacher.title}</p>
+                  
+                  <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
+                    <span className="flex items-center gap-1.5 font-bold text-gray-900">
+                      <FaLocationDot className="w-3.5 h-3.5 text-[#00a264]" /> {teacher.location}
+                    </span>
+                    <span className="text-gray-300">•</span>
+                    <span className="flex items-center gap-1.5">
+                      <FaBriefcase className="w-3.5 h-3.5 text-gray-400" /> {teacher.experience} Years Experience
+                    </span>
+                    {teacher.rating && (
+                      <>
+                        <span className="text-gray-300">•</span>
+                        <span className="flex items-center gap-1 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md text-amber-700 font-bold text-xs">
+                          <FaStar className="w-3 h-3 text-amber-500" /> {teacher.rating}
+                        </span>
+                      </>
                     )}
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-3 flex-wrap">
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-3 flex-wrap pt-1">
                 <button
                   onClick={toggleShortlist}
-                  className={`px-5 py-2.5 font-semibold text-sm border transition-all flex items-center gap-2 ${shortlisted ? "bg-[#e6f7ed] border-[#00a264]/30 text-[#00a264]" : "border-gray-200 text-gray-700 hover:border-[#00a264] hover:text-[#00a264]"}`}
-                  style={{ borderRadius: "0.75rem" }}
+                  className={`px-4 py-2.5 font-bold text-xs rounded-xl border transition-all flex items-center gap-2 ${
+                    shortlisted
+                      ? "bg-[#e6f7ed] border-[#00a264]/40 text-[#00a264]"
+                      : "bg-white border-gray-200 text-gray-700 hover:border-gray-400"
+                  }`}
                 >
-                  {shortlisted ? <FaBookmark className="w-4 h-4" /> : <FaRegBookmark className="w-4 h-4" />}
+                  {shortlisted ? <FaBookmark className="w-3.5 h-3.5" /> : <FaRegBookmark className="w-3.5 h-3.5" />}
                   {shortlisted ? "Shortlisted" : "Shortlist"}
                 </button>
                 <button
                   onClick={() => setShowScheduleModal(true)}
-                  className="px-6 py-2.5 font-semibold text-sm bg-[#00a264] text-white hover:bg-[#008f58] transition-all flex items-center gap-2"
-                  style={{ borderRadius: "0.75rem" }}
+                  className="px-6 py-2.5 font-extrabold text-xs bg-[#00a264] text-white hover:bg-[#008f58] rounded-xl transition-all shadow-sm flex items-center gap-2"
                 >
-                  <FaCalendarDays className="w-4 h-4" /> Schedule Interview
+                  <FaCalendarDays className="w-3.5 h-3.5" /> Schedule Interview
                 </button>
               </div>
             </div>
           </div>
+        </section>
 
-          <div className="grid lg:grid-cols-3 gap-6">
-            {/* Main */}
-            <div className="lg:col-span-2 space-y-5">
+        {/* ─── Body Grid ────────────────────────────────────────────────────── */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Main Content */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* About */}
               {teacher.about && (
-                <div className="bg-white border border-gray-100 p-6" style={{ borderRadius: "1rem" }}>
-                  <h2 className="text-base font-bold text-gray-900 mb-3">About Educator</h2>
-                  <p className="text-sm text-gray-600 leading-relaxed">{teacher.about}</p>
+                <div className="bg-white border border-gray-200/80 rounded-2xl p-6 sm:p-7 shadow-sm">
+                  <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2.5">
+                    <span className="w-2 h-6 bg-[#00a264] rounded-full" />
+                    About Educator
+                  </h2>
+                  <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{teacher.about}</p>
                 </div>
               )}
 
+              {/* Teaching Demo */}
               {teacher.hasDemo && (
-                <div className="bg-white border border-gray-100 p-6" style={{ borderRadius: "1rem" }}>
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-base font-bold text-gray-900 flex items-center gap-2"><FaVideo className="w-4 h-4 text-[#00a264]" /> Teaching Demo</h2>
-                  </div>
-                  <div className="relative bg-gray-900 h-52 flex items-center justify-center overflow-hidden group cursor-pointer" style={{ borderRadius: "0.75rem" }} onClick={() => setIsPlayingDemo(!isPlayingDemo)}>
+                <div className="bg-white border border-gray-200/80 rounded-2xl p-6 sm:p-7 shadow-sm">
+                  <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2.5">
+                    <span className="w-2 h-6 bg-red-500 rounded-full" />
+                    <FaVideo className="w-4 h-4 text-red-500" /> Teaching Demo
+                  </h2>
+                  <div
+                    className="relative bg-gray-900 h-56 rounded-xl flex items-center justify-center overflow-hidden group cursor-pointer shadow-inner"
+                    onClick={() => setIsPlayingDemo(!isPlayingDemo)}
+                  >
                     {isPlayingDemo ? (
-                      <div className="w-full h-full flex items-center justify-center bg-[#00a264]/90 text-white flex-col gap-2">
+                      <div className="w-full h-full flex items-center justify-center bg-[#00a264]/95 text-white flex-col gap-2">
                         <FaPlay className="w-10 h-10 animate-pulse text-white/80" />
-                        <p className="font-bold text-sm">Playing Demo</p>
+                        <p className="font-bold text-sm">Playing Teaching Demo</p>
                       </div>
                     ) : (
                       <>
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                        <div className="w-14 h-14 bg-gray-900 text-white flex items-center justify-center group-hover:scale-110 transition-transform z-10" style={{ borderRadius: "50%" }}>
-                          <FaPlay className="w-5 h-5 ml-1" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                        <div className="w-16 h-16 bg-white/20 backdrop-blur-md border border-white/40 text-white rounded-full flex items-center justify-center group-hover:scale-110 transition-transform z-10">
+                          <FaPlay className="w-6 h-6 ml-1 text-white" />
                         </div>
+                        <span className="absolute bottom-4 left-4 text-xs font-semibold text-white/90 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full">
+                          Click to preview demo
+                        </span>
                       </>
                     )}
                   </div>
                 </div>
               )}
 
+              {/* Teaching Experience Timeline */}
               {teacher.teachingExperience?.length > 0 && (
-                <div className="bg-white border border-gray-100 p-6" style={{ borderRadius: "1rem" }}>
-                  <h2 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2"><FaBriefcase className="w-4 h-4 text-[#00a264]" /> Experience</h2>
-                  <div className="space-y-5">
+                <div className="bg-white border border-gray-200/80 rounded-2xl p-6 sm:p-7 shadow-sm">
+                  <h2 className="text-lg font-bold text-gray-900 mb-5 flex items-center gap-2.5">
+                    <span className="w-2 h-6 bg-blue-600 rounded-full" />
+                    Teaching Experience
+                  </h2>
+                  <div className="space-y-6">
                     {teacher.teachingExperience.map((exp: any, i: number) => (
-                      <div key={i} className="relative pl-5 border-l-2 border-[#00a264]/20">
-                        <div className="absolute -left-[5px] top-1 w-2.5 h-2.5 bg-[#00a264]" style={{ borderRadius: "50%" }} />
-                        <div className="flex flex-wrap items-center justify-between gap-2 mb-0.5">
-                          <h3 className="text-sm font-bold text-gray-900">{exp.role || exp.jobTitle || "Teacher"}</h3>
-                          <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-500 font-medium" style={{ borderRadius: "0.375rem" }}>
+                      <div key={i} className="relative pl-6 border-l-2 border-[#00a264]/30">
+                        <div className="absolute -left-[7px] top-1 w-3 h-3 bg-[#00a264] rounded-full ring-4 ring-white" />
+                        <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
+                          <h3 className="text-base font-bold text-gray-900">{exp.role || exp.jobTitle || "Educator"}</h3>
+                          <span className="text-xs px-2.5 py-0.5 bg-gray-100 text-gray-600 font-semibold rounded-full">
                             {exp.duration || `${exp.startDate || ""}${exp.endDate ? ` – ${exp.endDate}` : ""}`}
                           </span>
                         </div>
-                        <p className="text-xs font-medium text-[#00a264]">{exp.school || exp.organization || ""}</p>
+                        <p className="text-sm font-semibold text-[#00a264]">{exp.school || exp.organization || ""}</p>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              <div className="bg-white border border-gray-100 p-6" style={{ borderRadius: "1rem" }}>
-                <h2 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2"><FaGraduationCap className="w-4 h-4 text-[#00a264]" /> Education & Qualifications</h2>
+              {/* Education & Qualifications */}
+              <div className="bg-white border border-gray-200/80 rounded-2xl p-6 sm:p-7 shadow-sm">
+                <h2 className="text-lg font-bold text-gray-900 mb-5 flex items-center gap-2.5">
+                  <span className="w-2 h-6 bg-purple-600 rounded-full" />
+                  Education & Qualifications
+                </h2>
                 <div className="grid sm:grid-cols-2 gap-5">
                   {teacher.education?.length > 0 && (
                     <div>
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">Degrees</p>
-                      <div className="space-y-2">
+                      <p className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400 mb-3">Academic Degrees</p>
+                      <div className="space-y-2.5">
                         {teacher.education.map((edu: any, i: number) => (
-                          <div key={i} className="p-3 bg-gray-50 border border-gray-100" style={{ borderRadius: "0.625rem" }}>
+                          <div key={i} className="p-3.5 bg-gray-50 border border-gray-100 rounded-xl">
                             <p className="text-sm font-bold text-gray-900">{edu.degree || ""}{edu.fieldOfStudy ? ` in ${edu.fieldOfStudy}` : ""}</p>
-                            <p className="text-xs text-gray-500">{edu.institution || ""}{edu.endDate ? ` · ${edu.endDate}` : ""}</p>
+                            <p className="text-xs text-gray-500 mt-0.5">{edu.institution || ""}{edu.endDate ? ` · ${edu.endDate}` : ""}</p>
                           </div>
                         ))}
                       </div>
@@ -293,11 +339,11 @@ export default function TeacherProfilePage() {
                   )}
                   {teacher.professionalQualifications?.length > 0 && (
                     <div>
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">Prof. Qualifications</p>
-                      <div className="flex flex-wrap gap-1.5">
+                      <p className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400 mb-3">Certifications</p>
+                      <div className="flex flex-wrap gap-2">
                         {teacher.professionalQualifications.map((q: any, i: number) => (
-                          <span key={i} className="text-xs font-semibold px-3 py-1.5 bg-[#e6f7ed] text-[#00a264] flex items-center gap-1.5" style={{ borderRadius: "999px" }}>
-                            <FaAward className="w-3 h-3" />{q}
+                          <span key={i} className="text-xs font-bold px-3 py-1.5 bg-[#e6f7ed] text-[#00a264] border border-[#00a264]/20 rounded-full flex items-center gap-1.5">
+                            <FaAward className="w-3.5 h-3.5" /> {q}
                           </span>
                         ))}
                       </div>
@@ -306,31 +352,47 @@ export default function TeacherProfilePage() {
                 </div>
               </div>
 
+              {/* Subjects & Skills Tag Cloud */}
               {(teacher.subjects?.length > 0 || teacher.skills?.length > 0 || teacher.boards?.length > 0) && (
-                <div className="bg-white border border-gray-100 p-6" style={{ borderRadius: "1rem" }}>
-                  <h2 className="text-base font-bold text-gray-900 mb-4">Subjects & Skills</h2>
-                  <div className="space-y-3">
+                <div className="bg-white border border-gray-200/80 rounded-2xl p-6 sm:p-7 shadow-sm">
+                  <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2.5">
+                    <span className="w-2 h-6 bg-amber-500 rounded-full" />
+                    Expertise & Skills
+                  </h2>
+                  <div className="space-y-4">
                     {teacher.subjects?.length > 0 && (
                       <div>
-                        <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">Subjects</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {teacher.subjects.map((s: string) => <span key={s} className="text-xs font-bold px-3 py-1 bg-gray-900 text-white" style={{ borderRadius: "0.5rem" }}>{s}</span>)}
+                        <p className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400 mb-2">Subjects</p>
+                        <div className="flex flex-wrap gap-2">
+                          {teacher.subjects.map((s: string) => (
+                            <span key={s} className="text-xs font-bold px-3 py-1 bg-slate-900 text-white rounded-lg">
+                              {s}
+                            </span>
+                          ))}
                         </div>
                       </div>
                     )}
                     {teacher.boards?.length > 0 && (
                       <div>
-                        <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">Boards</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {teacher.boards.map((b: string) => <span key={b} className="text-xs font-semibold px-3 py-1 bg-gray-100 text-gray-700" style={{ borderRadius: "0.5rem" }}>{b}</span>)}
+                        <p className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400 mb-2">Curriculum Boards</p>
+                        <div className="flex flex-wrap gap-2">
+                          {teacher.boards.map((b: string) => (
+                            <span key={b} className="text-xs font-semibold px-3 py-1 bg-gray-100 text-gray-700 rounded-lg">
+                              {b}
+                            </span>
+                          ))}
                         </div>
                       </div>
                     )}
                     {teacher.skills?.length > 0 && (
                       <div>
-                        <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">Skills</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {teacher.skills.map((s: string) => <span key={s} className="text-xs font-medium px-3 py-1 bg-gray-50 border border-gray-200 text-gray-600" style={{ borderRadius: "0.5rem" }}>{s}</span>)}
+                        <p className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400 mb-2">Technical & Soft Skills</p>
+                        <div className="flex flex-wrap gap-2">
+                          {teacher.skills.map((s: string) => (
+                            <span key={s} className="text-xs font-medium px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-100 rounded-lg">
+                              {s}
+                            </span>
+                          ))}
                         </div>
                       </div>
                     )}
@@ -339,29 +401,53 @@ export default function TeacherProfilePage() {
               )}
             </div>
 
-            {/* Sidebar */}
-            <div className="space-y-5">
-              <div className="bg-white border border-gray-100 p-5 lg:sticky lg:top-24" style={{ borderRadius: "1rem" }}>
-                <h3 className="text-sm font-bold text-gray-900 mb-4 pb-3 border-b border-gray-100">Candidate Overview</h3>
-                <div className="space-y-3 text-sm mb-5">
-                  <div className="flex justify-between"><span className="text-gray-500">Availability</span><span className="font-bold text-[#00a264]">{teacher.availability}</span></div>
-                  <div className="flex justify-between"><span className="text-gray-500">Expected Salary</span><span className="font-bold text-gray-900">{formatSalary(teacher.expectedSalaryMin, teacher.expectedSalaryMax)}</span></div>
-                  {teacher.preferredLocations?.length > 0 && <div className="flex justify-between"><span className="text-gray-500">Preferred Cities</span><span className="font-semibold text-gray-900 text-right max-w-[60%]">{teacher.preferredLocations.join(", ")}</span></div>}
-                  {teacher.languages?.length > 0 && <div className="flex justify-between"><span className="text-gray-500">Languages</span><span className="font-semibold text-gray-900">{teacher.languages.join(", ")}</span></div>}
+            {/* Right Sidebar */}
+            <div className="space-y-6">
+              <div className="bg-white border border-gray-200/80 rounded-2xl p-6 shadow-md">
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 pb-3 border-b border-gray-100">
+                  Candidate Overview
+                </h3>
+
+                <div className="space-y-3.5 text-xs sm:text-sm mb-6">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500">Availability</span>
+                    <span className="font-bold text-[#00a264] px-2 py-0.5 bg-emerald-50 rounded-full">{teacher.availability}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500">Expected Salary</span>
+                    <span className="font-extrabold text-gray-900">{formatSalary(teacher.expectedSalaryMin, teacher.expectedSalaryMax)}</span>
+                  </div>
+                  {teacher.preferredLocations?.length > 0 && (
+                    <div className="flex justify-between items-start">
+                      <span className="text-gray-500">Preferred Cities</span>
+                      <span className="font-semibold text-gray-800 text-right max-w-[60%]">{teacher.preferredLocations.join(", ")}</span>
+                    </div>
+                  )}
+                  {teacher.languages?.length > 0 && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-500">Languages</span>
+                      <span className="font-semibold text-gray-800">{teacher.languages.join(", ")}</span>
+                    </div>
+                  )}
                 </div>
 
                 {teacher.hasCV && (
-                  <div className="p-3 bg-gray-50 border border-gray-100 flex items-center gap-3 mb-4" style={{ borderRadius: "0.75rem" }}>
-                    <FaFileLines className="w-4 h-4 text-[#00a264]" />
+                  <div className="p-3.5 bg-gray-50 border border-gray-200/80 rounded-xl flex items-center gap-3 mb-5">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-[#00a264]">
+                      <FaFileLines className="w-4 h-4" />
+                    </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-bold text-gray-900">Resume / CV</p>
-                      <p className="text-[10px] text-gray-400">PDF • Verified</p>
+                      <p className="text-xs font-bold text-gray-900">Resume / CV Attached</p>
+                      <p className="text-[10px] text-gray-500">PDF Document • Verified</p>
                     </div>
                   </div>
                 )}
 
-                <button onClick={() => setShowScheduleModal(true)} className="w-full py-3 text-sm font-semibold bg-[#00a264] text-white hover:bg-[#008f58] transition-all" style={{ borderRadius: "0.75rem" }}>
-                  Schedule Interview
+                <button
+                  onClick={() => setShowScheduleModal(true)}
+                  className="w-full py-3.5 text-xs font-extrabold bg-gradient-to-r from-[#00a264] to-[#00c278] hover:from-[#007a4d] hover:to-[#00a264] text-white rounded-xl shadow-lg shadow-[#00a264]/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                >
+                  <FaCalendarDays className="w-4 h-4" /> Schedule Interview
                 </button>
               </div>
             </div>

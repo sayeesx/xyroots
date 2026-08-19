@@ -219,13 +219,6 @@ export default function TeacherDashboard() {
   // ── Sidebar component (shared desktop + mobile) ──
   const SidebarContent = () => (
     <>
-      {/* Logo */}
-      <div className="px-5 py-4 border-b border-gray-100 shrink-0">
-        <Link href="/" className="flex items-center gap-2">
-          <Image src="/logo1.webp" alt="Xyroots" width={120} height={36} className="h-8 w-auto object-contain" />
-        </Link>
-      </div>
-
       {/* Avatar mini */}
       <div className="px-4 py-4 border-b border-gray-100 shrink-0">
         <div className="flex items-center gap-3">
@@ -400,20 +393,28 @@ export default function TeacherDashboard() {
 
                 {/* Stats + Profile Strength card */}
                 <div className="bg-white border border-gray-200 p-6 flex flex-col gap-4" style={{ borderRadius: "1rem" }}>
-                  <h2 className="text-base font-bold text-gray-900">Activity</h2>
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-base font-bold text-gray-900">Activity</h2>
+                    <FaArrowRight className="w-3.5 h-3.5 text-gray-400" />
+                  </div>
                   {/* Stats 2×2 grid */}
                   <div className="grid grid-cols-2 gap-3">
                     {[
-                      { label: "Applications", value: applications.length, sub: "total submitted", color: "text-gray-900", bg: "bg-gray-50" },
-                      { label: "Active", value: activeCount, sub: "shortlisted / offers", color: "text-[#00a264]", bg: "bg-[#f0fdf4]" },
-                      { label: "Saved Jobs", value: savedIds.length, sub: "bookmarked", color: "text-gray-900", bg: "bg-gray-50" },
-                      { label: "Interviews", value: interviews.length, sub: "scheduled", color: hasNewInterviews ? "text-blue-700" : "text-gray-900", bg: hasNewInterviews ? "bg-blue-50" : "bg-gray-50" },
+                      { label: "Applications", value: applications.length, sub: "total submitted", color: "text-gray-900", bg: "bg-gray-50", tab: "applications" as Tab },
+                      { label: "Active", value: activeCount, sub: "shortlisted / offers", color: "text-[#00a264]", bg: "bg-[#f0fdf4]", tab: "applications" as Tab },
+                      { label: "Saved Jobs", value: savedIds.length, sub: "bookmarked", color: "text-gray-900", bg: "bg-gray-50", tab: "saved" as Tab },
+                      { label: "Interviews", value: interviews.length, sub: "scheduled", color: hasNewInterviews ? "text-blue-700" : "text-gray-900", bg: hasNewInterviews ? "bg-blue-50" : "bg-gray-50", tab: "interviews" as Tab },
                     ].map(s => (
-                      <div key={s.label} className={`${s.bg} p-3.5`} style={{ borderRadius: "0.75rem" }}>
+                      <button
+                        key={s.label}
+                        onClick={() => setTab(s.tab)}
+                        className={`${s.bg} p-3.5 text-left hover:opacity-80 transition-opacity active:scale-[0.98]`}
+                        style={{ borderRadius: "0.75rem" }}
+                      >
                         <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
                         <p className="text-xs font-semibold text-gray-700 mt-0.5">{s.label}</p>
                         <p className="text-[10px] text-gray-400">{s.sub}</p>
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </div>

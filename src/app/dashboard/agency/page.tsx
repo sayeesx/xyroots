@@ -138,9 +138,6 @@ export default function AgencyDashboard() {
 
   const SidebarContent = () => (
     <>
-      <div className="px-5 py-4 border-b border-gray-100 shrink-0">
-        <Link href="/"><Image src="/logo1.webp" alt="Xyroots" width={120} height={36} className="h-8 w-auto object-contain" /></Link>
-      </div>
       <div className="px-4 py-4 border-b border-gray-100 shrink-0">
         <div className="flex items-center gap-3">
           <img src={avatar} alt={profile?.full_name || "A"} className="w-10 h-10 rounded-full border-2 border-[#00a264]/20 object-cover shrink-0" />
@@ -168,7 +165,15 @@ export default function AgencyDashboard() {
           </button>
         ))}
       </nav>
-      <div className="px-3 py-3 border-t border-gray-100 shrink-0">
+      <div className="px-3 py-3 border-t border-gray-100 shrink-0 space-y-0.5">
+        <Link
+          href="/"
+          onClick={() => setMobileMenuOpen(false)}
+          className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+          style={{ borderRadius: "0.625rem" }}
+        >
+          <FaHouse className="w-4 h-4 text-gray-400" /> Go to Homepage
+        </Link>
         <button onClick={handleSignOut} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 transition-colors" style={{ borderRadius: "0.625rem" }}>
           <FaArrowRightFromBracket className="w-4 h-4" /> Log Out
         </button>
@@ -185,19 +190,21 @@ export default function AgencyDashboard() {
       {/* Mobile top bar */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-100 flex items-center justify-between px-4 py-3">
         <Link href="/"><Image src="/logo1.webp" alt="Xyroots" width={100} height={30} className="h-7 w-auto" /></Link>
-        <div className="flex items-center gap-2">
-          <button onClick={() => setShowPostJob(true)} className="flex items-center gap-1.5 px-3 py-1.5 bg-[#00a264] text-white text-xs font-bold" style={{ borderRadius: "0.5rem" }}>
-            <FaCirclePlus className="w-3.5 h-3.5" /> Post Job
-          </button>
-          <button onClick={() => setMobileMenuOpen(true)} className="p-2 hover:bg-gray-100 rounded-lg"><FaBars className="w-5 h-5 text-gray-700" /></button>
-        </div>
+        <button onClick={() => setMobileMenuOpen(true)} className="p-2 hover:bg-gray-100 rounded-lg"><FaBars className="w-5 h-5 text-gray-700" /></button>
       </div>
 
       {mobileMenuOpen && (
         <div className="md:hidden fixed inset-0 z-50">
           <div className="absolute inset-0 bg-black/40" onClick={() => setMobileMenuOpen(false)} />
           <div className="absolute left-0 top-0 bottom-0 w-72 bg-white flex flex-col shadow-2xl overflow-y-auto">
-            <SidebarContent />
+            <div className="flex items-center justify-end px-4 py-3 border-b border-gray-100 shrink-0">
+              <button onClick={() => setMobileMenuOpen(false)} className="p-1.5 hover:bg-gray-100 rounded-full" aria-label="Close menu">
+                <FaXmark className="w-4 h-4 text-gray-600" />
+              </button>
+            </div>
+            <div className="flex-1 flex flex-col">
+              <SidebarContent />
+            </div>
           </div>
         </div>
       )}

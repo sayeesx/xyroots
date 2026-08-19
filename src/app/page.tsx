@@ -32,7 +32,6 @@ export default function Home() {
       <main className="flex-1">
         <Hero />
         <TrustLogos />
-        <HowItWorksSection />
         <Suspense fallback={
           <section className="py-12 px-4 bg-white">
             <div className="max-w-7xl mx-auto animate-pulse">
@@ -47,6 +46,7 @@ export default function Home() {
         }>
           <LatestVacancies />
         </Suspense>
+        <HowItWorksSection />
         <TeacherSection />
       </main>
       <Footer />

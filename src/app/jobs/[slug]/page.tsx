@@ -33,14 +33,18 @@ export default function JobDetailPage() {
 
   useEffect(() => {
     if (!actualId) { setNotFound(true); setPageLoading(false); return; }
-    supabase.from('jobs').select('*, institutions(verified)').eq('id', actualId).single()
+    supabase.from('jobs').select('*, institutions(id, name, location, logo_url, verified)').eq('id', actualId).single()
       .then(({ data }: any) => {
         if (data) {
+          const instName = data.institutions?.name || data.school_name || data.institution_name;
+          const instLoc = data.location || data.institutions?.location || "India";
+          const instLogo = data.logo_url || data.institutions?.logo_url || null;
           setDbJob({
             ...data,
-            school: data.school_name || data.institution_name || "Institution",
+            school: instName || "Educational Institution",
             schoolVerified: data.institutions?.verified || false,
-            location: data.location || "India",
+            location: instLoc,
+            logoUrl: instLogo,
             salaryMin: data.salary_min,
             salaryMax: data.salary_max,
             experienceMin: data.experience_min,
@@ -50,18 +54,30 @@ export default function JobDetailPage() {
             requirements: data.requirements || [],
             benefits: data.benefits || [],
             postedDate: new Date(data.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+            postedAgo: (() => {
+              const diff = Date.now() - new Date(data.created_at).getTime();
+              const mins = Math.floor(diff / 60000);
+              if (mins < 60) return `${mins}m ago`;
+              const hrs = Math.floor(mins / 60);
+              if (hrs < 24) return `${hrs}h ago`;
+              const days = Math.floor(hrs / 24);
+              if (days < 7) return `${days}d ago`;
+              const weeks = Math.floor(days / 7);
+              if (weeks < 5) return `${weeks}w ago`;
+              const months = Math.floor(days / 30);
+              return `${months}mo ago`;
+            })(),
+            institutionId: data.institutions?.id || data.institution_id || null,
           });
         } else { setNotFound(true); }
         setPageLoading(false);
-      })
-      .catch(() => { setNotFound(true); setPageLoading(false); });
+      });
   }, [actualId]); // eslint-disable-line
 
   // Save state — DB-backed with optimistic update
   const [saved, setSaved] = useState(false);
   useEffect(() => {
     if (!actualId || !user) return;
-    // Check if already saved in DB
     const checkSaved = async () => {
       const { data: { user: authUser } } = await supabase.auth.getUser();
       if (!authUser) return;
@@ -112,8 +128,7 @@ export default function JobDetailPage() {
     }
   };
 
-  // Look up institution ID for the institution link
-  const institutionId = dbJob?.institution_id || null;
+  const institutionId = dbJob?.institutionId || null;
   const [showShareModal, setShowShareModal] = useState(false);
 
   if (pageLoading) {
@@ -135,7 +150,7 @@ export default function JobDetailPage() {
           <div className="text-center p-12">
             <h2 className="text-2xl font-bold text-gray-900 mb-3">Job Not Found</h2>
             <p className="text-gray-500 text-sm mb-6">This vacancy may have been removed or the link is invalid.</p>
-            <button onClick={() => router.push('/jobs')} className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#00a264] text-white text-sm font-semibold" style={{ borderRadius: "0.75rem" }}>
+            <button onClick={() => router.push('/jobs')} className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#00a264] text-white text-sm font-semibold rounded-xl">
               <FaArrowLeft className="w-3.5 h-3.5" /> Browse All Jobs
             </button>
           </div>
@@ -148,78 +163,96 @@ export default function JobDetailPage() {
   const job = dbJob;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f7f8fa]">
+    <div className="min-h-screen flex flex-col bg-[#f8faf9]">
       <Navbar />
 
-      <main className="flex-1 pb-28">
-        {/* Clean header — no dark gradient */}
-        <div className="bg-white border-b border-gray-100 py-6 px-4">
+      <main className="flex-1 pb-24">
+        {/* ─── Glassdoor / Indeed Clean White Header Card ───────────────────── */}
+        <section className="bg-white border-b border-gray-200 py-6 px-4 sm:px-6 lg:px-8">
           <div className="max-w-6xl mx-auto">
-            <button onClick={() => router.back()} className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-700 mb-5 transition-colors group">
-              <FaArrowLeft className="w-3 h-3 group-hover:-translate-x-0.5 transition-transform" /> Back to Jobs
+            <button
+              onClick={() => router.back()}
+              className="inline-flex items-center gap-2 text-xs font-semibold text-gray-600 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg mb-4 transition-all"
+            >
+              <FaArrowLeft className="w-3 h-3" /> Back to Vacancies
             </button>
 
-            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
-              <div className="flex items-start gap-4 flex-1 min-w-0">
-                {/* Institution initial badge */}
-                <div className="w-14 h-14 shrink-0 flex items-center justify-center font-bold text-xl text-white bg-gray-900 border border-gray-100"
-                  style={{ borderRadius: "0.875rem" }}>
-                  {(job.school || 'S').charAt(0)}
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+              <div className="flex items-start gap-4 sm:gap-5 flex-1 min-w-0">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 flex items-center justify-center font-bold text-2xl text-gray-700 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                  {job.logoUrl ? (
+                    <img src={job.logoUrl} alt={job.school} className="w-full h-full object-cover" />
+                  ) : (
+                    (job.school || 'S').charAt(0).toUpperCase()
+                  )}
                 </div>
-                <div className="min-w-0">
-                  {/* Chips */}
-                  <div className="flex flex-wrap gap-1.5 mb-2">
+
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
                     {job.board && (
-                      <span className="px-2 py-0.5 text-[10px] font-bold bg-[#e6f7ed] text-[#00a264] border border-[#00a264]/20 uppercase tracking-wider" style={{ borderRadius: "999px" }}>
+                      <span className="px-2.5 py-0.5 text-xs font-bold bg-[#e6f7ed] text-[#00a264] rounded-md border border-[#00a264]/20 uppercase tracking-wider">
                         {job.board}
                       </span>
                     )}
-                    <span className="px-2 py-0.5 text-[10px] font-medium bg-gray-100 text-gray-600" style={{ borderRadius: "999px" }}>{job.employmentType}</span>
-                    {job.level && <span className="px-2 py-0.5 text-[10px] font-medium bg-gray-100 text-gray-600" style={{ borderRadius: "999px" }}>{job.level}</span>}
+                    <span className="px-2.5 py-0.5 text-xs font-semibold bg-gray-100 text-gray-700 rounded-md">
+                      {job.employmentType}
+                    </span>
+                    {job.level && (
+                      <span className="px-2.5 py-0.5 text-xs font-semibold bg-gray-100 text-gray-700 rounded-md">
+                        {job.level}
+                      </span>
+                    )}
                   </div>
-                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight mb-2">{job.title}</h1>
-                  <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">
-                    <span className="flex items-center gap-1.5 font-semibold text-gray-800">
-                      <FaBuilding className="w-3.5 h-3.5 text-[#00a264] shrink-0" />
+
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight mb-2">
+                    {job.title}
+                  </h1>
+
+                  <div className="flex flex-wrap items-center gap-3.5 text-sm text-gray-600">
+                    <span className="flex items-center gap-1.5 font-bold text-gray-900">
+                      <FaBuilding className="w-4 h-4 text-[#00a264] shrink-0" />
                       {institutionId ? (
-                        <a href={`/institutions/${institutionId}`} className="hover:text-[#00a264] hover:underline transition-colors">
+                        <a href={`/institutions/${institutionId}`} className="hover:text-[#00a264] transition-colors">
                           {job.school}
                         </a>
                       ) : (
                         job.school
                       )}
-                      {job.schoolVerified && <FaShieldHalved className="w-3.5 h-3.5 text-[#00a264]" />}
+                      {job.schoolVerified && <FaShieldHalved className="w-4 h-4 text-[#00a264]" />}
                     </span>
+                    <span className="text-gray-300">•</span>
                     <span className="flex items-center gap-1.5">
-                      <FaLocationDot className="w-3.5 h-3.5 shrink-0" /> {job.location}
+                      <FaLocationDot className="w-3.5 h-3.5 text-gray-400 shrink-0" /> {job.location}
                     </span>
-                    <span className="flex items-center gap-1.5">
-                      <FaCalendarDays className="w-3.5 h-3.5 shrink-0" /> Posted {job.postedDate}
+                    <span className="text-gray-300">•</span>
+                    <span className="flex items-center gap-1.5 text-xs text-gray-500">
+                      <FaCalendarDays className="w-3.5 h-3.5 text-gray-400 shrink-0" /> Posted {job.postedAgo || job.postedDate}
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Desktop quick apply */}
-              <div className="hidden sm:flex items-center gap-3 shrink-0">
+              {/* Desktop CTA in header */}
+              <div className="hidden sm:flex items-center gap-3 shrink-0 pt-1">
                 <button
                   onClick={toggleSave}
-                  className={`px-4 py-2.5 text-sm font-semibold border transition-all flex items-center gap-2 ${
-                    saved ? "bg-[#e6f7ed] border-[#00a264]/30 text-[#00a264]" : "border-gray-200 text-gray-600 hover:border-gray-400"
+                  className={`px-4 py-3 text-xs font-bold rounded-xl border transition-all flex items-center gap-2 ${
+                    saved
+                      ? "bg-[#e6f7ed] border-[#00a264]/40 text-[#00a264]"
+                      : "bg-white border-gray-200 text-gray-700 hover:border-gray-400"
                   }`}
-                  style={{ borderRadius: "0.75rem" }}
                 >
                   {saved ? <FaBookmark className="w-3.5 h-3.5" /> : <FaRegBookmark className="w-3.5 h-3.5" />}
-                  {saved ? "Saved" : "Save"}
+                  {saved ? "Saved" : "Save Job"}
                 </button>
                 <button
                   onClick={handleApply}
                   disabled={applyLoading || applied}
-                  className={`px-6 py-2.5 text-sm font-bold flex items-center gap-2 transition-all ${
-                    applied ? "bg-[#e6f7ed] text-[#00a264] cursor-default" :
-                    "bg-[#00a264] text-white hover:bg-[#008f58] active:scale-95"
+                  className={`px-6 py-3 text-xs font-extrabold rounded-xl transition-all shadow-sm flex items-center gap-2 ${
+                    applied
+                      ? "bg-[#e6f7ed] text-[#00a264] cursor-default"
+                      : "bg-[#00a264] text-white hover:bg-[#008f58]"
                   }`}
-                  style={{ borderRadius: "0.75rem" }}
                 >
                   {applyLoading ? <FaSpinner className="w-4 h-4 animate-spin" /> :
                    applied ? <><FaCircleCheck className="w-4 h-4" /> Applied!</> :
@@ -228,7 +261,7 @@ export default function JobDetailPage() {
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
           {/* Error banner */}
@@ -339,93 +372,97 @@ export default function JobDetailPage() {
             </div>
 
             {/* Right sidebar */}
-            <div className="space-y-4">
-              {/* Apply card — sticky */}
-              <div className="bg-white border border-gray-100 p-6 lg:sticky lg:top-24" style={{ borderRadius: "1rem" }}>
-                <div className="mb-5">
-                  {job.salaryMin && (
-                    <div className="text-center py-4 mb-4 bg-gray-50 border border-gray-200" style={{ borderRadius: "0.75rem" }}>
-                      <p className="text-xs text-gray-500 font-medium mb-1">Monthly Salary</p>
-                      <p className="text-2xl font-bold text-gray-900 flex items-center justify-center gap-0.5">
-                        <FaIndianRupeeSign className="w-4 h-4" />
-                        {`${(job.salaryMin/1000).toFixed(0)}k`}
-                        {job.salaryMax && `–${(job.salaryMax/1000).toFixed(0)}k`}
-                      </p>
-                    </div>
-                  )}
+            <div className="space-y-6">
+              {/* Action Card */}
+              <div className="bg-white border border-gray-200/80 rounded-2xl p-6 shadow-md">
+                <div className="text-center py-4 mb-5 bg-[#f0fdf4] border border-[#00a264]/20 rounded-xl">
+                  <p className="text-xs font-semibold text-gray-500 mb-0.5">Offered Salary</p>
+                  <p className="text-2xl font-extrabold text-[#00a264] flex items-center justify-center gap-0.5">
+                    <FaIndianRupeeSign className="w-4 h-4" />
+                    {job.salaryMin && job.salaryMax ? `${(job.salaryMin/1000).toFixed(0)}k–${(job.salaryMax/1000).toFixed(0)}k/mo` : formatSalary(job.salaryMin, job.salaryMax) || "Negotiable"}
+                  </p>
                 </div>
 
-                <div className="space-y-2.5">
+                <div className="space-y-3">
                   <button
                     onClick={handleApply}
                     disabled={applyLoading || applied}
-                    className={`w-full py-3.5 px-6 font-bold text-sm transition-all flex items-center justify-center gap-2 ${
-                      applied ? "bg-[#e6f7ed] text-[#00a264] cursor-default" :
-                      "bg-[#00a264] text-white hover:bg-[#008f58] active:scale-[0.98]"
+                    className={`w-full py-3.5 px-6 font-extrabold text-sm rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 ${
+                      applied
+                        ? "bg-[#e6f7ed] text-[#00a264] shadow-none cursor-default"
+                        : "bg-gradient-to-r from-[#00a264] to-[#00c278] hover:from-[#007a4d] hover:to-[#00a264] text-white shadow-[#00a264]/25 active:scale-[0.98]"
                     }`}
-                    style={{ borderRadius: "0.75rem" }}
                   >
                     {applyLoading ? <><FaSpinner className="w-4 h-4 animate-spin" /> Submitting...</> :
                      applied ? <><FaCircleCheck className="w-4 h-4" /> Application Submitted!</> :
-                     <>Apply Now <FaArrowRight className="w-3.5 h-3.5" /></>}
+                     <>Apply Now <FaArrowRight className="w-4 h-4" /></>}
                   </button>
 
                   <button
                     onClick={toggleSave}
-                    className={`w-full py-3 px-6 font-semibold text-sm border transition-all flex items-center justify-center gap-2 ${
-                      saved ? "bg-[#e6f7ed] border-[#00a264]/30 text-[#00a264]" : "border-gray-200 text-gray-700 hover:border-[#00a264] hover:text-[#00a264]"
+                    className={`w-full py-3 px-6 font-bold text-sm border rounded-xl transition-all flex items-center justify-center gap-2 ${
+                      saved
+                        ? "bg-[#e6f7ed] border-[#00a264]/40 text-[#00a264]"
+                        : "border-gray-200 text-gray-700 hover:border-[#00a264] hover:text-[#00a264]"
                     }`}
-                    style={{ borderRadius: "0.75rem" }}
                   >
                     {saved ? <FaBookmark className="w-4 h-4" /> : <FaRegBookmark className="w-4 h-4" />}
-                    {saved ? "Saved to Watchlist" : "Save to Watchlist"}
+                    {saved ? "Saved to Watchlist" : "Save Job"}
                   </button>
 
                   <button
                     onClick={() => setShowShareModal(true)}
-                    className="w-full py-3 px-6 font-semibold text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
-                    style={{ borderRadius: "0.75rem" }}
+                    className="w-full py-2.5 px-6 font-semibold text-xs border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-xl transition-all flex items-center justify-center gap-2"
                   >
-                    <FaShareNodes className="w-3.5 h-3.5" /> Share
+                    <FaShareNodes className="w-3.5 h-3.5" /> Share Position
                   </button>
                 </div>
 
-                {applyError && (
-                  <p className="mt-3 text-xs text-red-600 text-center">{applyError}</p>
-                )}
-
-                <div className="mt-5 pt-4 border-t border-gray-100 text-xs text-gray-500 space-y-1.5">
-                  <div className="flex justify-between"><span>Posted</span><span className="font-medium text-gray-800">{job.postedDate}</span></div>
-                  {job.application_deadline && <div className="flex justify-between"><span>Deadline</span><span className="font-medium text-gray-800">{new Date(job.application_deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span></div>}
+                <div className="mt-6 pt-5 border-t border-gray-100 text-xs text-gray-500 space-y-2">
+                  <div className="flex justify-between"><span>Posted</span><span className="font-semibold text-gray-800">{job.postedAgo || job.postedDate}</span></div>
+                  <div className="flex justify-between"><span>Employment</span><span className="font-semibold text-gray-800">{job.employmentType}</span></div>
+                  {job.application_deadline && (
+                    <div className="flex justify-between"><span>Deadline</span><span className="font-semibold text-gray-800">{new Date(job.application_deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span></div>
+                  )}
                 </div>
               </div>
 
-              {/* School card */}
-              <div className="bg-white border border-gray-100 p-5" style={{ borderRadius: "1rem" }}>
-                <h3 className="text-sm font-bold text-gray-900 mb-3">About the Institution</h3>
+              {/* Institution Card */}
+              <div className="bg-white border border-gray-200/80 rounded-2xl p-5 shadow-sm">
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">About Institution</h3>
                 {institutionId ? (
-                  <a href={`/institutions/${institutionId}`} className="flex items-center gap-3 group">
-                    <div className="w-10 h-10 bg-gray-100 flex items-center justify-center font-bold text-gray-700 text-base border border-gray-200 group-hover:border-[#00a264]/50 transition-colors" style={{ borderRadius: "0.75rem" }}>
-                      {(job.school || 'S').charAt(0)}
+                  <a href={`/institutions/${institutionId}`} className="flex items-center gap-3.5 group cursor-pointer">
+                    <div className="w-12 h-12 bg-[#074526] text-white flex items-center justify-center font-bold text-lg rounded-xl overflow-hidden shrink-0 shadow-sm">
+                      {job.logoUrl ? (
+                        <img src={job.logoUrl} alt={job.school} className="w-full h-full object-cover" />
+                      ) : (
+                        (job.school || 'S').charAt(0).toUpperCase()
+                      )}
                     </div>
-                    <div>
-                      <p className="text-sm font-bold text-gray-900 group-hover:text-[#00a264] transition-colors flex items-center gap-1">
-                        {job.school} {job.schoolVerified && <FaShieldHalved className="w-3.5 h-3.5 text-[#00a264]" />}
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-bold text-gray-900 group-hover:text-[#00a264] transition-colors flex items-center gap-1 truncate">
+                        {job.school} {job.schoolVerified && <FaShieldHalved className="w-3.5 h-3.5 text-[#00a264] shrink-0" />}
                       </p>
-                      <p className="text-xs text-gray-500">{job.location}</p>
-                      <p className="text-xs text-[#00a264] mt-0.5 font-medium">View institution →</p>
+                      <p className="text-xs text-gray-500 mt-0.5 truncate">{job.location}</p>
+                      <p className="text-xs text-[#00a264] font-bold mt-1 inline-flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                        View Institution Profile →
+                      </p>
                     </div>
                   </a>
                 ) : (
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-100 flex items-center justify-center font-bold text-gray-700 text-base border border-gray-200" style={{ borderRadius: "0.75rem" }}>
-                      {(job.school || 'S').charAt(0)}
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-12 h-12 bg-[#074526] text-white flex items-center justify-center font-bold text-lg rounded-xl overflow-hidden shrink-0 shadow-sm">
+                      {job.logoUrl ? (
+                        <img src={job.logoUrl} alt={job.school} className="w-full h-full object-cover" />
+                      ) : (
+                        (job.school || 'S').charAt(0).toUpperCase()
+                      )}
                     </div>
-                    <div>
-                      <p className="text-sm font-bold text-gray-900 flex items-center gap-1">
-                        {job.school} {job.schoolVerified && <FaShieldHalved className="w-3.5 h-3.5 text-[#00a264]" />}
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-bold text-gray-900 flex items-center gap-1 truncate">
+                        {job.school} {job.schoolVerified && <FaShieldHalved className="w-3.5 h-3.5 text-[#00a264] shrink-0" />}
                       </p>
-                      <p className="text-xs text-gray-500">{job.location}</p>
+                      <p className="text-xs text-gray-500 mt-0.5 truncate">{job.location}</p>
                     </div>
                   </div>
                 )}

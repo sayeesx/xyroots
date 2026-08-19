@@ -312,7 +312,7 @@ export default function TeacherDashboard() {
       {mobileMenuOpen && (
         <div className="md:hidden fixed inset-0 z-50">
           <div className="absolute inset-0 bg-black/40" onClick={() => setMobileMenuOpen(false)} />
-          <div className="absolute left-0 top-0 bottom-0 w-72 bg-white flex flex-col shadow-2xl overflow-y-auto">
+          <div className="absolute left-0 top-0 bottom-0 w-72 bg-white flex flex-col overflow-y-auto">
             {/* Close button row — no logo (SidebarContent already has one) */}
             <div className="flex items-center justify-end px-4 py-3 border-b border-gray-100 shrink-0">
               <button onClick={() => setMobileMenuOpen(false)} className="p-1.5 hover:bg-gray-100 rounded-full" aria-label="Close menu">
@@ -345,10 +345,10 @@ export default function TeacherDashboard() {
                   <div className="flex items-start gap-4">
                     <div className="relative shrink-0">
                       <img src={avatar} alt={profile?.full_name || "T"}
-                        className="w-16 h-16 rounded-full object-cover border-2 border-gray-100 shadow-sm" />
+                        className="w-16 h-16 rounded-full object-cover border-2 border-gray-100" />
                       <button
                         onClick={() => setShowEditModal(true)}
-                        className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#00a264] text-white flex items-center justify-center shadow hover:bg-[#007a4d] transition-colors"
+                        className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#00a264] text-white flex items-center justify-center hover:bg-[#007a4d] transition-colors"
                         style={{ borderRadius: "50%" }}
                       >
                         <FaPencil className="w-2.5 h-2.5" />
@@ -386,7 +386,7 @@ export default function TeacherDashboard() {
                       className={`relative shrink-0 transition-colors ${isProfileVisible ? "bg-[#00a264]" : "bg-gray-300"}`}
                       style={{ width: 38, height: 22, borderRadius: 999 }}
                     >
-                      <div className="absolute top-[3px] w-4 h-4 bg-white shadow transition-all" style={{ borderRadius: "50%", left: isProfileVisible ? 20 : 3 }} />
+                      <div className="absolute top-[3px] w-4 h-4 bg-white transition-all" style={{ borderRadius: "50%", left: isProfileVisible ? 20 : 3 }} />
                     </button>
                   </div>
                 </div>
@@ -541,7 +541,7 @@ export default function TeacherDashboard() {
                     <Link
                       key={app.id}
                       href={jobId ? `/jobs/${jobId}` : "#"}
-                      className="block bg-white border border-gray-100 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-[#00a264]/40 hover:shadow-sm transition-all"
+                      className="block bg-white border border-gray-100 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-[#00a264]/40 transition-all"
                       style={{ borderRadius: "1rem" }}
                     >
                       <div className="flex items-start gap-3 min-w-0">
@@ -639,7 +639,7 @@ export default function TeacherDashboard() {
                   const isNew = (Date.now() - new Date(iv.created_at).getTime()) < 48 * 60 * 60 * 1000;
                   const isUpcoming = iv.status === "scheduled" || iv.status === "confirmed";
                   return (
-                    <div key={iv.id} className={`bg-white border p-5 ${isUpcoming ? "border-[#00a264]/30 shadow-sm shadow-[#00a264]/5" : "border-gray-100"}`} style={{ borderRadius: "1rem" }}>
+                    <div key={iv.id} className={`bg-white border p-5 ${isUpcoming ? "border-[#00a264]/30  " : "border-gray-100"}`} style={{ borderRadius: "1rem" }}>
                       <div className="flex items-start justify-between gap-3 flex-wrap">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -690,8 +690,8 @@ export default function TeacherDashboard() {
                     </div>
                     <div className="flex items-start gap-4 mb-4">
                       <div className="relative shrink-0">
-                        <img src={avatar} alt={profile?.full_name || "T"} className="w-16 h-16 rounded-full object-cover border-2 border-gray-100 shadow-sm" />
-                        <button onClick={() => setShowEditModal(true)} className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#00a264] text-white flex items-center justify-center shadow hover:bg-[#007a4d]" style={{ borderRadius: "50%" }}>
+                        <img src={avatar} alt={profile?.full_name || "T"} className="w-16 h-16 rounded-full object-cover border-2 border-gray-100" />
+                        <button onClick={() => setShowEditModal(true)} className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#00a264] text-white flex items-center justify-center hover:bg-[#007a4d]" style={{ borderRadius: "50%" }}>
                           <FaPencil className="w-2.5 h-2.5" />
                         </button>
                       </div>
@@ -833,7 +833,7 @@ export default function TeacherDashboard() {
                         className={`relative shrink-0 transition-colors ${isProfileVisible ? "bg-[#00a264]" : "bg-gray-300"}`}
                         style={{ width: 40, height: 22, borderRadius: 999 }}
                       >
-                        <div className="absolute top-[3px] w-4 h-4 bg-white shadow transition-all" style={{ borderRadius: "50%", left: isProfileVisible ? 21 : 3 }} />
+                        <div className="absolute top-[3px] w-4 h-4 bg-white transition-all" style={{ borderRadius: "50%", left: isProfileVisible ? 21 : 3 }} />
                       </button>
                     </div>
                     <div className="flex items-center justify-between py-3 border-b border-gray-100">

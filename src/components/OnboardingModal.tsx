@@ -307,7 +307,7 @@ export default function OnboardingModal({ isOpen, onClose, role, onSaved }: Onbo
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in overflow-hidden">
       <div
-        className="bg-white rounded-2xl w-full max-w-4xl shadow-2xl relative animate-modal-in flex flex-col my-auto max-h-[90vh]"
+        className="bg-white rounded-2xl w-full max-w-4xl relative animate-modal-in flex flex-col my-auto max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -608,7 +608,7 @@ export default function OnboardingModal({ isOpen, onClose, role, onSaved }: Onbo
                             setTimeout(() => { onSaved?.(); onClose(); }, 1200);
                           }}
                           disabled={loading}
-                          className="px-6 py-3 rounded-xl bg-xyroots-teal text-white font-bold hover:bg-xyroots-teal/90 transition-all shadow-lg shadow-xyroots-teal/20"
+                          className="px-6 py-3 rounded-xl bg-xyroots-teal text-white font-bold hover:bg-xyroots-teal/90 transition-all -teal/20"
                         >
                           {loading ? <FaSpinner className="w-4 h-4 animate-spin mx-auto" /> : 'Yes, Show Profile'}
                         </button>

@@ -65,7 +65,7 @@ export default function LoginPage() {
 
       <main className="flex-1 pt-28 lg:pt-36 pb-20 flex items-center justify-center">
         <div className="max-w-md w-full mx-auto px-4">
-          <div className="bg-white rounded-3xl p-8 border border-xyroots-border shadow-xl">
+          <div className="bg-white rounded-3xl p-8 border border-xyroots-border">
             {/* Header */}
             <div className="text-center mb-8">
               <div className="w-12 h-12 rounded-2xl bg-xyroots-teal text-white font-bold text-xl flex items-center justify-center mx-auto mb-3">

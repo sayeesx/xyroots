@@ -23,7 +23,7 @@ export default function CandidateSearchUI() {
         </div>
 
         {/* Mock Candidate Search Layout */}
-        <div className="bg-xyroots-cream rounded-3xl p-4 sm:p-6 lg:p-8 border border-xyroots-border shadow-sm">
+        <div className="bg-xyroots-cream rounded-3xl p-4 sm:p-6 lg:p-8 border border-xyroots-border">
           <div className="grid lg:grid-cols-4 gap-6">
             {/* Sidebar Filters Mock */}
             <div className="hidden lg:block bg-white rounded-2xl p-5 border border-xyroots-border h-fit space-y-5">

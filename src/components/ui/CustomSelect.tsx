@@ -132,7 +132,7 @@ export default function CustomSelect({
 
           {/* Dropdown */}
           {isOpen && (
-            <div className="absolute top-full left-0 w-full mt-1 bg-white border border-xyroots-border dashboard-shadow rounded-md z-50 max-h-64 flex flex-col overflow-hidden">
+            <div className="absolute top-full left-0 w-full mt-1 bg-white border border-xyroots-border rounded-md z-50 max-h-64 flex flex-col overflow-hidden">
               {searchable && (
                 <div className="p-2 border-b border-xyroots-border sticky top-0 bg-white">
                   <div className="relative">

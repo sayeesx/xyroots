@@ -67,7 +67,7 @@ function CustomSortDropdown({ value, onChange, options }: { value: string; onCha
     <div className="relative" ref={ref}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:border-gray-400 transition-all shadow-sm cursor-pointer"
+        className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:border-gray-400 transition-all cursor-pointer"
       >
         <FaSort className="w-3 h-3 text-[#00a264]" />
         <span>{selectedOption.label}</span>
@@ -75,7 +75,7 @@ function CustomSortDropdown({ value, onChange, options }: { value: string; onCha
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-1.5 w-48 bg-white border border-gray-200 rounded-xl shadow-xl py-1.5 z-50 animate-in fade-in duration-100">
+        <div className="absolute right-0 mt-1.5 w-48 bg-white border border-gray-200 rounded-xl py-1.5 z-50 animate-in fade-in duration-100">
           <div className="px-3 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">
             Sort By
           </div>
@@ -157,7 +157,7 @@ function FilterPanel({
             className={`relative transition-colors shrink-0 ${openToRemote ? 'bg-[#00a264]' : 'bg-gray-300'}`}
             style={{ width: 36, height: 20, borderRadius: 999 }}
           >
-            <div className={`absolute top-[2px] w-4 h-4 rounded-full bg-white shadow transition-all ${openToRemote ? 'left-[18px]' : 'left-[2px]'}`} />
+            <div className={`absolute top-[2px] w-4 h-4 rounded-full bg-white  transition-all ${openToRemote ? 'left-[18px]' : 'left-[2px]'}`} />
           </button>
         </div>
         <hr className="border-gray-100" />
@@ -336,7 +336,7 @@ function JobsPageInner() {
   const isAuthed = !!user;
 
   const [searchTerm, setSearchTerm] = useState(searchParams.get("q") || "");
-  const [citySearch, setCitySearch] = useState(searchParams.get("location") || "");
+  const [citySearch, setCitySearch] = useState(searchParams.get("location") || searchParams.get("district") || "");
   const [activeSubject, setActiveSubject] = useState(searchParams.get("subject") || "All");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
@@ -388,15 +388,30 @@ function JobsPageInner() {
   }, []); // eslint-disable-line
 
   // Filters
-  const [selectedJobTypes, setSelectedJobTypes] = useState<string[]>([]);
+  const [selectedJobTypes, setSelectedJobTypes] = useState<string[]>(() => {
+    const t = searchParams.get("jobType");
+    return t ? [t] : [];
+  });
   const [openToRemote, setOpenToRemote] = useState(false);
   const [salaryRange, setSalaryRange] = useState<[number, number]>([SALARY_MIN, SALARY_MAX]);
-  const [selectedExperiences, setSelectedExperiences] = useState<string[]>([]);
-  const [selectedBoards, setSelectedBoards] = useState<string[]>([]);
-  const [selectedInstTypes, setSelectedInstTypes] = useState<string[]>([]);
-  const [selectedQuals, setSelectedQuals] = useState<string[]>([]);
-  const [postedDate, setPostedDate] = useState<string>("Any time");
-  const [selectedState, setSelectedState] = useState("All States");
+  const [selectedExperiences, setSelectedExperiences] = useState<string[]>(() => {
+    const e = searchParams.get("exp");
+    return e ? [e] : [];
+  });
+  const [selectedBoards, setSelectedBoards] = useState<string[]>(() => {
+    const b = searchParams.get("board");
+    return b ? [b] : [];
+  });
+  const [selectedInstTypes, setSelectedInstTypes] = useState<string[]>(() => {
+    const i = searchParams.get("type");
+    return i ? [i] : [];
+  });
+  const [selectedQuals, setSelectedQuals] = useState<string[]>(() => {
+    const q = searchParams.get("qual");
+    return q ? [q] : [];
+  });
+  const [postedDate, setPostedDate] = useState<string>(() => searchParams.get("posted") || "Any time");
+  const [selectedState, setSelectedState] = useState(() => searchParams.get("state") || "All States");
   const [sortBy, setSortBy] = useState("default");
 
   // Watchlist — DB-backed, falls back to optimistic local state
@@ -540,7 +555,7 @@ function JobsPageInner() {
       {mobileFilterOpen && (
         <div className="fixed inset-0 z-[100] flex lg:hidden">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setMobileFilterOpen(false)} />
-          <div className="relative ml-auto w-[85vw] max-w-sm h-full bg-white shadow-2xl flex flex-col">
+          <div className="relative ml-auto w-[85vw] max-w-sm h-full bg-white flex flex-col">
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
               <span className="font-bold text-gray-900">Filters</span>
               <button onClick={() => setMobileFilterOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
@@ -639,7 +654,7 @@ function JobsPageInner() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setMobileFilterOpen(true)}
-                    className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-xs font-semibold text-gray-700 shadow-sm hover:border-gray-400 transition-colors"
+                    className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-xs font-semibold text-gray-700 hover:border-gray-400 transition-colors"
                   >
                     <FaFilter className="w-3 h-3 text-gray-600" />
                     Filters
@@ -654,7 +669,7 @@ function JobsPageInner() {
                 <div className="flex items-center gap-1.5">
                   {/* Sort — custom dropdown */}
                   <CustomSortDropdown value={sortBy} onChange={setSortBy} options={SORT_OPTIONS} />
-                  <div className="hidden sm:flex items-center bg-white rounded-lg p-0.5 border border-gray-200 shadow-sm">
+                  <div className="hidden sm:flex items-center bg-white rounded-lg p-0.5 border border-gray-200">
                     <button onClick={() => setViewMode("grid")} className={`p-1.5 rounded-md transition-all ${viewMode === 'grid' ? 'bg-gray-100 text-gray-900' : 'text-gray-400 hover:text-gray-700'}`}>
                       <FaTableCellsLarge className="w-3.5 h-3.5" />
                     </button>
@@ -671,7 +686,7 @@ function JobsPageInner() {
                   {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
                 </div>
               ) : filteredJobs.length === 0 ? (
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
+                <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
                   <p className="text-gray-500 text-sm">No jobs match your search yet. Check back soon!</p>
                 </div>
               ) : (
@@ -679,7 +694,7 @@ function JobsPageInner() {
                   {filteredJobs.map((job, i) => {
                     const isSaved = watchlist.includes(job.id);
                     return (
-                      <div key={job.id} className="bg-white border border-gray-200 overflow-hidden hover:border-[#00a264]/50 hover:shadow-[0_2px_12px_rgba(0,162,100,0.08)] transition-all group flex flex-col" style={{ borderRadius: "1rem" }}>
+                      <div key={job.id} className="bg-white border border-gray-200 overflow-hidden hover:border-[#00a264]/50 (0,162,100,0.08)] transition-all group flex flex-col" style={{ borderRadius: "1rem" }}>
                         <div className="p-4 flex-1">
                           <div className="flex items-start justify-between mb-2 gap-3">
                             {job.logoUrl && (

@@ -59,7 +59,7 @@ function CustomSortDropdown({ value, onChange, options }: { value: string; onCha
     <div className="relative" ref={ref}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:border-gray-400 transition-all shadow-sm cursor-pointer"
+        className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:border-gray-400 transition-all cursor-pointer"
       >
         <FaSort className="w-3 h-3 text-[#00a264]" />
         <span>{selectedOption.label}</span>
@@ -67,7 +67,7 @@ function CustomSortDropdown({ value, onChange, options }: { value: string; onCha
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-1.5 w-52 bg-white border border-gray-200 rounded-xl shadow-xl py-1.5 z-50 animate-in fade-in duration-100">
+        <div className="absolute right-0 mt-1.5 w-52 bg-white border border-gray-200 rounded-xl py-1.5 z-50 animate-in fade-in duration-100">
           <div className="px-3 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">
             Sort By
           </div>
@@ -255,20 +255,41 @@ function TeachersPageInner() {
   const { user, loading, role, openSignIn, openInstitutionRegistration } = useAuth();
 
   const [searchTerm, setSearchTerm] = useState(searchParams.get("q") || "");
-  const [citySearch, setCitySearch] = useState(searchParams.get("location") || "");
+  const [citySearch, setCitySearch] = useState(searchParams.get("location") || searchParams.get("district") || "");
   const [activeSubject, setActiveSubject] = useState(searchParams.get("subject") || "All");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [dbTeachers, setDbTeachers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedVerification, setSelectedVerification] = useState<string[]>([]);
-  const [selectedQuals, setSelectedQuals] = useState<string[]>([]);
-  const [selectedExperiences, setSelectedExperiences] = useState<string[]>([]);
-  const [selectedBoards, setSelectedBoards] = useState<string[]>([]);
-  const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
-  const [selectedModes, setSelectedModes] = useState<string[]>([]);
-  const [selectedNotice, setSelectedNotice] = useState<string[]>([]);
-  const [selectedState, setSelectedState] = useState("All States");
+  const [selectedVerification, setSelectedVerification] = useState<string[]>(() => {
+    const v = searchParams.get("verified");
+    return v ? [v] : [];
+  });
+  const [selectedQuals, setSelectedQuals] = useState<string[]>(() => {
+    const q = searchParams.get("qual");
+    return q ? [q] : [];
+  });
+  const [selectedExperiences, setSelectedExperiences] = useState<string[]>(() => {
+    const e = searchParams.get("exp");
+    return e ? [e] : [];
+  });
+  const [selectedBoards, setSelectedBoards] = useState<string[]>(() => {
+    const b = searchParams.get("board");
+    return b ? [b] : [];
+  });
+  const [selectedLevels, setSelectedLevels] = useState<string[]>(() => {
+    const l = searchParams.get("level");
+    return l ? [l] : [];
+  });
+  const [selectedModes, setSelectedModes] = useState<string[]>(() => {
+    const m = searchParams.get("mode");
+    return m ? [m] : [];
+  });
+  const [selectedNotice, setSelectedNotice] = useState<string[]>(() => {
+    const n = searchParams.get("notice");
+    return n ? [n] : [];
+  });
+  const [selectedState, setSelectedState] = useState(() => searchParams.get("state") || "All States");
   const [sortBy, setSortBy] = useState("default");
   const supabase = createClient();
 
@@ -356,7 +377,7 @@ function TeachersPageInner() {
       {mobileFilterOpen && (
         <div className="fixed inset-0 z-[100] flex lg:hidden">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setMobileFilterOpen(false)} />
-          <div className="relative ml-auto w-[85vw] max-w-sm h-full bg-white shadow-2xl flex flex-col">
+          <div className="relative ml-auto w-[85vw] max-w-sm h-full bg-white flex flex-col">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <span className="font-bold text-gray-900 text-base">Filters</span>
               <button onClick={() => setMobileFilterOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200">
@@ -392,7 +413,7 @@ function TeachersPageInner() {
 
                 {/* Search Bar + Subject Dropdown row */}
                 <div className="mb-2.5">
-                  <div className="bg-white border border-gray-200 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center" style={{ borderRadius: "10px" }}>
+                  <div className="bg-white border border-gray-200 flex flex-col sm:flex-row items-stretch sm:items-center" style={{ borderRadius: "10px" }}>
                     <div className="flex-1 flex items-center px-3 py-2 border-b sm:border-b-0 sm:border-r border-gray-200 min-w-0">
                       <FaMagnifyingGlass className="w-3.5 h-3.5 text-gray-400 mr-2.5 shrink-0" />
                       <input
@@ -433,7 +454,7 @@ function TeachersPageInner() {
                 <div className="flex items-center justify-between mb-2.5">
                   <div className="flex items-center gap-2">
                     <button onClick={() => setMobileFilterOpen(true)}
-                      className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-xs font-semibold text-gray-700 shadow-sm hover:border-gray-400">
+                      className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-xs font-semibold text-gray-700 hover:border-gray-400">
                       <FaFilter className="w-3 h-3 text-gray-500" />
                       Filters
                       {activeFilterCount > 0 && <span className="w-4 h-4 rounded-full bg-gray-900 text-white text-[9px] font-bold flex items-center justify-center">{activeFilterCount}</span>}
@@ -445,7 +466,7 @@ function TeachersPageInner() {
                   <div className="flex items-center gap-1.5">
                     {/* Sort — custom dropdown */}
                     <CustomSortDropdown value={sortBy} onChange={setSortBy} options={SORT_OPTIONS} />
-                    <div className="hidden sm:flex items-center bg-white rounded-lg p-0.5 border border-gray-200 shadow-sm">
+                    <div className="hidden sm:flex items-center bg-white rounded-lg p-0.5 border border-gray-200">
                       <button onClick={() => setViewMode("grid")} className={`p-1.5 rounded-md transition-all ${viewMode === 'grid' ? 'bg-gray-100 text-gray-900' : 'text-gray-400 hover:text-gray-700'}`}>
                         <FaTableCellsLarge className="w-3.5 h-3.5" />
                       </button>
@@ -469,7 +490,7 @@ function TeachersPageInner() {
                 ) : (
                   <div className={`grid gap-3 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5' : 'grid-cols-1'}`}>
                     {filteredTeachers.map(tp => (
-                      <div key={tp.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:border-[#00a264]/60 hover:shadow-md transition-all group flex flex-col">
+                      <div key={tp.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:border-[#00a264]/60 transition-all group flex flex-col">
                         <div className="p-3.5 flex-1">
                           {/* Header */}
                           <div className="flex items-center gap-2.5 mb-3">

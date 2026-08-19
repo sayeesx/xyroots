@@ -32,12 +32,12 @@ export default function PricingSection() {
               key={plan.id}
               className={`rounded-3xl p-8 border flex flex-col justify-between transition-all relative ${
                 plan.highlighted
-                  ? "bg-xyroots-dark text-white border-xyroots-dark shadow-2xl scale-105"
-                  : "bg-white text-black border-xyroots-border hover:border-xyroots-teal/40 shadow-sm"
+                  ? "bg-xyroots-dark text-white border-xyroots-dark  scale-105"
+                  : "bg-white text-black border-xyroots-border hover:border-xyroots-teal/40 "
               }`}
             >
               {plan.highlighted && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-xyroots-yellow text-black font-bold text-xs px-4 py-1.5 rounded-full uppercase tracking-wider shadow-sm">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-xyroots-yellow text-black font-bold text-xs px-4 py-1.5 rounded-full uppercase tracking-wider">
                   Most Popular for Schools
                 </div>
               )}

@@ -118,7 +118,7 @@ export default function Navbar() {
                 <div className="relative">
                   <button
                     onClick={() => setProfileOpen(!profileOpen)}
-                    className="flex items-center gap-2 pl-2 pr-4 py-1.5 rounded-full border border-xyroots-border hover:border-xyroots-teal hover:shadow-sm transition-all bg-white"
+                    className="flex items-center gap-2 pl-2 pr-4 py-1.5 rounded-full border border-xyroots-border hover:border-xyroots-teal transition-all bg-white"
                   >
                     <div className="w-8 h-8 rounded-full bg-xyroots-cream flex items-center justify-center text-xyroots-teal font-bold overflow-hidden">
                       {profile?.avatar_url ? (
@@ -133,7 +133,7 @@ export default function Navbar() {
                   </button>
 
                   {profileOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-xyroots-border py-2 animate-modal-in z-50">
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl border border-xyroots-border py-2 animate-modal-in z-50">
                       <div className="px-4 py-3 border-b border-xyroots-border mb-2">
                         <p className="text-sm font-bold text-black truncate">{profile?.full_name}</p>
                         <p className="text-xs text-xyroots-muted truncate mt-0.5">{profile?.email}</p>
@@ -197,7 +197,7 @@ export default function Navbar() {
       {mobileOpen && (
         <div className="fixed inset-0 z-[60] lg:hidden">
           <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-          <div className="absolute right-0 top-0 bottom-0 w-full max-w-sm bg-white shadow-2xl flex flex-col animate-slide-in-right">
+          <div className="absolute right-0 top-0 bottom-0 w-full max-w-sm bg-white flex flex-col animate-slide-in-right">
             <div className="flex items-center justify-between p-4 border-b border-xyroots-border shrink-0">
               <Link href="/" onClick={() => setMobileOpen(false)}>
                 <Image src="/logo1.webp" alt="Xyroots Logo" width={160} height={48} className="h-9 w-auto object-contain" />

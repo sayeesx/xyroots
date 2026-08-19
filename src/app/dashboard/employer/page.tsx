@@ -205,7 +205,7 @@ export default function EmployerDashboard() {
       {mobileMenuOpen && (
         <div className="md:hidden fixed inset-0 z-50">
           <div className="absolute inset-0 bg-black/40" onClick={() => setMobileMenuOpen(false)} />
-          <div className="absolute left-0 top-0 bottom-0 w-72 bg-white flex flex-col shadow-2xl overflow-y-auto">
+          <div className="absolute left-0 top-0 bottom-0 w-72 bg-white flex flex-col overflow-y-auto">
             <div className="flex items-center justify-end px-4 py-3 border-b border-gray-100 shrink-0">
               <button onClick={() => setMobileMenuOpen(false)} className="p-1.5 hover:bg-gray-100 rounded-full" aria-label="Close menu">
                 <FaXmark className="w-4 h-4 text-gray-600" />
@@ -242,7 +242,7 @@ export default function EmployerDashboard() {
                   </div>
                   <div className="flex items-start gap-4">
                     <div className="relative shrink-0">
-                      <img src={avatar} alt={profile?.full_name || "S"} className="w-16 h-16 rounded-full object-cover border-2 border-gray-100 shadow-sm" />
+                      <img src={avatar} alt={profile?.full_name || "S"} className="w-16 h-16 rounded-full object-cover border-2 border-gray-100" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-base font-bold text-gray-900">{profile?.full_name}</p>
@@ -267,7 +267,7 @@ export default function EmployerDashboard() {
                       className={`relative shrink-0 transition-colors ${institutionVisible ? "bg-[#00a264]" : "bg-gray-300"}`}
                       style={{ width: 38, height: 22, borderRadius: 999 }}
                     >
-                      <div className="absolute top-[3px] w-4 h-4 bg-white shadow transition-all" style={{ borderRadius: "50%", left: institutionVisible ? 20 : 3 }} />
+                      <div className="absolute top-[3px] w-4 h-4 bg-white transition-all" style={{ borderRadius: "50%", left: institutionVisible ? 20 : 3 }} />
                     </button>
                   </div>
                 </div>
@@ -494,7 +494,7 @@ export default function EmployerDashboard() {
                     className={`relative shrink-0 transition-colors ${institutionVisible ? "bg-[#00a264]" : "bg-gray-300"}`}
                     style={{ width: 44, height: 24, borderRadius: 999 }}
                   >
-                    <div className={`absolute top-[3px] w-[18px] h-[18px] rounded-full bg-white shadow transition-all ${institutionVisible ? "left-[23px]" : "left-[3px]"}`} />
+                    <div className={`absolute top-[3px] w-[18px] h-[18px] rounded-full bg-white  transition-all ${institutionVisible ? "left-[23px]" : "left-[3px]"}`} />
                   </button>
                 </div>
                 {!institutionVisible && (

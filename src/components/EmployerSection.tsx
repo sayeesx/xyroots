@@ -73,7 +73,7 @@ export default function EmployerSection() {
 
           {/* Right - Dashboard Mockup */}
           <div>
-            <div className="bg-white rounded-2xl dashboard-shadow overflow-hidden max-w-md mx-auto lg:ml-auto">
+            <div className="bg-white rounded-2xl overflow-hidden max-w-md mx-auto lg:ml-auto">
               {/* Header */}
               <div className="px-6 py-4 border-b border-xyroots-border">
                 <h3 className="text-sm font-bold text-black">Hiring Overview</h3>

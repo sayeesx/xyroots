@@ -31,7 +31,7 @@ export default function SecurityPage() {
         <section className="py-16 bg-[#f7f8fa]">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 grid sm:grid-cols-2 gap-6 mb-12">
             {features.map((f) => (
-              <div key={f.title} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-all">
+              <div key={f.title} className="bg-white rounded-2xl border border-gray-100 p-6 transition-all">
                 <div className="w-11 h-11 bg-gradient-to-br from-xyroots-teal to-[#068050] rounded-xl flex items-center justify-center mb-4">
                   <f.icon className="w-5 h-5 text-white" />
                 </div>
@@ -42,7 +42,7 @@ export default function SecurityPage() {
           </div>
 
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-7">
+            <div className="bg-white rounded-2xl border border-gray-100 p-7">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Data Practices</h2>
               <ul className="space-y-3 text-sm text-gray-700">
                 {[

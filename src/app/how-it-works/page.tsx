@@ -31,7 +31,7 @@ export default function HowItWorksPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16">
               {/* For Teachers */}
-              <div className="bg-white rounded-3xl p-8 border border-xyroots-border shadow-sm">
+              <div className="bg-white rounded-3xl p-8 border border-xyroots-border">
                 <span className="inline-block text-xs font-bold uppercase tracking-widest text-xyroots-teal bg-xyroots-mint px-3 py-1 rounded-full mb-4">
                   For Educators
                 </span>
@@ -62,7 +62,7 @@ export default function HowItWorksPage() {
               </div>
 
               {/* For Schools */}
-              <div className="bg-white rounded-3xl p-8 border border-xyroots-border shadow-sm">
+              <div className="bg-white rounded-3xl p-8 border border-xyroots-border">
                 <span className="inline-block text-xs font-bold uppercase tracking-widest text-yellow-800 bg-yellow-100 px-3 py-1 rounded-full mb-4">
                   For Institutions
                 </span>

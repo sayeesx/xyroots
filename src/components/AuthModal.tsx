@@ -162,7 +162,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in overflow-hidden">
       <div 
-        className="bg-white rounded-2xl w-full max-w-3xl shadow-2xl relative animate-modal-in flex flex-col md:flex-row my-auto max-h-[90vh] overflow-hidden"
+        className="bg-white rounded-2xl w-full max-w-3xl relative animate-modal-in flex flex-col md:flex-row my-auto max-h-[90vh] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         <button 
@@ -230,7 +230,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
           )}
 
           {successMsg && (
-            <div className="mb-5 p-3 bg-green-50 border border-green-100 rounded-lg text-green-700 text-sm font-medium flex items-center gap-2 shadow-sm">
+            <div className="mb-5 p-3 bg-green-50 border border-green-100 rounded-lg text-green-700 text-sm font-medium flex items-center gap-2">
               <FaCircleCheck className="w-4 h-4 text-green-600 shrink-0" />
               {successMsg}
             </div>

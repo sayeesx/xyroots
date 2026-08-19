@@ -23,7 +23,7 @@ export default function GetVerifiedModal({ isOpen, onClose }: GetVerifiedModalPr
   return (
     <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-hidden">
       <div
-        className="bg-white w-full max-w-lg max-h-[92vh] flex flex-col overflow-hidden shadow-2xl"
+        className="bg-white w-full max-w-lg max-h-[92vh] flex flex-col overflow-hidden"
         style={{ borderRadius: "1.5rem" }}
         onClick={e => e.stopPropagation()}
       >

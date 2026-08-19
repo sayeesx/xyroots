@@ -43,7 +43,7 @@ export default function BlogPage() {
         <section className="py-12 bg-[#f7f8fa]">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {posts.map((post) => (
-              <Link href={`/blog/${post.slug}`} key={post.slug} className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all overflow-hidden group flex flex-col">
+              <Link href={`/blog/${post.slug}`} key={post.slug} className="bg-white rounded-2xl border border-gray-100 transition-all overflow-hidden group flex flex-col">
                 <div className="h-36 bg-gradient-to-br from-xyroots-teal to-[#068050] flex items-center justify-center p-6">
                   <p className="text-white/70 text-sm font-medium text-center leading-relaxed">{post.title}</p>
                 </div>

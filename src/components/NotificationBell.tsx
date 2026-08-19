@@ -120,7 +120,7 @@ export default function NotificationBell() {
 
           {/* Panel — slides from right */}
           <div
-            className="relative w-full max-w-sm bg-white shadow-2xl flex flex-col"
+            className="relative w-full max-w-sm bg-white flex flex-col"
             style={{ height: "100vh", animation: "slide-in-right 0.28s cubic-bezier(0.16,1,0.3,1)" }}
             onClick={e => e.stopPropagation()}
           >

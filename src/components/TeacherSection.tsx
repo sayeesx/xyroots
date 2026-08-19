@@ -51,7 +51,7 @@ export default function TeacherSection() {
                   key={f.label}
                   className="flex items-center gap-2.5 text-sm text-xyroots-text"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center shrink-0 shadow-sm">
+                  <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center shrink-0">
                     <f.icon className="w-4 h-4 text-xyroots-teal" />
                   </div>
                   <span className="text-sm font-medium">{f.label}</span>
@@ -64,7 +64,7 @@ export default function TeacherSection() {
 
           {/* Right - Teacher Profile Mockup */}
           <div className="relative">
-            <div className="bg-white rounded-2xl dashboard-shadow border border-xyroots-border overflow-hidden max-w-sm mx-auto lg:ml-auto" style={{ background: "linear-gradient(160deg, #fff 70%, #f0fdf4 100%)" }}>
+            <div className="bg-white rounded-2xl border border-xyroots-border overflow-hidden max-w-sm mx-auto lg:ml-auto" style={{ background: "linear-gradient(160deg, #fff 70%, #f0fdf4 100%)" }}>
               {/* Cover */}
               <div className="h-40 sm:h-48 bg-gray-200 relative overflow-hidden">
                 <Image
@@ -78,7 +78,7 @@ export default function TeacherSection() {
 
               <div className="p-5 sm:p-6 relative pt-12 sm:pt-14">
                 {/* Profile Picture */}
-                <div className="absolute -top-10 left-5 sm:left-6 w-20 h-20 rounded-full border-4 border-white overflow-hidden bg-gray-100 z-10 shadow-sm">
+                <div className="absolute -top-10 left-5 sm:left-6 w-20 h-20 rounded-full border-4 border-white overflow-hidden bg-gray-100 z-10">
                   <Image
                     src="/lady-teacher.webp"
                     alt="Kavya T Profile"

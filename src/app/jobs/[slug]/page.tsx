@@ -179,7 +179,7 @@ export default function JobDetailPage() {
 
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
               <div className="flex items-start gap-4 sm:gap-5 flex-1 min-w-0">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 flex items-center justify-center font-bold text-2xl text-gray-700 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 flex items-center justify-center font-bold text-2xl text-gray-700 bg-white border border-gray-200 rounded-xl overflow-hidden">
                   {job.logoUrl ? (
                     <img src={job.logoUrl} alt={job.school} className="w-full h-full object-cover" />
                   ) : (
@@ -248,7 +248,7 @@ export default function JobDetailPage() {
                 <button
                   onClick={handleApply}
                   disabled={applyLoading || applied}
-                  className={`px-6 py-3 text-xs font-extrabold rounded-xl transition-all shadow-sm flex items-center gap-2 ${
+                  className={`px-6 py-3 text-xs font-extrabold rounded-xl transition-all  flex items-center gap-2 ${
                     applied
                       ? "bg-[#e6f7ed] text-[#00a264] cursor-default"
                       : "bg-[#00a264] text-white hover:bg-[#008f58]"
@@ -374,7 +374,7 @@ export default function JobDetailPage() {
             {/* Right sidebar */}
             <div className="space-y-6">
               {/* Action Card */}
-              <div className="bg-white border border-gray-200/80 rounded-2xl p-6 shadow-md">
+              <div className="bg-white border border-gray-200/80 rounded-2xl p-6">
                 <div className="text-center py-4 mb-5 bg-[#f0fdf4] border border-[#00a264]/20 rounded-xl">
                   <p className="text-xs font-semibold text-gray-500 mb-0.5">Offered Salary</p>
                   <p className="text-2xl font-extrabold text-[#00a264] flex items-center justify-center gap-0.5">
@@ -387,10 +387,10 @@ export default function JobDetailPage() {
                   <button
                     onClick={handleApply}
                     disabled={applyLoading || applied}
-                    className={`w-full py-3.5 px-6 font-extrabold text-sm rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 ${
+                    className={`w-full py-3.5 px-6 font-extrabold text-sm rounded-xl transition-all  flex items-center justify-center gap-2 ${
                       applied
-                        ? "bg-[#e6f7ed] text-[#00a264] shadow-none cursor-default"
-                        : "bg-gradient-to-r from-[#00a264] to-[#00c278] hover:from-[#007a4d] hover:to-[#00a264] text-white shadow-[#00a264]/25 active:scale-[0.98]"
+                        ? "bg-[#e6f7ed] text-[#00a264]  cursor-default"
+                        : "bg-gradient-to-r from-[#00a264] to-[#00c278] hover:from-[#007a4d] hover:to-[#00a264] text-white  active:scale-[0.98]"
                     }`}
                   >
                     {applyLoading ? <><FaSpinner className="w-4 h-4 animate-spin" /> Submitting...</> :
@@ -428,11 +428,11 @@ export default function JobDetailPage() {
               </div>
 
               {/* Institution Card */}
-              <div className="bg-white border border-gray-200/80 rounded-2xl p-5 shadow-sm">
+              <div className="bg-white border border-gray-200/80 rounded-2xl p-5">
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">About Institution</h3>
                 {institutionId ? (
                   <a href={`/institutions/${institutionId}`} className="flex items-center gap-3.5 group cursor-pointer">
-                    <div className="w-12 h-12 bg-[#074526] text-white flex items-center justify-center font-bold text-lg rounded-xl overflow-hidden shrink-0 shadow-sm">
+                    <div className="w-12 h-12 bg-[#074526] text-white flex items-center justify-center font-bold text-lg rounded-xl overflow-hidden shrink-0">
                       {job.logoUrl ? (
                         <img src={job.logoUrl} alt={job.school} className="w-full h-full object-cover" />
                       ) : (
@@ -451,7 +451,7 @@ export default function JobDetailPage() {
                   </a>
                 ) : (
                   <div className="flex items-center gap-3.5">
-                    <div className="w-12 h-12 bg-[#074526] text-white flex items-center justify-center font-bold text-lg rounded-xl overflow-hidden shrink-0 shadow-sm">
+                    <div className="w-12 h-12 bg-[#074526] text-white flex items-center justify-center font-bold text-lg rounded-xl overflow-hidden shrink-0">
                       {job.logoUrl ? (
                         <img src={job.logoUrl} alt={job.school} className="w-full h-full object-cover" />
                       ) : (

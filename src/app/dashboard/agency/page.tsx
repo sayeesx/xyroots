@@ -196,7 +196,7 @@ export default function AgencyDashboard() {
       {mobileMenuOpen && (
         <div className="md:hidden fixed inset-0 z-50">
           <div className="absolute inset-0 bg-black/40" onClick={() => setMobileMenuOpen(false)} />
-          <div className="absolute left-0 top-0 bottom-0 w-72 bg-white flex flex-col shadow-2xl overflow-y-auto">
+          <div className="absolute left-0 top-0 bottom-0 w-72 bg-white flex flex-col overflow-y-auto">
             <div className="flex items-center justify-end px-4 py-3 border-b border-gray-100 shrink-0">
               <button onClick={() => setMobileMenuOpen(false)} className="p-1.5 hover:bg-gray-100 rounded-full" aria-label="Close menu">
                 <FaXmark className="w-4 h-4 text-gray-600" />
@@ -234,7 +234,7 @@ export default function AgencyDashboard() {
                     {joinedDate && <span className="text-xs text-gray-400">Joined {joinedDate}</span>}
                   </div>
                   <div className="flex items-start gap-4">
-                    <img src={avatar} alt="" className="w-16 h-16 rounded-full object-cover border-2 border-gray-100 shadow-sm shrink-0" />
+                    <img src={avatar} alt="" className="w-16 h-16 rounded-full object-cover border-2 border-gray-100 shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="text-base font-bold text-gray-900">{profile?.full_name}</p>
                       <p className="text-sm text-gray-500 mt-0.5">Consultancy / Agency</p>

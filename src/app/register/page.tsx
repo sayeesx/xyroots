@@ -24,7 +24,7 @@ export default function RegisterChoicePage() {
 
           <div className="grid md:grid-cols-2 gap-8">
             {/* Teacher Option */}
-            <div className="bg-white rounded-3xl p-8 border border-xyroots-border hover:border-xyroots-teal transition-all shadow-sm flex flex-col justify-between card-hover">
+            <div className="bg-white rounded-3xl p-8 border border-xyroots-border hover:border-xyroots-teal transition-all flex flex-col justify-between card-hover">
               <div>
                 <div className="w-14 h-14 rounded-2xl bg-xyroots-mint text-xyroots-teal flex items-center justify-center mb-6">
                   <FaGraduationCap className="w-7 h-7" />
@@ -62,7 +62,7 @@ export default function RegisterChoicePage() {
             </div>
 
             {/* School Option */}
-            <div className="bg-white rounded-3xl p-8 border border-xyroots-border hover:border-xyroots-yellow transition-all shadow-sm flex flex-col justify-between card-hover">
+            <div className="bg-white rounded-3xl p-8 border border-xyroots-border hover:border-xyroots-yellow transition-all flex flex-col justify-between card-hover">
               <div>
                 <div className="w-14 h-14 rounded-2xl bg-yellow-50 text-yellow-700 flex items-center justify-center mb-6">
                   <FaBuilding className="w-7 h-7" />

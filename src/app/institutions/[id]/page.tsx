@@ -158,7 +158,7 @@ export default function InstitutionDetailPage() {
 
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
               <div className="flex items-start gap-4 sm:gap-5 flex-1 min-w-0">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 flex items-center justify-center font-bold text-2xl text-gray-700 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 flex items-center justify-center font-bold text-2xl text-gray-700 bg-white border border-gray-200 rounded-xl overflow-hidden">
                   {(institution.name || "I").charAt(0).toUpperCase()}
                 </div>
 
@@ -216,7 +216,7 @@ export default function InstitutionDetailPage() {
             <div className="lg:col-span-2 space-y-6">
               {/* Institution Bio */}
               {institution.description && (
-                <div className="bg-white border border-gray-200/80 rounded-2xl p-6 sm:p-7 shadow-sm">
+                <div className="bg-white border border-gray-200/80 rounded-2xl p-6 sm:p-7">
                   <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2.5">
                     <span className="w-2 h-6 bg-[#00a264] rounded-full" />
                     About Institution
@@ -226,7 +226,7 @@ export default function InstitutionDetailPage() {
               )}
 
               {/* Active Jobs */}
-              <div className="bg-white border border-gray-200/80 rounded-2xl p-6 sm:p-7 shadow-sm">
+              <div className="bg-white border border-gray-200/80 rounded-2xl p-6 sm:p-7">
                 <h2 className="text-lg font-bold text-gray-900 mb-5 flex items-center gap-2.5">
                   <span className="w-2 h-6 bg-emerald-600 rounded-full" />
                   <FaBriefcase className="w-4 h-4 text-[#00a264]" />
@@ -245,7 +245,7 @@ export default function InstitutionDetailPage() {
                     {activeJobs.map(job => (
                       <div
                         key={job.id}
-                        className="bg-white border border-gray-200/80 rounded-xl p-5 hover:border-[#00a264] hover:shadow-md transition-all group"
+                        className="bg-white border border-gray-200/80 rounded-xl p-5 hover:border-[#00a264] transition-all group"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                           <div className="space-y-1.5 min-w-0 flex-1">
@@ -283,7 +283,7 @@ export default function InstitutionDetailPage() {
 
                           <Link
                             href={`/jobs/${job.id}`}
-                            className="px-5 py-2.5 bg-[#00a264] hover:bg-[#007a4d] text-white text-xs font-bold rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5 shrink-0"
+                            className="px-5 py-2.5 bg-[#00a264] hover:bg-[#007a4d] text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 shrink-0"
                           >
                             View Job <FaArrowRight className="w-3 h-3" />
                           </Link>
@@ -296,7 +296,7 @@ export default function InstitutionDetailPage() {
 
               {/* Past / Closed Jobs */}
               {inactiveJobs.length > 0 && (
-                <div className="bg-white border border-gray-200/80 rounded-2xl p-6 sm:p-7 shadow-sm opacity-80">
+                <div className="bg-white border border-gray-200/80 rounded-2xl p-6 sm:p-7 opacity-80">
                   <h2 className="text-base font-bold text-gray-500 mb-4 flex items-center gap-2">
                     <FaCircleXmark className="w-4 h-4 text-gray-400" />
                     Past / Closed Positions ({inactiveJobs.length})
@@ -320,7 +320,7 @@ export default function InstitutionDetailPage() {
 
             {/* Right Sidebar: Contact & Info */}
             <div className="space-y-6">
-              <div className="bg-white border border-gray-200/80 rounded-2xl p-6 shadow-md lg:sticky lg:top-24">
+              <div className="bg-white border border-gray-200/80 rounded-2xl p-6 lg:sticky lg:top-24">
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 pb-3 border-b border-gray-100">
                   Institution Info
                 </h3>

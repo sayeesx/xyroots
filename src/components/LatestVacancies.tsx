@@ -7,7 +7,7 @@ import AuthGuardedLink from "@/components/AuthGuardedLink";
 
 function JobCard({ job }: { job: any }) {
   return (
-    <div className="flex flex-col h-full border border-gray-200 bg-white hover:border-[#00a264]/50 hover:shadow-[0_4px_20px_rgba(0,162,100,0.10)] transition-all group" style={{ borderRadius: "1rem" }}>
+    <div className="flex flex-col h-full border border-gray-200 bg-white hover:border-[#00a264]/50 (0,162,100,0.10)] transition-all group" style={{ borderRadius: "1rem" }}>
       <div className="flex flex-1 flex-col">
         {/* Top header — clean */}
         <div className="border-b border-gray-100 px-5 py-4" style={{ borderRadius: "1rem 1rem 0 0", background: "#f9fafb" }}>
@@ -65,7 +65,7 @@ function JobCard({ job }: { job: any }) {
 
 function TeacherCard({ teacher, isAuthenticated }: { teacher: any, isAuthenticated: boolean }) {
   return (
-    <div className="flex flex-col h-full border border-gray-200 bg-white hover:border-gray-400 transition-all group shadow-sm" style={{ borderRadius: "1rem", background: "linear-gradient(135deg, #fff 80%, #f0fdf4 100%)" }}>
+    <div className="flex flex-col h-full border border-gray-200 bg-white hover:border-gray-400 transition-all group" style={{ borderRadius: "1rem", background: "linear-gradient(135deg, #fff 80%, #f0fdf4 100%)" }}>
       {/* Top header */}
       <div className="border-b border-gray-100 px-5 py-4" style={{ borderRadius: "1rem 1rem 0 0", background: "linear-gradient(to right, #f9fafb, #f0fdf4)" }}>
         <div className="flex items-center gap-3">

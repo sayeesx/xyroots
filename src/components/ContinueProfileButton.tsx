@@ -41,7 +41,7 @@ export default function ContinueProfileButton() {
 
   return (
     <>
-      <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-6 shadow-sm">
+      <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-6">
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
             <FaCircleExclamation className="w-6 h-6 text-amber-600" />
@@ -90,7 +90,7 @@ export default function ContinueProfileButton() {
 
             <button
               onClick={() => setShowModal(true)}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold text-sm rounded-xl hover:from-amber-600 hover:to-orange-600 transition-all shadow-md hover:shadow-lg"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold text-sm rounded-xl hover:from-amber-600 hover:to-orange-600 transition-all"
             >
               Continue Your Profile
               <FaArrowRight className="w-4 h-4" />

@@ -126,7 +126,7 @@ export default function ProfileSettingsPage() {
         </button>
         <h1 className="text-3xl font-bold font-editorial text-black mb-8">Account Settings</h1>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-xyroots-border p-6 sm:p-8">
+        <div className="bg-white rounded-2xl border border-xyroots-border p-6 sm:p-8">
           <h2 className="text-xl font-bold text-black mb-6 border-b border-xyroots-border pb-4">Profile Information</h2>
           
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-8 mb-8">
@@ -177,7 +177,7 @@ export default function ProfileSettingsPage() {
       {/* Crop Modal */}
       {cropModalOpen && imageSrc && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl relative overflow-hidden flex flex-col">
+          <div className="bg-white rounded-2xl w-full max-w-lg relative overflow-hidden flex flex-col">
             <div className="p-4 border-b border-gray-100 flex items-center justify-between">
                <h3 className="font-bold text-black">Crop Avatar</h3>
                <button onClick={() => { setCropModalOpen(false); setImageSrc(null); }} className="p-1 hover:bg-gray-100 rounded-full"><FaXmark className="w-5 h-5 text-gray-500" /></button>

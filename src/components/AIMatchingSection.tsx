@@ -32,7 +32,7 @@ export default function AIMatchingSection() {
           <div className="order-2 lg:order-1">
             <div className="max-w-md mx-auto lg:mr-auto">
               {/* Main match card */}
-              <div className="bg-white rounded-2xl dashboard-shadow border border-xyroots-border overflow-hidden">
+              <div className="bg-white rounded-2xl border border-xyroots-border overflow-hidden">
                 <div className="p-6">
                   <div className="flex items-center gap-2 mb-5">
                     <FaWandMagicSparkles className="w-5 h-5 text-xyroots-yellow" />

@@ -9,50 +9,6 @@ import { useRouter } from "next/navigation";
 
 // ─── Data Maps ─────────────────────────────────────────────────────────────
 
-const qualificationOptions = [
-  { value: "bed", label: "B.Ed" },
-  { value: "med", label: "M.Ed" },
-  { value: "msc", label: "M.Sc / MA" },
-  { value: "phd", label: "Ph.D / Doctorate" },
-  { value: "net_set", label: "NET / SET Qualified" },
-];
-
-const subjectOptions = [
-  { value: "maths", label: "Mathematics" },
-  { value: "physics", label: "Physics" },
-  { value: "chemistry", label: "Chemistry" },
-  { value: "english", label: "English Literature" },
-];
-
-const expFromOptions = [
-  { value: "0", label: "Fresher" },
-  { value: "1", label: "1 Year" },
-  { value: "3", label: "3 Years" },
-];
-
-const managementSubjectOptions = [
-  { value: "Mathematics", label: "Mathematics" },
-  { value: "Physics", label: "Physics" },
-  { value: "Chemistry", label: "Chemistry" },
-  { value: "Biology", label: "Biology" },
-  { value: "English", label: "English" },
-  { value: "Computer Science", label: "Computer Science" },
-];
-
-const managementQualOptions = [
-  { value: "bed", label: "B.Ed" },
-  { value: "med", label: "M.Ed" },
-  { value: "msc", label: "Master's" },
-  { value: "phd", label: "Ph.D" },
-];
-
-const managementExpOptions = [
-  { value: "0", label: "Fresher (0 yrs)" },
-  { value: "2", label: "2+ Years" },
-  { value: "5", label: "5+ Years" },
-  { value: "10", label: "10+ Years" },
-];
-
 const institutionOptions = [
   { value: "school", label: "School Teaching" },
   { value: "college", label: "College / University Faculty" },
@@ -78,7 +34,7 @@ const designationsMap: Record<string, { value: string; label: string }[]> = {
     { value: "prt", label: "Primary Teacher (PRT)" },
     { value: "tgt", label: "Trained Graduate Teacher (TGT)" },
     { value: "pgt", label: "Post Graduate Teacher (PGT)" },
-    { value: "physical_ed", label: "Physical Education / Sports Teacher" },
+    { value: "physical_ed", label: "Physical Education Teacher" },
     { value: "art_music", label: "Art, Craft & Music Teacher" },
     { value: "hod", label: "Head of Department (HOD)" },
     { value: "vice_principal", label: "Vice Principal" },
@@ -141,69 +97,170 @@ const stateOptions = [
   { value: "Delhi", label: "Delhi" },
   { value: "Telangana", label: "Telangana" },
   { value: "Uttar Pradesh", label: "Uttar Pradesh" },
+  { value: "West Bengal", label: "West Bengal" },
+  { value: "Gujarat", label: "Gujarat" },
+  { value: "Rajasthan", label: "Rajasthan" },
 ];
 
 const districtsMap: Record<string, { value: string; label: string }[]> = {
   Kerala: [
-    { value: "kochi", label: "Ernakulam / Kochi" },
-    { value: "tvm", label: "Thiruvananthapuram" },
-    { value: "calicut", label: "Kozhikode" },
-    { value: "thrissur", label: "Thrissur" },
-    { value: "kollam", label: "Kollam" },
-    { value: "kottayam", label: "Kottayam" },
-    { value: "palakkad", label: "Palakkad" },
-    { value: "malappuram", label: "Malappuram" },
-    { value: "kannur", label: "Kannur" },
-    { value: "alappuzha", label: "Alappuzha" },
+    { value: "Ernakulam / Kochi", label: "Ernakulam / Kochi" },
+    { value: "Thiruvananthapuram", label: "Thiruvananthapuram" },
+    { value: "Kozhikode", label: "Kozhikode" },
+    { value: "Thrissur", label: "Thrissur" },
+    { value: "Kollam", label: "Kollam" },
+    { value: "Kottayam", label: "Kottayam" },
+    { value: "Palakkad", label: "Palakkad" },
+    { value: "Malappuram", label: "Malappuram" },
+    { value: "Kannur", label: "Kannur" },
+    { value: "Alappuzha", label: "Alappuzha" },
   ],
   Karnataka: [
-    { value: "bengaluru", label: "Bengaluru Urban" },
-    { value: "mysuru", label: "Mysuru" },
-    { value: "mangaluru", label: "Mangaluru / Dakshina Kannada" },
-    { value: "hubballi", label: "Hubballi-Dharwad" },
-    { value: "belagavi", label: "Belagavi" },
-    { value: "shivamogga", label: "Shivamogga" },
-    { value: "udupi", label: "Udupi" },
+    { value: "Bengaluru Urban", label: "Bengaluru Urban" },
+    { value: "Mysuru", label: "Mysuru" },
+    { value: "Mangaluru", label: "Mangaluru" },
+    { value: "Hubballi-Dharwad", label: "Hubballi-Dharwad" },
+    { value: "Belagavi", label: "Belagavi" },
+    { value: "Shivamogga", label: "Shivamogga" },
+    { value: "Udupi", label: "Udupi" },
   ],
   "Tamil Nadu": [
-    { value: "chennai", label: "Chennai" },
-    { value: "coimbatore", label: "Coimbatore" },
-    { value: "madurai", label: "Madurai" },
-    { value: "tiruchirappalli", label: "Tiruchirappalli" },
-    { value: "salem", label: "Salem" },
-    { value: "tiruppur", label: "Tiruppur" },
-    { value: "vellore", label: "Vellore" },
+    { value: "Chennai", label: "Chennai" },
+    { value: "Coimbatore", label: "Coimbatore" },
+    { value: "Madurai", label: "Madurai" },
+    { value: "Tiruchirappalli", label: "Tiruchirappalli" },
+    { value: "Salem", label: "Salem" },
+    { value: "Tiruppur", label: "Tiruppur" },
+    { value: "Vellore", label: "Vellore" },
   ],
   Maharashtra: [
-    { value: "mumbai", label: "Mumbai" },
-    { value: "pune", label: "Pune" },
-    { value: "nagpur", label: "Nagpur" },
-    { value: "nashik", label: "Nashik" },
-    { value: "thane", label: "Thane" },
-    { value: "sambhajinagar", label: "Chhatrapati Sambhajinagar" },
+    { value: "Mumbai", label: "Mumbai" },
+    { value: "Pune", label: "Pune" },
+    { value: "Nagpur", label: "Nagpur" },
+    { value: "Nashik", label: "Nashik" },
+    { value: "Thane", label: "Thane" },
   ],
   Delhi: [
-    { value: "new_delhi", label: "New Delhi" },
-    { value: "south_delhi", label: "South Delhi" },
-    { value: "north_delhi", label: "North Delhi" },
-    { value: "east_delhi", label: "East Delhi" },
-    { value: "west_delhi", label: "West Delhi" },
+    { value: "New Delhi", label: "New Delhi" },
+    { value: "South Delhi", label: "South Delhi" },
+    { value: "North Delhi", label: "North Delhi" },
+    { value: "East Delhi", label: "East Delhi" },
+    { value: "West Delhi", label: "West Delhi" },
   ],
   Telangana: [
-    { value: "hyderabad", label: "Hyderabad" },
-    { value: "warangal", label: "Warangal" },
-    { value: "nizamabad", label: "Nizamabad" },
-    { value: "karimnagar", label: "Karimnagar" },
+    { value: "Hyderabad", label: "Hyderabad" },
+    { value: "Warangal", label: "Warangal" },
+    { value: "Nizamabad", label: "Nizamabad" },
+    { value: "Karimnagar", label: "Karimnagar" },
   ],
   "Uttar Pradesh": [
-    { value: "noida", label: "Noida / Greater Noida" },
-    { value: "lucknow", label: "Lucknow" },
-    { value: "kanpur", label: "Kanpur" },
-    { value: "agra", label: "Agra" },
-    { value: "varanasi", label: "Varanasi" },
-    { value: "prayagraj", label: "Prayagraj" },
+    { value: "Noida / Greater Noida", label: "Noida / Greater Noida" },
+    { value: "Lucknow", label: "Lucknow" },
+    { value: "Kanpur", label: "Kanpur" },
+    { value: "Agra", label: "Agra" },
+    { value: "Varanasi", label: "Varanasi" },
+    { value: "Prayagraj", label: "Prayagraj" },
   ],
 };
+
+// ─── Filter Options from Jobs Page (Job Seeker) ───────────────────────────
+const subjectOptions = [
+  { value: "Mathematics", label: "Mathematics" },
+  { value: "Physics", label: "Physics" },
+  { value: "Chemistry", label: "Chemistry" },
+  { value: "Biology", label: "Biology" },
+  { value: "English", label: "English" },
+  { value: "Hindi", label: "Hindi" },
+  { value: "Social Science", label: "Social Science" },
+  { value: "Computer Science", label: "Computer Science" },
+  { value: "Commerce", label: "Commerce" },
+  { value: "Economics", label: "Economics" },
+  { value: "History", label: "History" },
+  { value: "Geography", label: "Geography" },
+  { value: "Sanskrit", label: "Sanskrit" },
+  { value: "Physical Education", label: "Physical Education" },
+];
+
+const jobTypeOptions = [
+  { value: "Full-time", label: "Full-time" },
+  { value: "Part-time", label: "Part-time" },
+  { value: "Contract", label: "Contract" },
+  { value: "Internship", label: "Internship" },
+];
+
+const boardOptions = [
+  { value: "CBSE", label: "CBSE" },
+  { value: "ICSE", label: "ICSE" },
+  { value: "IB", label: "IB" },
+  { value: "IGCSE", label: "IGCSE" },
+  { value: "State Board", label: "State Board" },
+];
+
+const jobExpOptions = [
+  { value: "Less than a year", label: "Less than a year" },
+  { value: "1-3 years", label: "1-3 years" },
+  { value: "3-5 years", label: "3-5 years" },
+  { value: "5-10 years", label: "5-10 years" },
+  { value: "More than 10 years", label: "More than 10 years" },
+];
+
+const jobQualOptions = [
+  { value: "B.Ed", label: "B.Ed" },
+  { value: "M.Ed", label: "M.Ed" },
+  { value: "M.Sc", label: "M.Sc" },
+  { value: "Ph.D", label: "Ph.D" },
+  { value: "Graduate", label: "Graduate" },
+];
+
+const postedDateOptions = [
+  { value: "Any time", label: "Any time" },
+  { value: "Past 24 hours", label: "Past 24 hours" },
+  { value: "Past week", label: "Past week" },
+  { value: "Past month", label: "Past month" },
+];
+
+// ─── Filter Options from Teacher Page (Management) ────────────────────────
+const teacherQualOptions = [
+  { value: "B.Ed", label: "B.Ed" },
+  { value: "M.Ed", label: "M.Ed" },
+  { value: "M.Sc", label: "M.Sc" },
+  { value: "Ph.D", label: "Ph.D" },
+  { value: "NET Qualified", label: "NET Qualified" },
+  { value: "Graduate", label: "Graduate" },
+];
+
+const teacherExpOptions = [
+  { value: "Less than a year", label: "Less than a year" },
+  { value: "1–3 years", label: "1–3 years" },
+  { value: "3–5 years", label: "3–5 years" },
+  { value: "5–10 years", label: "5–10 years" },
+  { value: "10+ years", label: "10+ years" },
+];
+
+const teacherLevelOptions = [
+  { value: "Primary (1-5)", label: "Primary (1-5)" },
+  { value: "Middle School (6-8)", label: "Middle School (6-8)" },
+  { value: "High School (9-10)", label: "High School (9-10)" },
+  { value: "Senior Secondary (11-12)", label: "Senior Secondary (11-12)" },
+];
+
+const teacherModeOptions = [
+  { value: "On-site / Offline", label: "On-site / Offline" },
+  { value: "Online", label: "Online" },
+  { value: "Hybrid", label: "Hybrid" },
+];
+
+const teacherVerificationOptions = [
+  { value: "Verified Only", label: "Verified Only" },
+  { value: "Profile > 80%", label: "Profile > 80%" },
+];
+
+const teacherNoticeOptions = [
+  { value: "Immediate Joiner", label: "Immediate Joiner" },
+  { value: "Within 15 Days", label: "Within 15 Days" },
+  { value: "1 Month", label: "1 Month" },
+  { value: "2 Months", label: "2 Months" },
+];
 
 // ─── Component ─────────────────────────────────────────────────────────────
 
@@ -212,17 +269,27 @@ export default function Hero() {
     "https://res.cloudinary.com/draedbypr/image/upload/v1786420720/hero-section_oanvbj.png"
   );
   const [activeTab, setActiveTab] = useState<"seeker" | "management">("seeker");
-  const [jobOption, setJobOption] = useState("");
-  const [stateVal, setStateVal] = useState("Kerala");
-  const [designation, setDesignation] = useState("");
 
-  // Filter pill states
+  // Shared Filters
+  const [stateVal, setStateVal] = useState("Kerala");
   const [district, setDistrict] = useState("");
-  const [qualification, setQualification] = useState("");
   const [subject, setSubject] = useState("");
-  const [regLanguage, setRegLanguage] = useState("");
-  const [expFrom, setExpFrom] = useState("");
-  const [expTo, setExpTo] = useState("");
+  const [qualification, setQualification] = useState("");
+  const [experience, setExperience] = useState("");
+  const [board, setBoard] = useState("");
+
+  // Job Seeker Specific Filters
+  const [jobOption, setJobOption] = useState("");
+  const [designation, setDesignation] = useState("");
+  const [jobType, setJobType] = useState("");
+  const [postedDate, setPostedDate] = useState("");
+
+  // Management Specific Filters
+  const [teachingLevel, setTeachingLevel] = useState("");
+  const [preferredMode, setPreferredMode] = useState("");
+  const [verification, setVerification] = useState("");
+  const [noticePeriod, setNoticePeriod] = useState("");
+
   const { openTeacherRegistration, openInstitutionRegistration, isAuthenticated, role } = useAuth();
   const router = useRouter();
 
@@ -233,27 +300,88 @@ export default function Hero() {
     }
   }, [isAuthenticated, role]);
 
-  // Handle institution change -> reset designation
   const handleInstitutionChange = (val: string) => {
     setJobOption(val);
     setDesignation("");
   };
 
-  // Handle state change -> reset district
   const handleStateChange = (val: string) => {
     setStateVal(val);
     setDistrict("");
   };
 
-  // Available designations based on selected institution
-  const availableDesignations = designationsMap[jobOption] || designationsMap.default;
+  const clearSeekerFilters = () => {
+    setJobOption("");
+    setStateVal("Kerala");
+    setDistrict("");
+    setDesignation("");
+    setSubject("");
+    setQualification("");
+    setJobType("");
+    setBoard("");
+    setExperience("");
+    setPostedDate("");
+  };
 
-  // Available districts based on selected state
+  const clearManagementFilters = () => {
+    setSubject("");
+    setStateVal("Kerala");
+    setDistrict("");
+    setQualification("");
+    setExperience("");
+    setBoard("");
+    setTeachingLevel("");
+    setPreferredMode("");
+    setVerification("");
+    setNoticePeriod("");
+  };
+
+  const handleSeekerSearch = () => {
+    if (!isAuthenticated) {
+      openTeacherRegistration();
+      return;
+    }
+    const params = new URLSearchParams();
+    if (jobOption) params.set("type", jobOption);
+    if (stateVal && stateVal !== "All States") params.set("state", stateVal);
+    if (district) params.set("district", district);
+    if (designation) params.set("desig", designation);
+    if (qualification) params.set("qual", qualification);
+    if (subject) params.set("subject", subject);
+    if (jobType) params.set("jobType", jobType);
+    if (board) params.set("board", board);
+    if (experience) params.set("exp", experience);
+    if (postedDate && postedDate !== "Any time") params.set("posted", postedDate);
+
+    router.push(`/jobs?${params.toString()}`);
+  };
+
+  const handleManagementSearch = () => {
+    if (!isAuthenticated) {
+      openInstitutionRegistration();
+      return;
+    }
+    const params = new URLSearchParams();
+    if (subject) params.set("subject", subject);
+    if (stateVal && stateVal !== "All States") params.set("state", stateVal);
+    if (district) params.set("district", district);
+    if (qualification) params.set("qual", qualification);
+    if (experience) params.set("exp", experience);
+    if (board) params.set("board", board);
+    if (teachingLevel) params.set("level", teachingLevel);
+    if (preferredMode) params.set("mode", preferredMode);
+    if (verification) params.set("verified", verification);
+    if (noticePeriod) params.set("notice", noticePeriod);
+
+    router.push(`/teachers?${params.toString()}`);
+  };
+
+  const availableDesignations = designationsMap[jobOption] || designationsMap.default;
   const availableDistricts = districtsMap[stateVal] || districtsMap.Kerala;
 
   return (
     <div className="relative w-full bg-[#f7f9f8] min-h-[520px] md:min-h-[620px] flex flex-col">
-      {/* ─── Hero Background Image: shifted slightly up with -top-2 ─── */}
+      {/* ─── Hero Background Image ─── */}
       <div className="hidden md:block absolute inset-x-0 -top-2 bottom-0 z-0 overflow-hidden">
         <Image
           src={heroImgSrc}
@@ -286,11 +414,11 @@ export default function Hero() {
         </div>
 
         {/* Search Component */}
-        <div className="w-full bg-white border border-xyroots-border shadow-xl px-4 sm:px-6 lg:px-7 pt-4 pb-8 mt-auto relative z-20 -mb-20 lg:-mb-24" style={{ borderRadius: "1.5rem" }}>
+        <div className="w-full bg-white border border-xyroots-border px-4 sm:px-6 lg:px-7 pt-4 pb-7 mt-auto relative z-20 -mb-20 lg:-mb-24 rounded-3xl">
 
-          {/* Tabs Row + CTA on ONE line */}
-          <div className="flex items-center justify-between border-b border-xyroots-border pb-3 mb-4 gap-4">
-            {/* Tabs (left) */}
+          {/* Tabs Row + CTA */}
+          <div className="flex items-center justify-between border-b border-xyroots-border pb-3 mb-5 gap-4">
+            {/* Tabs */}
             <div className="flex items-center gap-6 shrink-0">
               {(!isAuthenticated || role !== 'management') && (
                 <button
@@ -320,7 +448,7 @@ export default function Hero() {
               )}
             </div>
 
-            {/* CTA only (right) */}
+            {/* CTA */}
             {!isAuthenticated && (
               <div className="flex items-center gap-2 shrink-0">
                 <span className="hidden md:inline text-xs sm:text-sm text-xyroots-muted">
@@ -344,86 +472,119 @@ export default function Hero() {
 
           {activeTab === "seeker" ? (
              <>
-                {/* SEEKER FILTER ROW */}
+                {/* SEEKER PRIMARY ROW */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4 items-end">
                   <div>
-                    <label className="block text-sm font-semibold text-xyroots-text mb-1.5">Where do you want the job?*</label>
-                    <CustomSelect value={jobOption} onChange={handleInstitutionChange} options={institutionOptions} placeholder="Choose an option" icon={<i className="bi bi-briefcase text-sm" />} searchable />
+                    <label className="block text-xs font-bold text-xyroots-text mb-1.5 uppercase tracking-wide">Where do you want the job?*</label>
+                    <CustomSelect value={jobOption} onChange={handleInstitutionChange} options={institutionOptions} placeholder="Institution Type" icon={<i className="bi bi-briefcase text-sm" />} searchable />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-xyroots-text mb-1.5">State</label>
-                    <CustomSelect value={stateVal} onChange={handleStateChange} options={stateOptions} placeholder="State" searchable />
+                    <label className="block text-xs font-bold text-xyroots-text mb-1.5 uppercase tracking-wide">State</label>
+                    <CustomSelect value={stateVal} onChange={handleStateChange} options={stateOptions} placeholder="Select State" searchable />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-xyroots-text mb-1.5">Designation</label>
-                    <CustomSelect value={designation} onChange={setDesignation} options={availableDesignations} placeholder="Select a designation" icon={<i className="bi bi-book text-sm" />} searchable />
+                    <label className="block text-xs font-bold text-xyroots-text mb-1.5 uppercase tracking-wide">Designation</label>
+                    <CustomSelect value={designation} onChange={setDesignation} options={availableDesignations} placeholder="Select Designation" icon={<i className="bi bi-person-badge text-sm" />} searchable />
                   </div>
                   <div>
-                    {isAuthenticated ? (
-                      <Link href={`/jobs?state=${stateVal}${jobOption ? `&type=${jobOption}` : ""}${designation ? `&desig=${designation}` : ""}`} className="w-full h-[42px] inline-flex items-center justify-center gap-2 bg-xyroots-teal text-white font-semibold text-sm hover:opacity-90 transition-opacity rounded-md">
-                        <i className="bi bi-search text-sm" /> Search
-                      </Link>
-                    ) : (
-                      <button onClick={() => openTeacherRegistration()} className="w-full h-[42px] inline-flex items-center justify-center gap-2 bg-xyroots-teal text-white font-semibold text-sm hover:opacity-90 transition-opacity rounded-md">
-                        <i className="bi bi-search text-sm" /> Search
-                      </button>
-                    )}
+                    <button onClick={handleSeekerSearch} className="w-full h-[42px] inline-flex items-center justify-center gap-2 bg-xyroots-teal text-white font-semibold text-sm hover:opacity-90 transition-opacity rounded-xl cursor-pointer">
+                      <i className="bi bi-search text-sm" /> Search Jobs
+                    </button>
                   </div>
                 </div>
-                {/* Secondary Filters */}
-                <div className="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center justify-between gap-3 sm:gap-2 pt-3 border-t border-xyroots-border text-xs">
-                  <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full sm:w-auto">
-                    <div className="w-full sm:w-32"><CustomSelect value={district} onChange={setDistrict} options={availableDistricts} placeholder="District" searchable /></div>
-                    <div className="w-full sm:w-36"><CustomSelect value={qualification} onChange={setQualification} options={qualificationOptions} placeholder="Qualification" /></div>
-                    <div className="w-full sm:w-36"><CustomSelect value={subject} onChange={setSubject} options={subjectOptions} placeholder="Subject" searchable /></div>
-                    <div className="w-full sm:w-36"><CustomSelect value={expFrom} onChange={setExpFrom} options={expFromOptions} placeholder="Exp From" /></div>
+
+                {/* SEEKER SECONDARY DROPDOWN FILTER OPTIONS (Matches Jobs Page Filter) */}
+                <div className="pt-3.5 border-t border-xyroots-border">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+                      <i className="bi bi-funnel text-xyroots-teal" /> Filter Options (Jobs Page)
+                    </span>
+                    <button onClick={clearSeekerFilters} className="text-xs font-semibold text-gray-400 hover:text-gray-700 transition-colors">
+                      Clear Filters
+                    </button>
                   </div>
-                  <div className="w-full sm:w-auto mt-1 sm:mt-0">
-                    {isAuthenticated ? (
-                      <button onClick={() => router.push('/jobs')} className="w-full sm:w-auto px-3 py-1.5 bg-white border border-xyroots-border text-xyroots-text font-semibold inline-flex items-center justify-center gap-1 hover:bg-xyroots-surface cursor-pointer">
-                        <i className="bi bi-sliders text-xs" /> All Filter
-                      </button>
-                    ) : (
-                      <button onClick={() => openTeacherRegistration()} className="w-full sm:w-auto px-3 py-1.5 bg-white border border-xyroots-border text-xyroots-text font-semibold inline-flex items-center justify-center gap-1 hover:bg-xyroots-surface">
-                        <i className="bi bi-sliders text-xs" /> All Filter
-                      </button>
-                    )}
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2.5">
+                    <div>
+                      <CustomSelect value={district} onChange={setDistrict} options={availableDistricts} placeholder="District" searchable />
+                    </div>
+                    <div>
+                      <CustomSelect value={subject} onChange={setSubject} options={subjectOptions} placeholder="Subject" searchable />
+                    </div>
+                    <div>
+                      <CustomSelect value={jobType} onChange={setJobType} options={jobTypeOptions} placeholder="Job Type" />
+                    </div>
+                    <div>
+                      <CustomSelect value={board} onChange={setBoard} options={boardOptions} placeholder="Board" />
+                    </div>
+                    <div>
+                      <CustomSelect value={qualification} onChange={setQualification} options={jobQualOptions} placeholder="Qualification" />
+                    </div>
+                    <div>
+                      <CustomSelect value={experience} onChange={setExperience} options={jobExpOptions} placeholder="Experience" />
+                    </div>
+                    <div>
+                      <CustomSelect value={postedDate} onChange={setPostedDate} options={postedDateOptions} placeholder="Date Posted" />
+                    </div>
                   </div>
                 </div>
              </>
           ) : (
              <>
-                {/* MANAGEMENT FILTER ROW */}
+                {/* MANAGEMENT PRIMARY ROW */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4 items-end">
                   <div>
-                    <label className="block text-sm font-semibold text-xyroots-text mb-1.5">Are you looking for?*</label>
-                    <CustomSelect value={subject} onChange={setSubject} options={managementSubjectOptions} placeholder="Subject specialisation" icon={<i className="bi bi-book text-sm" />} searchable />
+                    <label className="block text-xs font-bold text-xyroots-text mb-1.5 uppercase tracking-wide">Subject Specialisation*</label>
+                    <CustomSelect value={subject} onChange={setSubject} options={subjectOptions} placeholder="Choose Subject" icon={<i className="bi bi-book text-sm" />} searchable />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-xyroots-text mb-1.5">State</label>
-                    <CustomSelect value={stateVal} onChange={handleStateChange} options={stateOptions} placeholder="State" searchable />
+                    <label className="block text-xs font-bold text-xyroots-text mb-1.5 uppercase tracking-wide">State</label>
+                    <CustomSelect value={stateVal} onChange={handleStateChange} options={stateOptions} placeholder="Select State" searchable />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-xyroots-text mb-1.5">Qualification</label>
-                    <CustomSelect value={qualification} onChange={setQualification} options={managementQualOptions} placeholder="Any Qualification" icon={<i className="bi bi-award text-sm" />} searchable />
+                    <label className="block text-xs font-bold text-xyroots-text mb-1.5 uppercase tracking-wide">Qualification</label>
+                    <CustomSelect value={qualification} onChange={setQualification} options={teacherQualOptions} placeholder="Qualification" icon={<i className="bi bi-award text-sm" />} searchable />
                   </div>
                   <div>
-                    {isAuthenticated ? (
-                      <Link href={`/teachers?state=${stateVal}${subject ? `&subject=${subject}` : ""}`} className="w-full h-[42px] inline-flex items-center justify-center gap-2 bg-xyroots-teal text-white font-semibold text-sm hover:opacity-90 transition-opacity rounded-md">
-                        <i className="bi bi-search text-sm" /> Find Teachers
-                      </Link>
-                    ) : (
-                      <button onClick={() => openInstitutionRegistration()} className="w-full h-[42px] inline-flex items-center justify-center gap-2 bg-xyroots-teal text-white font-semibold text-sm hover:opacity-90 transition-opacity rounded-md">
-                        <i className="bi bi-search text-sm" /> Find Teachers
-                      </button>
-                    )}
+                    <button onClick={handleManagementSearch} className="w-full h-[42px] inline-flex items-center justify-center gap-2 bg-xyroots-teal text-white font-semibold text-sm hover:opacity-90 transition-opacity rounded-xl cursor-pointer">
+                      <i className="bi bi-search text-sm" /> Find Teachers
+                    </button>
                   </div>
                 </div>
-                {/* Management Secondary Filters */}
-                <div className="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center justify-between gap-3 sm:gap-2 pt-3 border-t border-xyroots-border text-xs">
-                  <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full sm:w-auto">
-                    <div className="w-full sm:w-36"><CustomSelect value={district} onChange={setDistrict} options={availableDistricts} placeholder="District Limit" searchable /></div>
-                    <div className="w-full sm:w-36"><CustomSelect value={expFrom} onChange={setExpFrom} options={managementExpOptions} placeholder="Min Experience" /></div>
+
+                {/* MANAGEMENT SECONDARY DROPDOWN FILTER OPTIONS (Matches Teacher Page Filter) */}
+                <div className="pt-3.5 border-t border-xyroots-border">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+                      <i className="bi bi-funnel text-xyroots-teal" /> Filter Options (Teacher Page)
+                    </span>
+                    <button onClick={clearManagementFilters} className="text-xs font-semibold text-gray-400 hover:text-gray-700 transition-colors">
+                      Clear Filters
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2.5">
+                    <div>
+                      <CustomSelect value={district} onChange={setDistrict} options={availableDistricts} placeholder="District" searchable />
+                    </div>
+                    <div>
+                      <CustomSelect value={experience} onChange={setExperience} options={teacherExpOptions} placeholder="Experience" />
+                    </div>
+                    <div>
+                      <CustomSelect value={board} onChange={setBoard} options={boardOptions} placeholder="Board Exp" />
+                    </div>
+                    <div>
+                      <CustomSelect value={teachingLevel} onChange={setTeachingLevel} options={teacherLevelOptions} placeholder="Teaching Level" />
+                    </div>
+                    <div>
+                      <CustomSelect value={preferredMode} onChange={setPreferredMode} options={teacherModeOptions} placeholder="Preferred Mode" />
+                    </div>
+                    <div>
+                      <CustomSelect value={verification} onChange={setVerification} options={teacherVerificationOptions} placeholder="Status / Verification" />
+                    </div>
+                    <div>
+                      <CustomSelect value={noticePeriod} onChange={setNoticePeriod} options={teacherNoticeOptions} placeholder="Availability" />
+                    </div>
                   </div>
                 </div>
              </>
@@ -431,8 +592,6 @@ export default function Hero() {
 
         </div>
       </div>
-
-
     </div>
   );
 }

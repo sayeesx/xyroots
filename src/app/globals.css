@@ -118,7 +118,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Re-allow minimal focus rings on inputs */
 input:focus, textarea:focus, select:focus {
-  box-shadow: 0 0 0 2px #374151 !important;
+  box-: 0 0 0 2px #374151 !important;
   outline: none !important;
 }
 
@@ -129,20 +129,20 @@ input[type="password"]:focus,
 input[type="search"]:focus,
 input[type="number"]:focus,
 input[type="tel"]:focus {
-  box-shadow: none !important;
+  box-: none !important;
   outline: 2px solid #374151 !important;
   outline-offset: 0px !important;
 }
 
 /* No focus ring on range inputs (salary slider) */
 input[type="range"]:focus {
-  box-shadow: none !important;
+  box-: none !important;
   outline: none !important;
 }
 
 /* Search bar inputs — no focus stroke */
 input.search-input:focus {
-  box-shadow: none !important;
+  box-: none !important;
   outline: none !important;
 }
 
@@ -158,7 +158,7 @@ input.search-input:focus {
 }
 .animate-float { animation: float 4s ease-in-out infinite; }
 
-/* Smooth hover effects (no shadow) */
+/* Smooth hover effects (no ) */
 .card-hover {
   transition: transform 0.25s ease, background-color 0.25s ease;
 }
@@ -226,13 +226,13 @@ a, button {
   border-radius: 50%;
   background: #00a264;
   border: 2px solid white;
-  box-shadow: 0 1px 4px rgba(0, 162, 100, 0.35);
+  box-: none !important;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.15s ease;
 }
 .salary-slider-thumb::-webkit-slider-thumb:hover {
   transform: scale(1.15);
-  box-shadow: 0 2px 8px rgba(0, 162, 100, 0.5);
+  box-: none !important;
 }
 .salary-slider-thumb::-moz-range-thumb {
   pointer-events: all;
@@ -241,7 +241,15 @@ a, button {
   border-radius: 50%;
   background: #00a264;
   border: 2px solid white;
-  box-shadow: 0 1px 4px rgba(0, 162, 100, 0.35);
+  box-: none !important;
   cursor: pointer;
   transition: transform 0.15s ease;
 }
+
+/* ─── Global Zero Shadow Reset ───────────────────────────────────────── */
+*, *::before, *::after,
+button, a, div, section, article, input, select, textarea,
+.card, .btn, [class*=""] {
+  box-: none !important;
+}
+

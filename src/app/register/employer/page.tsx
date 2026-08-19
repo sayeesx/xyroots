@@ -139,7 +139,7 @@ export default function EmployerRegisterPage() {
           )}
 
           {/* Form Card */}
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-xyroots-border shadow-xl">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-xyroots-border">
             {step === 1 && (
               <div className="space-y-4 animate-modal-in">
                 <h2 className="text-lg font-bold text-black mb-4">1. Institution Details</h2>

@@ -55,7 +55,7 @@ function RealInstitutionCard({ inst, openPositions }: { inst: any; openPositions
   return (
     <Link
       href={`/institutions/${inst.id}`}
-      className="bg-white border border-gray-200 hover:border-[#00a264]/50 hover:shadow-[0_4px_24px_rgba(0,162,100,0.10)] transition-all duration-300 flex flex-col group"
+      className="bg-white border border-gray-200 hover:border-[#00a264]/50 (0,162,100,0.10)] transition-all duration-300 flex flex-col group"
       style={{ borderRadius: "1.25rem" }}
     >
       <div

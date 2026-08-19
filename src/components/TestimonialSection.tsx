@@ -26,7 +26,7 @@ export default function TestimonialSection() {
           {testimonials.map((t) => (
             <div
               key={t.id}
-              className="bg-white rounded-3xl p-8 border border-xyroots-border shadow-sm flex flex-col justify-between card-hover relative"
+              className="bg-white rounded-3xl p-8 border border-xyroots-border flex flex-col justify-between card-hover relative"
             >
               <FaQuoteRight className="w-10 h-10 text-xyroots-mint absolute top-6 right-6" />
 

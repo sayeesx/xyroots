@@ -183,7 +183,7 @@ export default function TeacherProfilePage() {
 
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center text-gray-700 font-bold text-3xl shrink-0 overflow-hidden bg-white border border-gray-200 rounded-2xl shadow-sm">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center text-gray-700 font-bold text-3xl shrink-0 overflow-hidden bg-white border border-gray-200 rounded-2xl">
                   {teacher.avatar ? (
                     <img src={teacher.avatar} alt={teacher.name} className="w-full h-full object-cover" />
                   ) : (
@@ -237,7 +237,7 @@ export default function TeacherProfilePage() {
                 </button>
                 <button
                   onClick={() => setShowScheduleModal(true)}
-                  className="px-6 py-2.5 font-extrabold text-xs bg-[#00a264] text-white hover:bg-[#008f58] rounded-xl transition-all shadow-sm flex items-center gap-2"
+                  className="px-6 py-2.5 font-extrabold text-xs bg-[#00a264] text-white hover:bg-[#008f58] rounded-xl transition-all flex items-center gap-2"
                 >
                   <FaCalendarDays className="w-3.5 h-3.5" /> Schedule Interview
                 </button>
@@ -253,7 +253,7 @@ export default function TeacherProfilePage() {
             <div className="lg:col-span-2 space-y-6">
               {/* About */}
               {teacher.about && (
-                <div className="bg-white border border-gray-200/80 rounded-2xl p-6 sm:p-7 shadow-sm">
+                <div className="bg-white border border-gray-200/80 rounded-2xl p-6 sm:p-7">
                   <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2.5">
                     <span className="w-2 h-6 bg-[#00a264] rounded-full" />
                     About Educator
@@ -264,13 +264,13 @@ export default function TeacherProfilePage() {
 
               {/* Teaching Demo */}
               {teacher.hasDemo && (
-                <div className="bg-white border border-gray-200/80 rounded-2xl p-6 sm:p-7 shadow-sm">
+                <div className="bg-white border border-gray-200/80 rounded-2xl p-6 sm:p-7">
                   <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2.5">
                     <span className="w-2 h-6 bg-red-500 rounded-full" />
                     <FaVideo className="w-4 h-4 text-red-500" /> Teaching Demo
                   </h2>
                   <div
-                    className="relative bg-gray-900 h-56 rounded-xl flex items-center justify-center overflow-hidden group cursor-pointer shadow-inner"
+                    className="relative bg-gray-900 h-56 rounded-xl flex items-center justify-center overflow-hidden group cursor-pointer"
                     onClick={() => setIsPlayingDemo(!isPlayingDemo)}
                   >
                     {isPlayingDemo ? (
@@ -295,7 +295,7 @@ export default function TeacherProfilePage() {
 
               {/* Teaching Experience Timeline */}
               {teacher.teachingExperience?.length > 0 && (
-                <div className="bg-white border border-gray-200/80 rounded-2xl p-6 sm:p-7 shadow-sm">
+                <div className="bg-white border border-gray-200/80 rounded-2xl p-6 sm:p-7">
                   <h2 className="text-lg font-bold text-gray-900 mb-5 flex items-center gap-2.5">
                     <span className="w-2 h-6 bg-blue-600 rounded-full" />
                     Teaching Experience
@@ -318,7 +318,7 @@ export default function TeacherProfilePage() {
               )}
 
               {/* Education & Qualifications */}
-              <div className="bg-white border border-gray-200/80 rounded-2xl p-6 sm:p-7 shadow-sm">
+              <div className="bg-white border border-gray-200/80 rounded-2xl p-6 sm:p-7">
                 <h2 className="text-lg font-bold text-gray-900 mb-5 flex items-center gap-2.5">
                   <span className="w-2 h-6 bg-purple-600 rounded-full" />
                   Education & Qualifications
@@ -354,7 +354,7 @@ export default function TeacherProfilePage() {
 
               {/* Subjects & Skills Tag Cloud */}
               {(teacher.subjects?.length > 0 || teacher.skills?.length > 0 || teacher.boards?.length > 0) && (
-                <div className="bg-white border border-gray-200/80 rounded-2xl p-6 sm:p-7 shadow-sm">
+                <div className="bg-white border border-gray-200/80 rounded-2xl p-6 sm:p-7">
                   <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2.5">
                     <span className="w-2 h-6 bg-amber-500 rounded-full" />
                     Expertise & Skills
@@ -403,7 +403,7 @@ export default function TeacherProfilePage() {
 
             {/* Right Sidebar */}
             <div className="space-y-6">
-              <div className="bg-white border border-gray-200/80 rounded-2xl p-6 shadow-md">
+              <div className="bg-white border border-gray-200/80 rounded-2xl p-6">
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 pb-3 border-b border-gray-100">
                   Candidate Overview
                 </h3>
@@ -445,7 +445,7 @@ export default function TeacherProfilePage() {
 
                 <button
                   onClick={() => setShowScheduleModal(true)}
-                  className="w-full py-3.5 text-xs font-extrabold bg-gradient-to-r from-[#00a264] to-[#00c278] hover:from-[#007a4d] hover:to-[#00a264] text-white rounded-xl shadow-lg shadow-[#00a264]/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                  className="w-full py-3.5 text-xs font-extrabold bg-gradient-to-r from-[#00a264] to-[#00c278] hover:from-[#007a4d] hover:to-[#00a264] text-white rounded-xl active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                 >
                   <FaCalendarDays className="w-4 h-4" /> Schedule Interview
                 </button>

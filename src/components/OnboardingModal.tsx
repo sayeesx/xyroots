@@ -435,12 +435,12 @@ export default function OnboardingModal({ isOpen, onClose, role, onSaved }: Onbo
                           <label className="text-xs font-bold text-gray-700 block mb-1">
                             {role === 'management' ? 'Institution Location' : 'Current Location'}
                           </label>
-                          <SuggestInput
-                            id="location-input"
+                          <CustomSelect
                             value={formData.location}
                             onChange={(val) => setFormData(prev => ({ ...prev, location: val }))}
-                            suggestions={LOCATION_OPTIONS as readonly string[]}
-                            placeholder="e.g. Mumbai, Kerala…"
+                            options={locationOptions}
+                            placeholder="Select location"
+                            searchable
                           />
                         </div>
                       </div>
@@ -462,34 +462,34 @@ export default function OnboardingModal({ isOpen, onClose, role, onSaved }: Onbo
                               className="w-full px-4 py-2.5 text-sm bg-white border border-gray-200 rounded-lg outline-none focus:border-xyroots-teal"
                             />
                           </div>
-                        <div>
+                          <div>
                             <label className="text-xs font-bold text-gray-700 block mb-1">Primary Subject <span className="text-red-500">*</span></label>
-                            <SuggestInput
-                              id="subject-input"
+                            <CustomSelect
                               value={formData.subject}
                               onChange={(val) => setFormData(prev => ({ ...prev, subject: val }))}
-                              suggestions={SUBJECT_OPTIONS}
-                              placeholder="e.g. Mathematics, Physics…"
+                              options={subjectOptions}
+                              placeholder="Select subject"
+                              searchable
                             />
                           </div>
                           <div>
                             <label className="text-xs font-bold text-gray-700 block mb-1">Academic Qualification</label>
-                            <SuggestInput
-                              id="qual-input"
+                            <CustomSelect
                               value={formData.qualification}
                               onChange={(val) => setFormData(prev => ({ ...prev, qualification: val }))}
-                              suggestions={QUALIFICATION_OPTIONS}
-                              placeholder="e.g. B.Sc., M.A.…"
+                              options={qualificationOptions}
+                              placeholder="Select qualification"
+                              searchable
                             />
                           </div>
                           <div>
                             <label className="text-xs font-bold text-gray-700 block mb-1">Teaching Qualification</label>
-                            <SuggestInput
-                              id="profqual-input"
+                            <CustomSelect
                               value={formData.professionalQualification}
                               onChange={(val) => setFormData(prev => ({ ...prev, professionalQualification: val }))}
-                              suggestions={PROFESSIONAL_QUALIFICATION_OPTIONS}
-                              placeholder="e.g. B.Ed., CTET…"
+                              options={professionalQualificationOptions}
+                              placeholder="Select teaching qualification"
+                              searchable
                             />
                           </div>
                           <div>

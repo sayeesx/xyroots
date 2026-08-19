@@ -51,37 +51,35 @@ export default function TeacherProfilePage() {
       .eq('id', actualId)
       .eq('is_visible', true)
       .single()
-      .then(({ data }: any) => {
-        if (data) {
-          setDbTeacher({
-            id: data.id,
-            name: data.profiles?.full_name || "Anonymous",
-            title: data.title || "Educator",
-            location: data.location || "India",
-            avatar: data.profiles?.avatar_url || null,
-            subjects: data.specializations?.length > 0 ? data.specializations : (data.subject ? [data.subject] : []),
-            experience: data.experience_years || 0,
-            verified: (data.profile_completion || 0) > 80,
-            about: data.bio || "",
-            education: data.education || [],
-            professionalQualifications: [data.professional_qualification, data.qualification].filter(Boolean),
-            teachingExperience: data.experience_details || [],
-            boards: data.boards || [],
-            languages: data.languages || [],
-            skills: data.skills || [],
-            availability: data.availability || "Immediate",
-            expectedSalaryMin: data.expected_salary_min || 0,
-            expectedSalaryMax: data.expected_salary_max || 0,
-            preferredLocations: data.preferred_locations || [],
-            workPreferences: data.work_preferences || [],
-            hasDemo: data.has_demo_video || false,
-            hasCV: !!data.resume_url,
-            rating: null,
-          });
-        } else { setNotFound(true); }
+      .then(({ data, error }: any) => {
+        if (error || !data) { setNotFound(true); setPageLoading(false); return; }
+        setDbTeacher({
+          id: data.id,
+          name: data.profiles?.full_name || "Anonymous",
+          title: data.title || "Educator",
+          location: data.location || "India",
+          avatar: data.profiles?.avatar_url || null,
+          subjects: data.specializations?.length > 0 ? data.specializations : (data.subject ? [data.subject] : []),
+          experience: data.experience_years || 0,
+          verified: (data.profile_completion || 0) > 80,
+          about: data.bio || "",
+          education: data.education || [],
+          professionalQualifications: [data.professional_qualification, data.qualification].filter(Boolean),
+          teachingExperience: data.experience_details || [],
+          boards: data.boards || [],
+          languages: data.languages || [],
+          skills: data.skills || [],
+          availability: data.availability || "Immediate",
+          expectedSalaryMin: data.expected_salary_min || 0,
+          expectedSalaryMax: data.expected_salary_max || 0,
+          preferredLocations: data.preferred_locations || [],
+          workPreferences: data.work_preferences || [],
+          hasDemo: data.has_demo_video || false,
+          hasCV: !!data.resume_url,
+          rating: null,
+        });
         setPageLoading(false);
-      })
-      .catch(() => { setNotFound(true); setPageLoading(false); });
+      });
   }, [actualId]); // eslint-disable-line
 
   const [shortlisted, setShortlisted] = useState(false);
@@ -171,8 +169,8 @@ export default function TeacherProfilePage() {
       <Navbar />
 
       <main className="flex-1 pb-24">
-        {/* ─── Glassdoor / Indeed Clean White Header Card ───────────────────── */}
-        <section className="bg-white border-b border-gray-200 py-6 px-4 sm:px-6 lg:px-8">
+        {/* ─── Glassdoor / Indeed Clean Header Card ───────────────────── */}
+        <section className="py-6 px-4 sm:px-6 lg:px-8">
           <div className="max-w-6xl mx-auto">
             <button
               onClick={() => router.back()}

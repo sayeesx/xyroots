@@ -112,7 +112,7 @@ function FilterPanel({
       <div className={`w-4 h-4 rounded flex items-center justify-center border transition-colors shrink-0 ${arr.includes(val) ? 'bg-gray-900 border-gray-900' : 'border-gray-300 group-hover:border-gray-500 bg-white'}`}>
         {arr.includes(val) && <FaCircleCheck className="w-2.5 h-2.5 text-white" />}
       </div>
-      <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 select-none">{val}</span>
+      <span className="text-xs font-medium text-gray-700 group-hover:text-gray-900 select-none">{val}</span>
     </label>
   );
 
@@ -128,7 +128,7 @@ function FilterPanel({
       <div className="flex-1 overflow-y-auto pr-1 space-y-4 custom-scrollbar">
         {/* Status */}
         <div>
-          <p className="text-sm font-bold mb-2.5 text-gray-900 uppercase tracking-wide">Status</p>
+          <p className="text-xs font-bold mb-2.5 text-gray-700 uppercase tracking-wide">Status</p>
           <div className="space-y-2">
             {["Verified Only", "Profile > 80%"].map(v => <CB key={v} arr={selectedVerification} setArr={setSelectedVerification} val={v} />)}
           </div>
@@ -137,7 +137,7 @@ function FilterPanel({
 
         {/* Qualification */}
         <div>
-          <p className="text-sm font-bold mb-2.5 text-gray-900 uppercase tracking-wide">Qualification</p>
+          <p className="text-xs font-bold mb-2.5 text-gray-700 uppercase tracking-wide">Qualification</p>
           <div className="space-y-2">
             {["B.Ed", "M.Ed", "M.Sc", "Ph.D", "NET Qualified", "Graduate"].map(q => <CB key={q} arr={selectedQuals} setArr={setSelectedQuals} val={q} />)}
           </div>
@@ -146,7 +146,7 @@ function FilterPanel({
 
         {/* Experience */}
         <div>
-          <p className="text-sm font-bold mb-2.5 text-gray-900 uppercase tracking-wide">Experience</p>
+          <p className="text-xs font-bold mb-2.5 text-gray-700 uppercase tracking-wide">Experience</p>
           <div className="space-y-2">
             {["Less than a year", "1–3 years", "3–5 years", "5–10 years", "10+ years"].map(e => <CB key={e} arr={selectedExperiences} setArr={setSelectedExperiences} val={e} />)}
           </div>

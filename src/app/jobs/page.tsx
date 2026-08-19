@@ -135,14 +135,14 @@ function FilterPanel({
       <div className="flex-1 overflow-y-auto pr-1 space-y-4 custom-scrollbar">
         {/* Job Type */}
         <div>
-          <p className="text-sm font-bold mb-2.5 text-gray-900 uppercase tracking-wide">Job Type</p>
+          <p className="text-xs font-bold mb-2.5 text-gray-700 uppercase tracking-wide">Job Type</p>
           <div className="space-y-2">
             {["Contract", "Full-time", "Part-time", "Internship"].map(type => (
               <label key={type} className="flex items-center gap-2.5 cursor-pointer group" onClick={(e) => { e.preventDefault(); toggleCheckbox(selectedJobTypes, setSelectedJobTypes, type); }}>
                 <div className={`w-4 h-4 rounded flex items-center justify-center border transition-colors shrink-0 ${selectedJobTypes.includes(type) ? 'bg-gray-900 border-gray-900' : 'border-gray-300 group-hover:border-gray-500 bg-white'}`}>
                   {selectedJobTypes.includes(type) && <FaCircleCheck className="w-2.5 h-2.5 text-white" />}
                 </div>
-                <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 select-none">{type}</span>
+                <span className="text-xs font-medium text-gray-700 group-hover:text-gray-900 select-none">{type}</span>
               </label>
             ))}
           </div>
@@ -164,14 +164,14 @@ function FilterPanel({
 
         {/* Board / Curriculum */}
         <div>
-          <p className="text-sm font-bold mb-2.5 text-gray-900 uppercase tracking-wide">Board / Curriculum</p>
+          <p className="text-xs font-bold mb-2.5 text-gray-700 uppercase tracking-wide">Board / Curriculum</p>
           <div className="space-y-2">
             {["CBSE", "ICSE", "IB", "IGCSE", "State Board"].map(board => (
               <label key={board} className="flex items-center gap-2.5 cursor-pointer group" onClick={(e) => { e.preventDefault(); toggleCheckbox(selectedBoards, setSelectedBoards, board); }}>
                 <div className={`w-4 h-4 rounded flex items-center justify-center border transition-colors shrink-0 ${selectedBoards.includes(board) ? 'bg-gray-900 border-gray-900' : 'border-gray-300 group-hover:border-gray-500 bg-white'}`}>
                   {selectedBoards.includes(board) && <FaCircleCheck className="w-2.5 h-2.5 text-white" />}
                 </div>
-                <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 select-none">{board}</span>
+                <span className="text-xs font-medium text-gray-700 group-hover:text-gray-900 select-none">{board}</span>
               </label>
             ))}
           </div>
@@ -213,14 +213,14 @@ function FilterPanel({
 
         {/* Experience */}
         <div>
-          <p className="text-sm font-bold mb-2.5 text-gray-900 uppercase tracking-wide">Experience</p>
+          <p className="text-xs font-bold mb-2.5 text-gray-700 uppercase tracking-wide">Experience</p>
           <div className="space-y-2">
             {["Less than a year", "1-3 years", "3-5 years", "5-10 years", "More than 10 years"].map(exp => (
               <label key={exp} className="flex items-center gap-2.5 cursor-pointer group" onClick={(e) => { e.preventDefault(); toggleCheckbox(selectedExperiences, setSelectedExperiences, exp); }}>
                 <div className={`w-4 h-4 rounded flex items-center justify-center border transition-colors shrink-0 ${selectedExperiences.includes(exp) ? 'bg-gray-900 border-gray-900' : 'border-gray-300 group-hover:border-gray-500 bg-white'}`}>
                   {selectedExperiences.includes(exp) && <FaCircleCheck className="w-2.5 h-2.5 text-white" />}
                 </div>
-                <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 select-none">{exp}</span>
+                <span className="text-xs font-medium text-gray-700 group-hover:text-gray-900 select-none">{exp}</span>
               </label>
             ))}
           </div>
@@ -236,7 +236,7 @@ function FilterPanel({
                 <div className={`w-4 h-4 rounded flex items-center justify-center border transition-colors shrink-0 ${selectedInstTypes.includes(inst) ? 'bg-gray-900 border-gray-900' : 'border-gray-300 group-hover:border-gray-500 bg-white'}`}>
                   {selectedInstTypes.includes(inst) && <FaCircleCheck className="w-2.5 h-2.5 text-white" />}
                 </div>
-                <span className="text-xs font-medium text-gray-600 group-hover:text-gray-900 select-none">{inst}</span>
+                <span className="text-xs font-medium text-gray-700 group-hover:text-gray-900 select-none">{inst}</span>
               </label>
             ))}
           </div>
@@ -252,7 +252,7 @@ function FilterPanel({
                 <div className={`w-4 h-4 rounded flex items-center justify-center border transition-colors shrink-0 ${selectedQuals.includes(qual) ? 'bg-gray-900 border-gray-900' : 'border-gray-300 group-hover:border-gray-500 bg-white'}`}>
                   {selectedQuals.includes(qual) && <FaCircleCheck className="w-2.5 h-2.5 text-white" />}
                 </div>
-                <span className="text-xs font-medium text-gray-600 group-hover:text-gray-900 select-none">{qual}</span>
+                <span className="text-xs font-medium text-gray-700 group-hover:text-gray-900 select-none">{qual}</span>
               </label>
             ))}
           </div>
@@ -268,7 +268,7 @@ function FilterPanel({
                 <div className={`w-4 h-4 rounded-full flex items-center justify-center border transition-colors shrink-0 ${postedDate === period ? 'border-[#00a264] bg-[#00a264]' : 'border-gray-300 group-hover:border-gray-500 bg-white'}`}>
                   {postedDate === period && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                 </div>
-                <span className="text-xs font-medium text-gray-600 group-hover:text-gray-900 select-none">{period}</span>
+                <span className="text-xs font-medium text-gray-700 group-hover:text-gray-900 select-none">{period}</span>
               </label>
             ))}
           </div>

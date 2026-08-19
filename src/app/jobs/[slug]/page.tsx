@@ -167,8 +167,8 @@ export default function JobDetailPage() {
       <Navbar />
 
       <main className="flex-1 pb-24">
-        {/* ─── Glassdoor / Indeed Clean White Header Card ───────────────────── */}
-        <section className="bg-white border-b border-gray-200 py-6 px-4 sm:px-6 lg:px-8">
+        {/* ─── Glassdoor / Indeed Clean Header Card ───────────────────── */}
+        <section className="py-6 px-4 sm:px-6 lg:px-8">
           <div className="max-w-6xl mx-auto">
             <button
               onClick={() => router.back()}

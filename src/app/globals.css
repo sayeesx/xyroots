@@ -190,20 +190,33 @@ a, button {
 @media (min-width: 768px)  { .section-padding { padding-top: 5.5rem; padding-bottom: 5.5rem; } }
 @media (min-width: 1024px) { .section-padding { padding-top: 6.5rem; padding-bottom: 6.5rem; } }
 
-/* Custom Scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
+/* Custom Scrollbar - Thinner & Light Green */
+.custom-scrollbar::-webkit-scrollbar,
+.modal-scrollbar::-webkit-scrollbar,
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
 }
-.custom-scrollbar::-webkit-scrollbar-track {
+.custom-scrollbar::-webkit-scrollbar-track,
+.modal-scrollbar::-webkit-scrollbar-track,
+::-webkit-scrollbar-track {
   background: transparent;
 }
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #00a264;
-  border-radius: 20px;
+.custom-scrollbar::-webkit-scrollbar-thumb,
+.modal-scrollbar::-webkit-scrollbar-thumb,
+::-webkit-scrollbar-thumb {
+  background-color: #a8e6cf;
+  border-radius: 999px;
 }
-.custom-scrollbar {
+.custom-scrollbar::-webkit-scrollbar-thumb:hover,
+.modal-scrollbar::-webkit-scrollbar-thumb:hover,
+::-webkit-scrollbar-thumb:hover {
+  background-color: #52c49c;
+}
+.custom-scrollbar,
+.modal-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: #00a264 transparent;
+  scrollbar-color: #a8e6cf transparent;
 }
 
 /* Loader CSS */
